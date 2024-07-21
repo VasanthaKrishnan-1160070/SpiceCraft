@@ -10,8 +10,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{3ADC1BFA-D009-4D54-A2C6-E23FA8602FFD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{CBE99354-F56A-4FEA-ACDC-2786B8FE7B5E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{471E9E7F-7D3E-449A-A277-900040BD3E76}"
 	ProjectSection(SolutionItems) = preProject
-		deploy.yaml = deploy.yaml
+		.gitignore = .gitignore
+		ecs-task-definition.json = ecs-task-definition.json
 	EndProjectSection
 EndProject
 Global
