@@ -16,7 +16,7 @@ RUN npm run build --prod
 # Use an Nginx image to serve the application
 FROM nginx:alpine
 
-COPY --from=build /app/dist/your-angular-app /usr/share/nginx/html
+COPY --from=build /app/dist/spicecraft.client /usr/share/nginx/html
 
 EXPOSE 80
 
