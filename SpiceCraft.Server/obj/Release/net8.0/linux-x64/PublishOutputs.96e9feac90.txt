@@ -1,0 +1,12 @@
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\SpiceCraft.Server
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\appsettings.Development.json
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\appsettings.json
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\SpiceCraft.Server.dll
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\SpiceCraft.Server.deps.json
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\SpiceCraft.Server.runtimeconfig.json
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\SpiceCraft.Server.pdb
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\Microsoft.AspNetCore.SpaProxy.dll
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\Microsoft.OpenApi.dll
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\vasanth\IndustryProject\SpiceCraft\SpiceCraft.Server\obj\Release\net8.0\linux-x64\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll

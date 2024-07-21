@@ -1,0 +1,6 @@
+@SpiceCraft.Server_HostAddress = http://localhost:5208
+
+GET {{SpiceCraft.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

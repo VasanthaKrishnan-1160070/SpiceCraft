@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpiceCraft.Server", "SpiceCraft.Server\SpiceCraft.Server.csproj", "{2CCD5CDE-6324-463D-95CA-DFC093700F38}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "spicecraft.client", "spicecraft.client\spicecraft.client.esproj", "{C37C458C-99CE-48AC-B85B-57C51067A0EC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{3ADC1BFA-D009-4D54-A2C6-E23FA8602FFD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{CBE99354-F56A-4FEA-ACDC-2786B8FE7B5E}"
+	ProjectSection(SolutionItems) = preProject
+		deploy.yaml = deploy.yaml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2CCD5CDE-6324-463D-95CA-DFC093700F38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CCD5CDE-6324-463D-95CA-DFC093700F38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CCD5CDE-6324-463D-95CA-DFC093700F38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CCD5CDE-6324-463D-95CA-DFC093700F38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C37C458C-99CE-48AC-B85B-57C51067A0EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C37C458C-99CE-48AC-B85B-57C51067A0EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C37C458C-99CE-48AC-B85B-57C51067A0EC}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C37C458C-99CE-48AC-B85B-57C51067A0EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C37C458C-99CE-48AC-B85B-57C51067A0EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C37C458C-99CE-48AC-B85B-57C51067A0EC}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CBE99354-F56A-4FEA-ACDC-2786B8FE7B5E} = {3ADC1BFA-D009-4D54-A2C6-E23FA8602FFD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AF5CE8B8-10AC-4ADA-A027-A2ED78D7481D}
+	EndGlobalSection
+EndGlobal
