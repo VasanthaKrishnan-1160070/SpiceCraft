@@ -4,7 +4,7 @@
   "containerDefinitions": [
     {
       "name": "spicecraft-client-container",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:${IMAGE_TAG}",
       "cpu": 256,
       "memory": 512,
       "essential": true,
@@ -18,7 +18,7 @@
     },
     {
       "name": "spicecraft-server-container",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:${IMAGE_TAG}",
       "cpu": 256,
       "memory": 512,
       "essential": true,
