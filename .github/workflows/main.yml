@@ -5,12 +5,11 @@ on:
     branches: [ "main" ]
 
 env:
-  AWS_REGION: ap-southeast-2                      # set this to your preferred AWS region
-  ECR_REPOSITORY_CLIENT: spicecraft-client        # set this to your Amazon ECR repository name for client
-  ECR_REPOSITORY_SERVER: spicecraft-server        # set this to your Amazon ECR repository name for server
-  ECS_SERVICE: spicecraft-service                 # set this to your Amazon ECS service name
-  ECS_CLUSTER: spicecraft-cluster                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: ecs-task-definition.json   # set this to the path to your Amazon ECS task definition file
+  AWS_REGION: ap-southeast-2
+  ECR_REPOSITORY: spicecraft-repo
+  ECS_SERVICE: spicecraft-service
+  ECS_CLUSTER: spicecraft-cluster
+  ECS_TASK_DEFINITION: ecs-task-definition.json
 
 permissions:
   contents: read
@@ -36,26 +35,20 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push Docker images to Amazon ECR
+    - name: Build, tag, and push Docker image to Amazon ECR
+      id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
-        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-        AWS_REGION: ${{ env.AWS_REGION }}
       run: |
-        docker-compose build
-        docker tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest $ECR_REGISTRY/${{ env.ECR_REPOSITORY_CLIENT }}:${{ github.sha }}
-        docker tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest $ECR_REGISTRY/${{ env.ECR_REPOSITORY_SERVER }}:${{ github.sha }}
-        docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_CLIENT }}:${{ github.sha }}
-        docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_SERVER }}:${{ github.sha }}
-        echo "image_client=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_CLIENT }}:${{ github.sha }}" >> $GITHUB_ENV
-        echo "image_server=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_SERVER }}:${{ github.sha }}" >> $GITHUB_ENV
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-    - name: Fill in the new image IDs in the Amazon ECS task definition
+    - name: Fill in the new image ID in the Amazon ECS task definition
       id: update-task-def
       run: |
-        sed -i 's|${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest|${{ env.image_client }}|g' ${{ env.ECS_TASK_DEFINITION }}
-        sed -i 's|${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest|${{ env.image_server }}|g' ${{ env.ECS_TASK_DEFINITION }}
+        sed -i 's|${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-repo:latest|${{ steps.build-image.outputs.image }}|g' ${{ env.ECS_TASK_DEFINITION }}
 
     - name: Deploy updated task definition to Amazon ECS
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -64,3 +57,9 @@ jobs:
         service: ${{ env.ECS_SERVICE }}
         cluster: ${{ env.ECS_CLUSTER }}
         wait-for-service-stability: true
+
+    - name: Get Load Balancer DNS
+      run: |
+        LB_ARN=$(aws ecs describe-services --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} --query "services[0].loadBalancers[0].loadBalancerArn" --output text)
+        LB_DNS=$(aws elbv2 describe-load-balancers --load-balancer-arns $LB_ARN --query "LoadBalancers[0].DNSName" --output text)
+        echo "Load Balancer DNS: $LB_DNS"
