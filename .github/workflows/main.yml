@@ -35,6 +35,11 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+    - name: Verify ECS Cluster
+      run: |
+        aws ecs describe-clusters --clusters ${{ env.ECS_CLUSTER }} --region ${{ env.AWS_REGION }} | grep "ACTIVE"
+      continue-on-error: false
+
     - name: Build, tag, and push Docker image to Amazon ECR
       id: build-image
       env:
