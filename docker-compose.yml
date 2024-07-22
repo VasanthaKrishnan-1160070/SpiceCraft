@@ -2,13 +2,18 @@ version: '3.4'
 
 services:
   spicecraft-client:
-    image: ${DOCKER_REGISTRY-}spicecraft-client
     build:
       context: .
       dockerfile: spicecraft.client/Dockerfile
+    ports:
+      - "8082:80"
+    
 
   spicecraft-server:
-    image: ${DOCKER_REGISTRY-}spicecraft-server
     build:
       context: .
       dockerfile: SpiceCraft.Server/Dockerfile
+    ports:
+      - "8080:80"
+
+    

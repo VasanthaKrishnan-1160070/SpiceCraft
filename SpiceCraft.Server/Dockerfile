@@ -2,6 +2,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+
 COPY ["SpiceCraft.Server/SpiceCraft.Server.csproj", "SpiceCraft.Server/"]
 RUN dotnet restore "./SpiceCraft.Server/SpiceCraft.Server.csproj"
 COPY . .
