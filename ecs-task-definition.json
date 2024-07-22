@@ -3,28 +3,19 @@
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "spicecraft-client",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest",
-      "cpu": 256,
-      "memory": 512,
+      "name": "spicecraft-container",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-repo:latest",
+      "cpu": 512,
+      "memory": 1024,
       "essential": true,
       "portMappings": [
         {
-          "containerPort": 80,
-          "hostPort": 80
-        }
-      ]
-    },
-    {
-      "name": "spicecraft-server",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest",
-      "cpu": 256,
-      "memory": 512,
-      "essential": true,
-      "portMappings": [
+          "containerPort": 8080,
+          "hostPort": 8080
+        },
         {
-          "containerPort": 80,
-          "hostPort": 80
+          "containerPort": 8081,
+          "hostPort": 8081
         }
       ]
     }
