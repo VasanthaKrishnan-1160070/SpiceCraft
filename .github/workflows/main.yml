@@ -44,8 +44,8 @@ jobs:
         AWS_REGION: ${{ env.AWS_REGION }}
       run: |
         docker-compose build
-        docker tag spicecraft-client:latest $ECR_REGISTRY/${{ env.ECR_REPOSITORY_CLIENT }}:${{ github.sha }}
-        docker tag spicecraft-server:latest $ECR_REGISTRY/${{ env.ECR_REPOSITORY_SERVER }}:${{ github.sha }}
+        docker tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest $ECR_REGISTRY/${{ env.ECR_REPOSITORY_CLIENT }}:${{ github.sha }}
+        docker tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest $ECR_REGISTRY/${{ env.ECR_REPOSITORY_SERVER }}:${{ github.sha }}
         docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_CLIENT }}:${{ github.sha }}
         docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_SERVER }}:${{ github.sha }}
         echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
