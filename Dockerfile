@@ -8,7 +8,7 @@ RUN npm run build --prod
 
 # Stage 2: Build .NET Core API with Node.js
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
+ARG BUILD_CONFIGURATION=debug
 WORKDIR /src
 COPY ["SpiceCraft.Server/SpiceCraft.Server.csproj", "SpiceCraft.Server/"]
 # Install Node.js 20.15.1
@@ -21,14 +21,14 @@ RUN dotnet build "./SpiceCraft.Server.csproj" -c $BUILD_CONFIGURATION -o /app/bu
 
 # Stage 3: Publish .NET Core API and Copy Angular Build
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
+ARG BUILD_CONFIGURATION=debug
 RUN dotnet publish "./SpiceCraft.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Stage 4: Combine Builds
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY --from=node-build /app/dist ./wwwroot
+COPY --from=node-build /app/dist/spicecraft.client/browser ./wwwroot
 
 # Expose Ports
 EXPOSE 8080

@@ -1,26 +1,13 @@
-# Use a node image to build the Angular application
-FROM node:20.15.1 AS node-build
-
+# Stage 1: Build Angular App
+FROM node:20.15.1 AS build
 WORKDIR /app
-
-RUN npm cache clean --force
-
-# Install dependencies
-COPY package.json package-lock.json ./
+COPY ./spicecraft.client/package*.json ./
 RUN npm install
-
-# Copy the rest of the application code
-COPY . .
-
-# Build the application
+COPY ./spicecraft.client/ ./
 RUN npm run build --prod
 
-# Use an Nginx image to serve the application
+# Stage 2: Serve Angular App with Nginx
 FROM nginx:alpine
-
-# Use the correct stage name from the first build stage
-COPY --from=node-build /app/dist/spicecraft.client /usr/share/nginx/html
-
+COPY --from=build /app/dist/spicecraft.client /usr/share/nginx/html
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]

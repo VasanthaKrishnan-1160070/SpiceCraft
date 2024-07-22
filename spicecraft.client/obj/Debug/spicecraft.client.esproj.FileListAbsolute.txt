@@ -1,1 +1,2 @@
 C:\vasanth\IndustryProject\SpiceCraft\spicecraft.client\obj\Debug\spicecraft.client.esproj.CoreCompileInputs.cache
+C:\vasanth\IndustryProject\new\SpiceCraft\spicecraft.client\obj\Debug\spicecraft.client.esproj.CoreCompileInputs.cache

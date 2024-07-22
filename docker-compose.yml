@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  spicecraft:    
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - spicecraft-network
+
+
+networks:
+  spicecraft-network:
+    driver: bridge

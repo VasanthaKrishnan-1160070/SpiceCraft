@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "Hash": "zmJXNzSiEnd3DFLbPXvn4IXUUJwPMlQgeBbvYTI3ov8=",
+  "Hash": "9Hy0GU6yumc90gcsQ6LwB6k1rjUeP1TG38u/S/Djp8k=",
   "Source": "SpiceCraft.Server",
   "BasePath": "_content/SpiceCraft.Server",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [
     {
-      "Identity": "C:\\vasanth\\IndustryProject\\SpiceCraft\\spicecraft.client\\spicecraft.client.esproj",
+      "Identity": "C:\\vasanth\\IndustryProject\\new\\SpiceCraft\\spicecraft.client\\spicecraft.client.esproj",
       "Version": 2,
       "Source": "spicecraft.client",
       "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
