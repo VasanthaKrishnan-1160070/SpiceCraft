@@ -22,5 +22,5 @@ RUN dotnet publish "./SpiceCraft.Server.csproj" -c $BUILD_CONFIGURATION -o /app/
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=publish /app/publish .
-EXPOSE 80
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "SpiceCraft.Server.dll"]

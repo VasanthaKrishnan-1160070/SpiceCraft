@@ -1,13 +1,35 @@
-# Stage 1: Build Angular App
+# Stage 1: Build the Angular application
 FROM node:20.15.1 AS build
+
+# Set the working directory
 WORKDIR /app
-COPY ./spicecraft.client/package*.json ./
+
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
+
+# Install the dependencies
 RUN npm install
-COPY ./spicecraft.client/ ./
+
+# Copy the rest of the application code to the working directory
+COPY . .
+
+# Build the Angular application
 RUN npm run build --prod
 
-# Stage 2: Serve Angular App with Nginx
-FROM nginx:alpine
-COPY --from=build /app/dist/spicecraft.client /usr/share/nginx/html
+# Stage 2: Serve the application with Node.js
+FROM node:20.15.1
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the built Angular application from the previous stage
+COPY --from=build /app/dist/spicecraft.client/browser ./dist
+
+# Install a simple HTTP server
+RUN npm install -g http-server
+
+# Expose port 8080
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+
+# Start the HTTP server
+CMD ["http-server", "dist", "-p", "8080"]
