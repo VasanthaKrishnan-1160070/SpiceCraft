@@ -1,16 +1,14 @@
 version: '3.4'
 
 services:
-  spicecraft:    
+  spicecraft-client:
+    image: ${DOCKER_REGISTRY-}spicecraft-client
     build:
       context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:80"
-    networks:
-      - spicecraft-network
+      dockerfile: spicecraft.client/Dockerfile
 
-
-networks:
-  spicecraft-network:
-    driver: bridge
+  spicecraft-server:
+    image: ${DOCKER_REGISTRY-}spicecraft-server
+    build:
+      context: .
+      dockerfile: SpiceCraft.Server/Dockerfile
