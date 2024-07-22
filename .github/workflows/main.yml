@@ -46,17 +46,14 @@ jobs:
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: spicecraft-container
-        image: ${{ steps.build-image.outputs.image }}
+      id: update-task-def
+      run: |
+        sed -i 's|${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-repo:latest|${{ steps.build-image.outputs.image }}|g' ${{ env.ECS_TASK_DEFINITION }}
 
     - name: Deploy updated task definition to Amazon ECS
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
         service: ${{ env.ECS_SERVICE }}
         cluster: ${{ env.ECS_CLUSTER }}
         wait-for-service-stability: true
