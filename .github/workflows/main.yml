@@ -6,8 +6,8 @@ on:
 
 env:
   AWS_REGION: ap-southeast-2                      # set this to your preferred AWS region
-  ECR_REPOSITORY_CLIENT: spicecraft-client        # set this to your Amazon ECR repository name for client
-  ECR_REPOSITORY_SERVER: spicecraft-server        # set this to your Amazon ECR repository name for server
+  ECR_REPOSITORY_CLIENT: spicecraft-repo          # set this to your Amazon ECR repository name for client
+  ECR_REPOSITORY_SERVER: spicecraft-repo       # set this to your Amazon ECR repository name for server
   ECS_SERVICE: spicecraft-service                 # set this to your Amazon ECS service name
   ECS_CLUSTER: spicecraft-cluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: ecs-task-definition.json   # set this to the path to your Amazon ECS task definition file
