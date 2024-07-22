@@ -51,6 +51,11 @@ jobs:
         echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
 
     - name: Fill in the new image IDs in the Amazon ECS task definition
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        AWS_REGION: ${{ env.AWS_REGION }}
       id: update-task-def
       run: |
         sed -i 's|\${AWS_ACCOUNT_ID}|${{ env.AWS_ACCOUNT_ID }}|g' ${{ env.ECS_TASK_DEFINITION }}
