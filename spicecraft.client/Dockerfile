@@ -3,6 +3,8 @@ FROM node:20.15.1 AS node-build
 
 WORKDIR /app
 
+RUN npm cache clean --force
+
 # Install dependencies
 COPY package.json package-lock.json ./
 RUN npm install
@@ -16,7 +18,8 @@ RUN npm run build --prod
 # Use an Nginx image to serve the application
 FROM nginx:alpine
 
-COPY --from=build /app/dist/spicecraft.client /usr/share/nginx/html
+# Use the correct stage name from the first build stage
+COPY --from=node-build /app/dist/spicecraft.client /usr/share/nginx/html
 
 EXPOSE 80
 
