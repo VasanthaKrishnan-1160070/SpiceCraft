@@ -1,9 +1,9 @@
 # Stage 1: Build Angular App
 FROM node:20.15.1 AS node-build
 WORKDIR /app
-COPY spicecraft.client/package*.json ./
+COPY ../spicecraft.client/package*.json ./
 RUN npm install
-COPY spicecraft.client/ ./
+COPY ../spicecraft.client/ ./
 RUN npm run build --prod
 
 # Stage 2: Build .NET Core API with Node.js
