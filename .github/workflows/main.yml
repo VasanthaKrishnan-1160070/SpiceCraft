@@ -6,7 +6,8 @@ on:
 
 env:
   AWS_REGION: ap-southeast-2                      # set this to your preferred AWS region
-  ECR_REPOSITORY: spicecraft-repo                 # set this to your Amazon ECR repository name
+  ECR_REPOSITORY_CLIENT: spicecraft-client        # set this to your Amazon ECR repository name for client
+  ECR_REPOSITORY_SERVER: spicecraft-server        # set this to your Amazon ECR repository name for server
   ECS_SERVICE: spicecraft-service                 # set this to your Amazon ECS service name
   ECS_CLUSTER: spicecraft-cluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: ecs-task-definition.json   # set this to the path to your Amazon ECS task definition file
@@ -40,20 +41,31 @@ jobs:
         aws ecs describe-clusters --clusters ${{ env.ECS_CLUSTER }} --region ${{ env.AWS_REGION }} | grep "ACTIVE"
       continue-on-error: false
 
-    - name: Build, tag, and push Docker image to Amazon ECR
-      id: build-image
+    - name: Build, tag, and push Docker image for Angular app to Amazon ECR
+      id: build-image-client
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_CLIENT:$IMAGE_TAG -f Dockerfile.client .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_CLIENT:$IMAGE_TAG
+        echo "image_client=$ECR_REGISTRY/$ECR_REPOSITORY_CLIENT:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
+    - name: Build, tag, and push Docker image for .NET Core API to Amazon ECR
+      id: build-image-server
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG -f Dockerfile.server .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG
+        echo "image_server=$ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Fill in the new image IDs in the Amazon ECS task definition
       id: update-task-def
       run: |
-        sed -i 's|${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-repo:latest|${{ steps.build-image.outputs.image }}|g' ${{ env.ECS_TASK_DEFINITION }}
+        sed -i 's|${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest|${{ steps.build-image-client.outputs.image_client }}|g' ${{ env.ECS_TASK_DEFINITION }}
+        sed -i 's|${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest|${{ steps.build-image-server.outputs.image_server }}|g' ${{ env.ECS_TASK_DEFINITION }}
 
     - name: Deploy updated task definition to Amazon ECS
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
