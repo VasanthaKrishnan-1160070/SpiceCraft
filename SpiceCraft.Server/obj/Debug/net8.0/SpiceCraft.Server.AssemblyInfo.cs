@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SpiceCraft.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d7625dff40fa5c55d52087929dc9d6bbd9ca28a6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+77c6c62ff591e0d301507ffa693d701b1c3ecdbc")]
 [assembly: System.Reflection.AssemblyProductAttribute("SpiceCraft.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SpiceCraft.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
