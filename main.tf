@@ -75,3 +75,4 @@ resource "aws_ecs_service" "spicecraft_service" {
     assign_public_ip = true
   }
 }
+
