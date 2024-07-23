@@ -7,8 +7,8 @@ WORKDIR /src
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
-COPY ["SpiceCraft.Server.csproj", "SpiceCraft.Server/"]
-RUN dotnet restore "SpiceCraft.Server.csproj"
+COPY ["SpiceCraft.Server/SpiceCraft.Server.csproj", "SpiceCraft.Server/"]
+RUN dotnet restore "./SpiceCraft.Server/SpiceCraft.Server.csproj"
 COPY . .
 WORKDIR "/src/SpiceCraft.Server"
 RUN dotnet build "./SpiceCraft.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build

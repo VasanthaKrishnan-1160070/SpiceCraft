@@ -12,8 +12,8 @@ services:
 
   spicecraft-server:
     build:
-      context: ./SpiceCraft.Server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: SpiceCraft.Server/Dockerfile
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest
     ports:
       - "8080:8080"
