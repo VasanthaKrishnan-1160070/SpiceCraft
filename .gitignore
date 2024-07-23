@@ -83,3 +83,6 @@ testem.log
 Thumbs.db
 /**/bin/**/*
 /**/obj/**/*
+*.env
+*.cache
+/**/.terraform/**/*
