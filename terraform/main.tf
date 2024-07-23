@@ -14,6 +14,35 @@ data "aws_subnets" "default" {
   }
 }
 
+# Create ECR Repositories
+resource "aws_ecr_repository" "spicecraft_client" {
+  name = "spicecraft-client"
+
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Name = "spicecraft-client"
+  }
+}
+
+resource "aws_ecr_repository" "spicecraft_server" {
+  name = "spicecraft-server"
+
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Name = "spicecraft-server"
+  }
+}
+
 # Create IAM Role for ECS Task Execution
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "spiceCraftEcsTaskExecutionRole"
@@ -36,7 +65,6 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   }
 }
 
-# Attach the required policies to the ECS Task Execution Role
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
@@ -64,31 +92,6 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-# Attach custom policies to the ECS Task Role (if any)
-# Example policy:
-# resource "aws_iam_policy" "ecs_task_policy" {
-#   name = "ecsTaskPolicy"
-#
-#   policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       {
-#         Effect = "Allow",
-#         Action = [
-#           "s3:GetObject"
-#         ],
-#         Resource = "arn:aws:s3:::my-bucket/*"
-#       }
-#     ]
-#   })
-# }
-#
-# resource "aws_iam_role_policy_attachment" "ecs_task_policy_attachment" {
-#   role       = aws_iam_role.ecs_task_role.name
-#   policy_arn = aws_iam_policy.ecs_task_policy.arn
-# }
-
-# Create Security Group
 resource "aws_security_group" "ecs_security_group" {
   vpc_id = data.aws_vpc.default.id
 
@@ -118,12 +121,10 @@ resource "aws_security_group" "ecs_security_group" {
   }
 }
 
-# ECS Cluster
 resource "aws_ecs_cluster" "spicecraft" {
   name = "spicecraft-cluster"
 }
 
-# ECS Task Definition
 resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
   network_mode             = "awsvpc"
@@ -136,7 +137,7 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
   container_definitions = jsonencode([
     {
       name      = "spicecraft-client-container"
-      image     = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/spicecraft-client:${var.image_tag}"
+      image     = "${aws_ecr_repository.spicecraft_client.repository_url}:latest"
       cpu       = 256
       memory    = 512
       essential = true
@@ -150,7 +151,7 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
     },
     {
       name      = "spicecraft-server-container"
-      image     = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/spicecraft-server:${var.image_tag}"
+      image     = "${aws_ecr_repository.spicecraft_server.repository_url}:latest"
       cpu       = 256
       memory    = 512
       essential = true
@@ -165,7 +166,6 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
   ])
 }
 
-# ECS Service
 resource "aws_ecs_service" "spicecraft_service" {
   name            = "spicecraft-service"
   cluster         = aws_ecs_cluster.spicecraft.id
