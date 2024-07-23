@@ -2,6 +2,7 @@
 FROM node:20.15.1 AS build
 WORKDIR /app
 COPY package*.json ./
+COPY nginx.conf ./
 RUN npm cache clean --force
 #### install angular cli
 RUN npm install -g @angular/cli
@@ -14,7 +15,6 @@ RUN npm run build --prod
 # Stage 2: Serve Angular App with Nginx
 FROM nginx:latest
 COPY --from=build /app/dist/spicecraft.client/browser /usr/share/nginx/html
-# copying nginx config from local to image
-COPY /app/nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
