@@ -3,7 +3,7 @@ version: '3.4'
 services:
   spicecraft-client:
     build:
-      context: .
+      context: spicecraft.client/
       dockerfile: spicecraft.client/Dockerfile
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest
     ports:
@@ -12,7 +12,7 @@ services:
 
   spicecraft-server:
     build:
-      context: .
+      context: SpiceCraft.Server/
       dockerfile: SpiceCraft.Server/Dockerfile
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest
     ports:
