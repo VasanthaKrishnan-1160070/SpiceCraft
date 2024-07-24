@@ -29,6 +29,34 @@
           "protocol": "tcp"
         }
       ]
+    },
+    {
+      "name": "mssql-container",
+      "image": "mcr.microsoft.com/mssql/server:2022:${IMAGE_TAG}",
+      "cpu": 512,
+      "memory": 1024,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 1433,
+          "hostPort": 1433,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "ACCEPT_EULA",
+          "value": "Y"
+        },
+        {
+          "name": "MSSQL_SA_PASSWORD",
+          "value": "${MSSQL_SA_PASSWORD}"
+        },
+        {
+          "name": "MSSQL_PID",
+          "value": "Developer"
+        }
+      ]
     }
   ],
   "requiresCompatibilities": [
