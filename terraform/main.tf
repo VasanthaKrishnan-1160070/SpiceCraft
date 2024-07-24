@@ -109,13 +109,6 @@ resource "aws_security_group" "ecs_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -169,30 +162,6 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
           protocol      = "tcp"
         }
       ]
-    },
-     {
-      name      = "mssql-container"
-      image     = "mcr.microsoft.com/mssql/server:2019-latest"
-      cpu       = 512
-      memory    = 1024
-      essential = true
-      portMappings = [
-        {
-          containerPort = 1433
-          hostPort      = 1433
-          protocol      = "tcp"
-        }
-      ]
-      environment = [
-        {
-          name  = "ACCEPT_EULA"
-          value = "Y"
-        },
-        {
-          name  = "SA_PASSWORD"
-          value = var.mssql_sa_password
-        }
-      ]
     }
   ])
 }
@@ -210,7 +179,6 @@ resource "aws_ecs_service" "spicecraft_service" {
     assign_public_ip = true
   }
 }
-
 resource "aws_ecr_lifecycle_policy" "spicecraft_client_lifecycle" {
   repository = aws_ecr_repository.spicecraft_client.name
 
@@ -254,4 +222,3 @@ resource "aws_ecr_lifecycle_policy" "spicecraft_server_lifecycle" {
     ]
   })
 }
-

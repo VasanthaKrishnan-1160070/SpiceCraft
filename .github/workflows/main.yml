@@ -11,6 +11,7 @@ env:
   ECS_SERVICE: spicecraft-service                 # set this to your Amazon ECS service name
   ECS_CLUSTER: spicecraft-cluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: ecs-task-definition.json   # set this to the path to your Amazon ECS task definition file
+  MSSQL_SA_PASSWORD: admin_password
 
 permissions:
   contents: read
@@ -62,6 +63,7 @@ jobs:
         sed -i 's|\${AWS_ACCOUNT_ID}|${{ env.AWS_ACCOUNT_ID }}|g' ${{ env.ECS_TASK_DEFINITION }}
         sed -i 's|\${AWS_REGION}|${{ env.AWS_REGION }}|g' ${{ env.ECS_TASK_DEFINITION }}
         sed -i 's|\${IMAGE_TAG}|${{ env.IMAGE_TAG }}|g' ${{ env.ECS_TASK_DEFINITION }}
+        sed -i 's|\${MSSQL_SA_PASSWORD}|${{ env.MSSQL_SA_PASSWORD }}|g' ${{ env.ECS_TASK_DEFINITION }}
 
     - name: Deploy updated task definition to Amazon ECS
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1

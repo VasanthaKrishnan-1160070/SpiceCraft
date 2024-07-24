@@ -15,20 +15,21 @@ services:
       dockerfile: SpiceCraft.Server/Dockerfile
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest
     ports:
-      - "8080:8080"
+      - "8080:8080"     
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=spicecraft-mssql;Database=SpiceCraftDb;User=sa;Password=${MSSQL_SA_PASSWORD}
+      - ASPNETCORE_URLS=http://+:8080      
+      - ConnectionStrings__DefaultConnection=Server=ASPNETCORE_URLS="https://+;http://+"spicecraft-mssql;Database=SpiceCraftDb;User=sa;Password=${MSSQL_SA_PASSWORD}
     depends_on:
       - spicecraft-mssql
 
   spicecraft-mssql:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
     volumes:
       - mssql-data:/var/opt/mssql
 
