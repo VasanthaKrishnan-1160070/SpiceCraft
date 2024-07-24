@@ -12,6 +12,7 @@ env:
   ECS_CLUSTER: spicecraft-cluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: ecs-task-definition.json   # set this to the path to your Amazon ECS task definition file
   MSSQL_SA_PASSWORD: admin_password
+  IMAGE_TAG: latest # ${{ github.sha }}
 
 permissions:
   contents: read
@@ -39,8 +40,7 @@ jobs:
 
     - name: Build, tag, and push Docker images to Amazon ECR
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         AWS_REGION: ${{ env.AWS_REGION }}
       run: |
@@ -53,8 +53,7 @@ jobs:
 
     - name: Fill in the new image IDs in the Amazon ECS task definition
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}      
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         AWS_REGION: ${{ env.AWS_REGION }}
       id: update-task-def

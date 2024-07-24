@@ -129,8 +129,8 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "512"
-  memory                   = "1024"
+  cpu                      = "1024"
+  memory                   = "2048"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
@@ -160,6 +160,34 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
           containerPort = 8080
           hostPort      = 8080
           protocol      = "tcp"
+        }
+      ]
+    },
+    {
+      name      = "mssql-container"
+      image     = "mcr.microsoft.com/mssql/server:2022-latest"
+      cpu       = 512
+      memory    = 1024
+      essential = true
+      portMappings = [
+        {
+          containerPort = 1433
+          hostPort      = 1433
+          protocol      = "tcp"
+        }
+      ]
+      environment = [
+        {
+          name  = "ACCEPT_EULA"
+          value = "Y"
+        },
+        {
+          name  = "MSSQL_SA_PASSWORD"
+          value = var.mssql_sa_password
+        },
+        {
+          name  = "MSSQL_PID"
+          value = "Developer"
         }
       ]
     }

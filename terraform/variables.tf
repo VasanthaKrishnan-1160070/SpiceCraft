@@ -13,3 +13,9 @@ variable "image_tag" {
   type        = string
   default     = "latest"
 }
+
+variable "mssql_sa_password" {
+  description = "MSSQL server password"
+  type        = string
+  default     = "admin_password"
+}
