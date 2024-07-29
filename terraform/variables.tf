@@ -17,5 +17,5 @@ variable "image_tag" {
 variable "mssql_sa_password" {
   description = "MSSQL server password"
   type        = string
-  default     = "admin_password"
+  default     = "Admin@123"
 }

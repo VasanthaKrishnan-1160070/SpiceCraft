@@ -14,6 +14,22 @@ data "aws_subnets" "default" {
   }
 }
 
+# Create CloudWatch Log Groups
+resource "aws_cloudwatch_log_group" "spicecraft_client_logs" {
+  name              = "/ecs/spicecraft-client-logs"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_group" "spicecraft_server_logs" {
+  name              = "/ecs/spicecraft-server-logs"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_group" "mssql_logs" {
+  name              = "/ecs/mssql-logs"
+  retention_in_days = 30
+}
+
 # Create ECR Repositories
 resource "aws_ecr_repository" "spicecraft_client" {
   name = "spicecraft-client"
@@ -148,6 +164,14 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
           protocol      = "tcp"
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.spicecraft_client_logs.name
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "spicecraft-client"
+        }
+      }
     },
     {
       name      = "spicecraft-server-container"
@@ -162,6 +186,14 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
           protocol      = "tcp"
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.spicecraft_server_logs.name
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "spicecraft-server"
+        }
+      }
     },
     {
       name      = "mssql-container"
@@ -190,6 +222,14 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
           value = "Developer"
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.mssql_logs.name
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "mssql"
+        }
+      }
     }
   ])
 }
@@ -207,6 +247,7 @@ resource "aws_ecs_service" "spicecraft_service" {
     assign_public_ip = true
   }
 }
+
 resource "aws_ecr_lifecycle_policy" "spicecraft_client_lifecycle" {
   repository = aws_ecr_repository.spicecraft_client.name
 
