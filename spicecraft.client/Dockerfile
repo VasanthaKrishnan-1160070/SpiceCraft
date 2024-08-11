@@ -1,6 +1,5 @@
 # Stage 1: Build Angular App
 FROM node:20.15.1 AS build
-RUN npm run build --prod
 WORKDIR /app
 COPY package*.json ./
 RUN npm cache clean --force
