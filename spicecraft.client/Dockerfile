@@ -1,5 +1,6 @@
 # Stage 1: Build Angular App
 FROM node:20.15.1 AS build
+RUN npm run build --prod
 WORKDIR /app
 COPY package*.json ./
 RUN npm cache clean --force
@@ -8,7 +9,8 @@ RUN npm install -g @angular/cli
 RUN npm install
 COPY . .
 #installing deps for project
-RUN ng build --prod
+RUN npm install
+RUN npm run build --prod
 
 # Stage 2: Serve Angular App with Nginx
 FROM nginx:latest
