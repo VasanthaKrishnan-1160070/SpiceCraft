@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using SpiceCraft.Server.Models;
 
-namespace SpiceCraft.Server.context;
+namespace SpiceCraft.Server.Context;
 
 public partial class SpiceCraftContext : DbContext
 {
