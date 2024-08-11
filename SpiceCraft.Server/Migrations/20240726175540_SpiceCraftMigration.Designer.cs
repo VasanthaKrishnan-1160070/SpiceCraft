@@ -4,13 +4,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SpiceCraft.Server.DB;
+using SpiceCraft.Server.Context;
+
 
 #nullable disable
 
 namespace SpiceCraft.Server.Migrations
 {
-    [DbContext(typeof(SpiceCraftDbContext))]
+    [DbContext(typeof(SpiceCraftContext))]
     [Migration("20240726175540_SpiceCraftMigration")]
     partial class SpiceCraftMigration
     {

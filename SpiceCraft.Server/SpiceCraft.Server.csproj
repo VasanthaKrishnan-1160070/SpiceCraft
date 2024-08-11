@@ -10,11 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="ReadMe.md" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="ReadMe.md" />
+    <None Remove="ReadMe.txt" />
   </ItemGroup>
 
   <ItemGroup>
