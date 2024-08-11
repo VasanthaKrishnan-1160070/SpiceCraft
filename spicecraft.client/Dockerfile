@@ -8,8 +8,7 @@ RUN npm install -g @angular/cli
 RUN npm install
 COPY . .
 #installing deps for project
-RUN npm install
-RUN npm run build --prod
+RUN ng build --prod
 
 # Stage 2: Serve Angular App with Nginx
 FROM nginx:latest
