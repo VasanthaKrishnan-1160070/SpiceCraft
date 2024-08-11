@@ -14,3 +14,8 @@
   dotnet ef database update AddNewTables
 
 
+# terraform
+
+  terraform apply -auto-approve
+  terraform plan
+  terraform destroy -auto-approve

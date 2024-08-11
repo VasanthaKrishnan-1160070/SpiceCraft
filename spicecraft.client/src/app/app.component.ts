@@ -9,7 +9,7 @@ interface WeatherForecast {
 }
 
 @Component({
-  selector: 'app-root',
+  selector: 'sc-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
