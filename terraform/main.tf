@@ -42,6 +42,7 @@ resource "aws_ecr_repository" "spicecraft_client" {
 
   tags = {
     Name = "spicecraft-client"
+   
   }
 }
 
