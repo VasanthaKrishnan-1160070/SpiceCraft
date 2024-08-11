@@ -55,7 +55,7 @@
       "portMappings": [
         {
           "containerPort": 1433,
-          "hostPort": 1455,
+          "hostPort": 1433,
           "protocol": "tcp"
         }
       ],
