@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest
     ports:
-      - "80:80"
+      - "4000:80"
 
   spicecraft-server:
     build:
