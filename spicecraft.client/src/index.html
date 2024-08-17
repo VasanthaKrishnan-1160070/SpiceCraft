@@ -6,8 +6,34 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
 <body class="dx-viewport">
   <sc-root></sc-root>
+
+  <script>
+    // Function to wrap the dx-license element with a new parent and hide the parent
+    function wrapAndHideDxLicense() {
+      const dxLicenseElements = document.getElementsByTagName('dx-license');
+      for (let i = 0; i < dxLicenseElements.length; i++) {
+        const dxLicenseElement = dxLicenseElements[i];
+
+        // Create a new parent element
+        const newParent = document.createElement('div');
+
+        // Wrap the dx-license element with the new parent
+        dxLicenseElement.parentNode.insertBefore(newParent, dxLicenseElement);
+        newParent.appendChild(dxLicenseElement);
+
+        // Set the new parent to display: none
+        newParent.style.display = 'none';
+      }
+    }
+
+    // Add an event listener for the DOMContentLoaded event to call wrapAndHideDxLicense when the page loads
+    document.addEventListener('DOMContentLoaded', wrapAndHideDxLicense);
+  </script>
 </body>
 </html>

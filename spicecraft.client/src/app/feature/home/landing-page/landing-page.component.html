@@ -1,1 +1,146 @@
-<p>landing-page works!</p>
+<div class="dark-green p-3">
+</div>
+<div class="thick-green p-3 d-flex">
+  <h1 class="logo">Spice Craft</h1>
+  <div class="flex-grow-1 d-flex justify-content-end align-items-center gap-4 text-light head-navigation">
+    <a>Home</a>
+    <a>Register</a>
+    <a class="">Menu</a>
+    <a class="activated">Orders</a>
+    <a>Payments</a>
+    <a>Contact Us</a>
+  </div>
+</div>
+
+<div class="row col-12">
+  <swiper-container
+     loop="true"
+     navigation="true"
+     pagination="true"
+     speed="500"
+     slides-per-view="1"
+  >
+    <swiper-slide>
+       <img src="https://picsum.photos/id/365/3000/700" />
+    </swiper-slide>
+    <swiper-slide>
+      <img src="https://picsum.photos/id/326/3000/700" />
+    </swiper-slide>
+    <swiper-slide>
+      <img src="https://picsum.photos/id/312/3000/700" />
+    </swiper-slide>
+    <swiper-slide>
+      <img src="https://picsum.photos/id/292/3000/700" />
+    </swiper-slide>
+  </swiper-container>
+</div>
+
+<div class="mt-5 p-5" ></div>
+
+
+<div class="todays-special">
+<div class="mt-4">
+  <sc-title [title]="'Today\'s Specials'" ></sc-title>
+  <swiper-container
+    loop="true"
+    navigation="true"
+    pagination="true"
+    speed="500"
+    effect="coverflow"
+    parallax="true"
+    slides-per-view="3"
+  >
+    <swiper-slide>
+      <div class="p-3 bg-light-coffee specials-card">
+        <img src="https://picsum.photos/id/42/200/300" />
+      </div>
+    </swiper-slide>
+    <swiper-slide>
+      <div class="p-3 bg-light-coffee specials-card">
+        <img src="https://picsum.photos/id/225/200/300" />
+      </div>
+    </swiper-slide>
+    <swiper-slide>
+      <div class="p-3 bg-light-coffee specials-card">
+        <img src="https://picsum.photos/id/248/200/300" />
+      </div>
+    </swiper-slide>
+    <swiper-slide>
+      <div class="p-3 bg-light-coffee specials-card">
+        <img src="https://picsum.photos/id/292/200/300" />
+      </div>
+    </swiper-slide>
+    <swiper-slide>
+      <div class="p-3 bg-light-coffee specials-card">
+        <img src="https://picsum.photos/id/312/200/300" />
+      </div>
+    </swiper-slide>
+  </swiper-container>
+</div>
+</div>
+
+<div class="mt-5 p-5" ></div>
+
+<div class="our-services d-flex flex-column">
+  <sc-title [title]="'Our Services'" ></sc-title>
+<div>
+
+
+  <div class="row col-12">
+    <div data-aos="fade-up" class="bg-light border border-opacity-25 border-3 border-secondary p-5 mb-3 rounded-start-4 rounded-end-1 shadow offset-2 col-4" >
+      <p class="text-center fw-medium">Food Delivery</p>
+      <div class="d-flex align-items-start justify-content-start">
+        <div class="bg-saffron p-2 rounded">
+          <i class="fa-solid fa-truck-fast fa-2x"></i>
+        </div>
+
+        <div style="width: 250px;" class="ms-3 flex-grow-1">
+          <p class="fs-6">We provide prompt food delivery service for the online order.</p>
+        </div>
+      </div>
+    </div>
+
+    <div data-aos="fade-up" class="bg-light border border-opacity-25 border-3 border-secondary p-5 ms-4 mb-3 rounded-start-4 rounded-end-1 shadow col-4" >
+      <p class="text-center fw-medium">Accommodation</p>
+      <div class="d-flex align-items-start justify-content-start">
+        <div class="bg-saffron p-2 rounded">
+          <i class="fa-solid fa-bath fa-2x"></i>
+        </div>
+
+        <div style="width: 250px;" class="ms-3 flex-grow-1">
+          <p class="fs-6">Rooms are available to stay for our customers. We have room of all sizes</p>
+        </div>
+      </div>
+    </div>
+    <div data-aos="fade-up" class="bg-light border border-opacity-25 border-3 border-secondary p-5 mb-3 rounded-start-4 rounded-end-1 shadow offset-2 col-4" >
+      <p class="text-center fw-medium">Book Table</p>
+      <div class="d-flex align-items-start justify-content-start">
+        <div class="bg-saffron p-2 rounded">
+          <i class="fa-solid fa-shop fa-2x"></i>
+        </div>
+
+        <div style="width: 250px;" class="ms-3 flex-grow-1">
+          <p class="fs-6">Prebook table for your family or company staff to avoid the waiting time. </p>
+        </div>
+      </div>
+    </div>
+    <div data-aos="fade-up" class="bg-light border border-opacity-25 border-3 border-secondary p-5 ms-4 mb-3 rounded-start-4 rounded-end-1 shadow col-4" >
+      <p class="text-center fw-medium">Party Hall</p>
+      <div class="d-flex align-items-start justify-content-start">
+        <div class="bg-saffron p-2 rounded">
+          <i class="fa-solid fa-wine-bottle fa-2x"></i>
+        </div>
+
+        <div style="width: 250px;" class="ms-3 flex-grow-1">
+          <p class="fs-6">We also have space for birthday celebration or any other party.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="bg-dark p-5">
+  <p class="text-light text-center">Spice Craft</p>
+  <p class="text-light text-center">It is just a college industry project made for Lincoln</p>
+</div>

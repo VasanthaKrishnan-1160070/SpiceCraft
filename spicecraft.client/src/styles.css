@@ -1,1 +1,89 @@
 /* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Macondo&family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Macondo&family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Yatra+One&display=swap');
+
+
+.dark-green {
+  background-color: #2b6e3e;
+}
+
+.dark {
+  background-color: #042d11;
+}
+
+.thick-green {
+  background-color: #125428;
+}
+
+.light-green {
+  background-color: #2b9b5d;
+}
+
+.logo {
+  font-family: 'Macondo', sans-serif;
+  color: #ffd705;
+}
+
+.head-navigation a {
+  padding-bottom: 5px;
+}
+
+.head-navigation a:hover, .head-navigation a.activated {
+  color: #fff;
+  border-bottom: 2px solid #ffd705;
+  text-decoration: none;
+}
+
+.parallax-container {
+  height: 500px;
+  background-image: url('https://picsum.photos/3000/700?random=4');
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.content {
+  text-align: center;
+  color: white;
+  padding: 100px 20px;
+}
+
+.saffron {
+  color: #df6c3f;
+}
+
+.bg-saffron {
+  background-color: #df6c3f;
+}
+
+.bg-grey {
+  background-color: #eeeded;
+}
+
+.specials-card {
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #c2c1c1;
+}
+
+.stylish-heading {
+  font-family: 'Yatra One', sans-serif;
+}
+
+.heading-border {
+  border-bottom-style: solid;
+  border-width: 4px;
+  border-color: #c241df;
+  max-width:100px;
+  border-radius: 5px;
+  max-height: 2px;
+  min-width: 100px;
+  min-height: 2px;
+}
+
+.bg-light-coffee {
+  background-color: #ffb469;
+}
