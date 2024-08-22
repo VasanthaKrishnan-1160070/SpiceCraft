@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SpiceCraft.Server.IndentityModels;
 using SpiceCraft.Server.Models;
 
 namespace SpiceCraft.Server.Context;
 
-public partial class SpiceCraftContext : DbContext
+public partial class SpiceCraftContext : IdentityDbContext<ApplicationUser>
 {
     public SpiceCraftContext()
     {
@@ -71,10 +73,11 @@ public partial class SpiceCraftContext : DbContext
     public virtual DbSet<UsersCredential> UsersCredentials { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Name=DefaultConnection");
+        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:DefaultConnection");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<CartItem>(entity =>
         {
             entity.HasKey(e => e.CartItemId).HasName("PK__CartItem__488B0B0A05C15EF9");

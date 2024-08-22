@@ -15,25 +15,25 @@
 
   <script>
     // Function to wrap the dx-license element with a new parent and hide the parent
-    function wrapAndHideDxLicense() {
-      const dxLicenseElements = document.getElementsByTagName('dx-license');
-      for (let i = 0; i < dxLicenseElements.length; i++) {
-        const dxLicenseElement = dxLicenseElements[i];
-
-        // Create a new parent element
-        const newParent = document.createElement('div');
-
-        // Wrap the dx-license element with the new parent
-        dxLicenseElement.parentNode.insertBefore(newParent, dxLicenseElement);
-        newParent.appendChild(dxLicenseElement);
-
-        // Set the new parent to display: none
-        newParent.style.display = 'none';
-      }
-    }
+    // function wrapAndHideDxLicense() {
+    //   const dxLicenseElements = document.getElementsByTagName('dx-license');
+    //
+    //   for (let i = 0; i < dxLicenseElements.length; i++) {
+    //     const dxLicenseElement = dxLicenseElements[i];
+    //
+    //     // Create a new parent element
+    //     const newParent = document.createElement('div');
+    //
+    //     // Wrap the dx-license element with the new parent
+    //     dxLicenseElement.parentNode.insertBefore(newParent, dxLicenseElement);
+    //     newParent.appendChild(dxLicenseElement);
+    //     // Set the new parent to display: none
+    //     newParent.style.display = 'none';
+    //   }
+    // }
 
     // Add an event listener for the DOMContentLoaded event to call wrapAndHideDxLicense when the page loads
-    document.addEventListener('DOMContentLoaded', wrapAndHideDxLicense);
+   // document.addEventListener('DOMContentLoaded', wrapAndHideDxLicense);
   </script>
 </body>
 </html>

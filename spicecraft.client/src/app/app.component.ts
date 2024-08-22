@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import {RouteChangeService} from "./core/service/route-change.service";
 
 interface WeatherForecast {
   date: string;
@@ -16,22 +17,14 @@ interface WeatherForecast {
 export class AppComponent implements OnInit {
   public forecasts: WeatherForecast[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private routeChangeService: RouteChangeService) {}
+
 
   ngOnInit() {
-    this.getForecasts();
+
   }
 
-  getForecasts() {
-    this.http.get<WeatherForecast[]>('/weatherforecast').subscribe(
-      (result) => {
-        this.forecasts = result;
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
-  }
+
 
   title = 'spicecraft.client';
 }

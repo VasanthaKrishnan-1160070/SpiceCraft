@@ -27,12 +27,20 @@
 
 .head-navigation a {
   padding-bottom: 5px;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.head-banner > a {
+  text-decoration: none;
 }
 
 .head-navigation a:hover, .head-navigation a.activated {
   color: #fff;
   border-bottom: 2px solid #ffd705;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .parallax-container {

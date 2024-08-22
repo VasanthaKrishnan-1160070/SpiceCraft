@@ -1,0 +1,33 @@
+<div class="p-5 w-100">
+<div>
+  <p *ngIf="loginSuccess === true" class="text-center fw-semibold fs-3 text-success">Login Successful</p>
+  <p *ngIf="loginSuccess === false" class="text-center fw-semibold fs-3 text-danger">Login Failed, Please enter valid user name and password</p>
+  <div class="row col-12">
+    <div class="offset-4 col-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-center mb-4">Login</h5>
+          <form>
+            <dx-form
+              [formData]="loginCredential"
+              [colCount]="1">
+              <dxi-item dataField="userName" [isRequired]="true" editorType="dxTextBox" >
+                <dxo-label text="User Name"></dxo-label>
+              </dxi-item>
+              <dxi-item dataField="password" [isRequired]="true" editorType="dxTextBox" [editorOptions]="{ mode: 'password'  }">
+              </dxi-item>
+              <dxi-item>
+                <dx-button
+                  text="Login"
+                  type="success"
+                  (onClick)="login()">
+                </dx-button>
+              </dxi-item>
+            </dx-form>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
