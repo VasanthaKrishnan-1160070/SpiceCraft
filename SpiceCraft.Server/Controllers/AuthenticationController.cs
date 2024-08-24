@@ -1,7 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 using Microsoft.IdentityModel.Tokens;
+using SpiceCraft.Server.Helpers;
 using SpiceCraft.Server.IndentityModels;
+using SpiceCraft.Server.Middleware;
+using SpiceCraft.Server.Models;
+using SpiceCraft.Server.Repository.Interface;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,74 +17,57 @@ namespace SpiceCraft.Server.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUserRepository _userRepository;
+        private readonly JwtService _jwtService;
         private readonly IConfiguration _configuration;
 
-        public AuthenticationController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+        public AuthenticationController(IUserRepository userRepository, JwtService jwtService, IConfiguration configuration)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _userRepository = userRepository;
+            _jwtService = jwtService;
             _configuration = configuration;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            var user = new ApplicationUser
+            var existingUser = await _userRepository.GetUserCredentialByUsernameAsync(model.Username);
+            if (existingUser != null)
             {
-                UserName = model.Username,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                DateOfBirth = model.DateOfBirth               
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (result.Succeeded)
-            {
-                return Ok(new { message = "User registered successfully" });
+                return BadRequest(new { message = "Username is already taken" });
             }
 
-            return BadRequest(result.Errors);
+            var user = new User
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+            };
+
+            var credential = new UsersCredential
+            {
+                UserName = model.Username,
+                Password = PasswordHelper.HashPassword(model.Password),
+                User = user
+            };
+
+            await _userRepository.AddUserAsync(user, credential);
+
+            return Ok(new { message = "User registered successfully" });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.Username);
+            var user = await _userRepository.GetUserByUserNameAsync(model.Username);
 
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            if (user != null && PasswordHelper.VerifyPassword(model.Password, user?.UsersCredential?.Password))
             {
-                var token = GenerateJwtToken(user);
+                var token = _jwtService.GenerateToken(user, user.UsersCredential, user.Role.RoleName);
                 return Ok(new { token });
             }
 
             return Unauthorized(new { message = "Invalid credentials" });
-        }
-
-        private string GenerateJwtToken(ApplicationUser user)
-        {
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Id)
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

@@ -7,7 +7,7 @@ using SpiceCraft.Server.Models;
 
 namespace SpiceCraft.Server.Context;
 
-public partial class SpiceCraftBackupContext : IdentityDbContext<ApplicationUser>
+public partial class SpiceCraftBackupContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
 {
     public SpiceCraftBackupContext()
     {

@@ -2,6 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using SpiceCraft.Server.IndentityModels;
 using SpiceCraft.Server.Context;
+using SpiceCraft.Server.Helpers;
+using SpiceCraft.Server.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace SpiceCraft.Server.SeedData
 {
@@ -9,95 +12,61 @@ namespace SpiceCraft.Server.SeedData
     {
         public static async Task SeedUsers(IServiceProvider serviceProvider)
         {
-            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var context = serviceProvider.GetRequiredService<SpiceCraftContext>();
             var password = "SpiceCraft@123";
 
             // Seed roles
             var roles = new[] { "Admin", "Manager", "Staff", "Customer" };
-            foreach (var role in roles)
+            foreach (var roleName in roles)
             {
-                if (!await roleManager.RoleExistsAsync(role))
+                if (!context.Roles.Any(r => r.RoleName == roleName))
                 {
-                    await roleManager.CreateAsync(new IdentityRole(role));
+                    var role = new Role { RoleName = roleName };
+                    context.Roles.Add(role);
+                    await context.SaveChangesAsync();
                 }
             }
 
-            // Seed admin user
-            var adminUser = await userManager.FindByEmailAsync("admin@spicecrafttest.com");
-            if (adminUser == null)
-            {
-                adminUser = new ApplicationUser
-                {
-                    UserName = "admin",
-                    Email = "admin@spicecrafttest.com",
-                    FirstName = "Admin",
-                    LastName = "User",
-                    DateOfBirth = new DateTime(1980, 1, 1)                   
-                };
-                var result = await userManager.CreateAsync(adminUser, password);
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(adminUser, "Admin");
-                }
-            }
+            // Seed users
+            await SeedUserAsync(context, "admin@spicecrafttest.com", "admin", "Admin", "User", "Admin", password);
+            await SeedUserAsync(context, "staff@spicecrafttest.com", "staff", "Staff", "User", "Staff", password);
+            await SeedUserAsync(context, "customer@spicecrafttest.com", "customer", "Customer", "User", "Customer", password);
+            await SeedUserAsync(context, "manager@spicecrafttest.com", "manager", "Manager", "User", "Manager", password);
+        }
 
-            var staffUser = await userManager.FindByEmailAsync("staff@spicecrafttest.com");
-            if (staffUser == null)
+        private static async Task SeedUserAsync(SpiceCraftContext context, string email, string username, string firstName, string lastName, string roleName, string password)
+        {
+            if (!context.UsersCredentials.Any(uc => uc.UserName == username))
             {
-                staffUser = new ApplicationUser
-                {
-                    UserName = "staff",
-                    Email = "staff@spicecrafttest.com",
-                    FirstName = "Staff",
-                    LastName = "User",
-                    DateOfBirth = new DateTime(1980, 1, 1)
-                    
-                };
-                var result = await userManager.CreateAsync(staffUser, password);
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(staffUser, "Staff");
-                }
-            }
 
-            var customer = await userManager.FindByEmailAsync("customer@spicecrafttest.com");
-            if (customer == null)
-            {
-                customer = new ApplicationUser
+                // Find the RoleId based on the role name
+                var role = await context.Roles.FirstOrDefaultAsync(r => r.RoleName == roleName);
+                if (role == null)
                 {
-                    UserName = "customer",
-                    Email = "customer@spicecrafttest.com",
-                    FirstName = "Customer",
-                    LastName = "User",
-                    DateOfBirth = new DateTime(1980, 1, 1)
-                   
-                };
-                var result = await userManager.CreateAsync(customer, password);
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(customer, "Customer");
+                    throw new Exception($"Role '{roleName}' not found in the database.");
                 }
-            }
 
-            var manager = await userManager.FindByEmailAsync("manager@spicecrafttest.com");
-            if (manager == null)
-            {
-                customer = new ApplicationUser
+                var user = new User
                 {
-                    UserName = "manager",
-                    Email = "manager@spicecrafttest.com",
-                    FirstName = "Manager",
-                    LastName = "User",
-                    DateOfBirth = new DateTime(1980, 1, 1)                   
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    RoleId = role.RoleId
                 };
-                var result = await userManager.CreateAsync(customer, password);
-                if (result.Succeeded)
+
+                var credential = new UsersCredential
                 {
-                    await userManager.AddToRoleAsync(customer, "Manager");
-                }
+                    UserName = username,
+                    Password = PasswordHelper.HashPassword(password),
+                    User = user
+                };
+
+                context.Users.Add(user);
+                context.UsersCredentials.Add(credential);               
+
+                await context.SaveChangesAsync();
             }
         }
+
     }
 }

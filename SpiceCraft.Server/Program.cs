@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SpiceCraft.Server;
 using SpiceCraft.Server.Context;
 using SpiceCraft.Server.IndentityModels;
+using SpiceCraft.Server.Middleware;
 using SpiceCraft.Server.SeedData;
 using System.Text;
 
@@ -17,29 +18,32 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SpiceCraftContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<SpiceCraftContext>()
-    .AddDefaultTokenProviders();
+//builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+//    .AddEntityFrameworkStores<SpiceCraftContext>()
+//    .AddDefaultTokenProviders();
+
+// Add JWT service
+builder.Services.AddScoped<JwtService>();
 
 // Configure Identity options
-builder.Services.Configure<IdentityOptions>(options =>
-{
-    // Password settings
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequiredUniqueChars = 1;
+//builder.Services.Configure<IdentityOptions>(options =>
+//{
+//    // Password settings
+//    options.Password.RequireDigit = true;
+//    options.Password.RequireLowercase = true;
+//    options.Password.RequireNonAlphanumeric = false;
+//    options.Password.RequireUppercase = true;
+//    options.Password.RequiredLength = 6;
+//    options.Password.RequiredUniqueChars = 1;
 
-    // Lockout settings
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 5;
-    options.Lockout.AllowedForNewUsers = true;
+//    // Lockout settings
+//    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+//    options.Lockout.MaxFailedAccessAttempts = 5;
+//    options.Lockout.AllowedForNewUsers = true;
 
-    // User settings
-    options.User.RequireUniqueEmail = true;
-});
+//    // User settings
+//    options.User.RequireUniqueEmail = true;
+//});
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -71,6 +75,9 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddControllers();
+
+builder.Services.AddProjectServices(builder.Configuration);
+
 // Add CORS services
 // Read the allowed origins from configuration
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();

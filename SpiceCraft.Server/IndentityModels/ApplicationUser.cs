@@ -3,7 +3,7 @@ using SpiceCraft.Server.Models;
 
 namespace SpiceCraft.Server.IndentityModels
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser<int>
     {
         // Existing Identity fields are inherited from IdentityUser
 

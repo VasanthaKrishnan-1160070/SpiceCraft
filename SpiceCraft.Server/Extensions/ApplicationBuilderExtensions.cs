@@ -19,7 +19,7 @@ namespace SpiceCraft.Server
                 try
                 {
                     var context = services.GetRequiredService<SpiceCraftContext>();
-                    context.Database.Migrate(); // Ensure database is up to date
+                   // context.Database.Migrate(); // Ensure database is up to date
 
                     // Seed users, roles, and other data
                     await Seed.SeedData(services);

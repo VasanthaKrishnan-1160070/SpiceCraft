@@ -43,8 +43,8 @@ create table Users (
 
 create table UsersCredential (
     UserCredentialId int primary key identity(1,1),
-    Username varchar(100) not null unique,
-    Password varchar(8000) default 'scrypt:32768:8:1$7VfJfm$00cf53e4d541c768689a76261af7a8be0adebdcdb6ecfee9e4d6918f2516ef477f42ecbde163079414d1d09041f8fb4198095e77afba9dd4d6a2a172b009ddd1',
+    UserName varchar(100) not null unique,
+    Password varchar(8000),
     UserId int unique not null,
     CreatedAt datetime default getdate(),
     UpdatedAt datetime default getdate(),
