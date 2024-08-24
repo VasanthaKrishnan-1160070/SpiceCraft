@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import {LandingPageComponent} from "./feature/home/landing-page/landing-page.component";
 import {AuthInterceptor} from "./core/interceptor/auth.interceptor";
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { CustomerRegistrationComponent } from './feature/registeration/customer-registeration/customer-registration.component';
 
 
 @NgModule({

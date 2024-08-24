@@ -32,8 +32,7 @@ namespace SpiceCraft.Server.Controllers
                 Email = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                DateOfBirth = model.DateOfBirth,
-                Address = model.Address
+                DateOfBirth = model.DateOfBirth               
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);

@@ -7,13 +7,13 @@ using SpiceCraft.Server.Models;
 
 namespace SpiceCraft.Server.Context;
 
-public partial class SpiceCraftContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
+public partial class SpiceCraftBackupContext : IdentityDbContext<ApplicationUser>
 {
-    public SpiceCraftContext()
+    public SpiceCraftBackupContext()
     {
     }
 
-    public SpiceCraftContext(DbContextOptions<SpiceCraftContext> options)
+    public SpiceCraftBackupContext(DbContextOptions<SpiceCraftContext> options)
         : base(options)
     {
     }

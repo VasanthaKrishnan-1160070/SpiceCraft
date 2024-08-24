@@ -34,8 +34,7 @@ namespace SpiceCraft.Server.SeedData
                     Email = "admin@spicecrafttest.com",
                     FirstName = "Admin",
                     LastName = "User",
-                    DateOfBirth = new DateTime(1980, 1, 1),
-                    Address = "123 Admin St"
+                    DateOfBirth = new DateTime(1980, 1, 1)                   
                 };
                 var result = await userManager.CreateAsync(adminUser, password);
                 if (result.Succeeded)
@@ -53,8 +52,8 @@ namespace SpiceCraft.Server.SeedData
                     Email = "staff@spicecrafttest.com",
                     FirstName = "Staff",
                     LastName = "User",
-                    DateOfBirth = new DateTime(1980, 1, 1),
-                    Address = "123 staff St"
+                    DateOfBirth = new DateTime(1980, 1, 1)
+                    
                 };
                 var result = await userManager.CreateAsync(staffUser, password);
                 if (result.Succeeded)
@@ -72,8 +71,8 @@ namespace SpiceCraft.Server.SeedData
                     Email = "customer@spicecrafttest.com",
                     FirstName = "Customer",
                     LastName = "User",
-                    DateOfBirth = new DateTime(1980, 1, 1),
-                    Address = "123 customer St"
+                    DateOfBirth = new DateTime(1980, 1, 1)
+                   
                 };
                 var result = await userManager.CreateAsync(customer, password);
                 if (result.Succeeded)
@@ -91,8 +90,7 @@ namespace SpiceCraft.Server.SeedData
                     Email = "manager@spicecrafttest.com",
                     FirstName = "Manager",
                     LastName = "User",
-                    DateOfBirth = new DateTime(1980, 1, 1),
-                    Address = "123 manager St"
+                    DateOfBirth = new DateTime(1980, 1, 1)                   
                 };
                 var result = await userManager.CreateAsync(customer, password);
                 if (result.Succeeded)

@@ -9,7 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Context\SpiceCraftContext - backup.txt" />
     <None Remove="ReadMe.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Context\SpiceCraftContext - backup.txt" />
   </ItemGroup>
 
   <ItemGroup>
