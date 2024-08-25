@@ -48,11 +48,20 @@ jobs:
         AWS_REGION: ${{ env.AWS_REGION }}
       run: |
         echo "Deleting all images from ECR repository: ${{ env.ECR_REPOSITORY_CLIENT }}"
-        aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY_CLIENT }} --image-ids \
-          $(aws ecr list-images --repository-name ${{ env.ECR_REPOSITORY_CLIENT }} --query 'imageIds[*]' --output json)
+        image_ids_client=$(aws ecr list-images --repository-name ${{ env.ECR_REPOSITORY_CLIENT }} --query 'imageIds[*]' --output json)
+        if [ "$image_ids_client" != "[]" ]; then
+          aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY_CLIENT }} --image-ids "$image_ids_client"
+        else
+          echo "No images to delete in ${{ env.ECR_REPOSITORY_CLIENT }}"
+        fi
+        
         echo "Deleting all images from ECR repository: ${{ env.ECR_REPOSITORY_SERVER }}"
-        aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY_SERVER }} --image-ids \
-          $(aws ecr list-images --repository-name ${{ env.ECR_REPOSITORY_SERVER }} --query 'imageIds[*]' --output json)
+        image_ids_server=$(aws ecr list-images --repository-name ${{ env.ECR_REPOSITORY_SERVER }} --query 'imageIds[*]' --output json)
+        if [ "$image_ids_server" != "[]" ]; then
+          aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY_SERVER }} --image-ids "$image_ids_server"
+        else
+          echo "No images to delete in ${{ env.ECR_REPOSITORY_SERVER }}"
+        fi
         echo "Deleted all images."
 
     - name: Install Docker Compose
