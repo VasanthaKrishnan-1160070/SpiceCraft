@@ -7,6 +7,8 @@ import {CommonModule} from "@angular/common";
 import {filter, takeUntil} from 'rxjs/operators';
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Subject} from "rxjs";
+import {SideNavigationComponent} from "../../../shared/components/side-navigation/side-navigation.component";
+import {AuthService} from "../../../core/service/auth.service";
 
 @Component({
   selector: 'sc-landing-page',
@@ -18,7 +20,8 @@ import {Subject} from "rxjs";
     TitleComponent,
     RouterOutlet,
     RouterLink,
-    RouterLinkActive
+    RouterLinkActive,
+    SideNavigationComponent
   ]
 })
 export class LandingPageComponent implements OnInit, OnDestroy {
@@ -27,6 +30,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   destroy$: Subject<void> = new Subject();
   isIntroPage: boolean = true;
+  isAuthenticated: boolean = false;
+  authService: AuthService = inject(AuthService);
 
   ngOnInit(): void {
     this.router.events.pipe(
@@ -34,8 +39,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(() => {
       this.currentRoute = this.activatedRoute.snapshot.firstChild?.routeConfig?.path || '';
-      console.log('Current Route:', this.currentRoute);
       this.checkIsIntroPage(this.currentRoute);
+      this.isAuthenticated = this.authService.isAuthenticated();
     });
   }
 

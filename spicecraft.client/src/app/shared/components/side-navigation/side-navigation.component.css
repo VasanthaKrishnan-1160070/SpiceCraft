@@ -1,0 +1,23 @@
+
+
+.side-navigation a {
+  padding-bottom: 5px;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.side-navigation a:hover, .side-navigation a.activated {
+  color: #fff;
+  border-bottom: 2px solid #ffd705;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.side-nav-icons {
+  color: #ffd705;
+}
+
+.side-nav-header {
+  background: #0f9578;
+}

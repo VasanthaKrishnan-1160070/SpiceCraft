@@ -1,10 +1,20 @@
+    <div class="side-navigation bg-plant-green vh-100">
 
-<div class="side-navigation">
-  <div>
-     @for(item of  navigation(); track item.name) {
-       <div>
+      <div class="mb-3 d-flex flex-column p-3 side-nav-header">
+        <i class="fa-solid fa-user fa-4x text-pale-grey align-self-center"></i>
+        <p class="align-self-center fs-5 mt-3 text-light">Customer</p>
+      </div>
 
-       </div>
-     }
-  </div>
-</div>
+      <div class="d-flex flex-column justify-content-start">
+         @for(item of  navigation(); track item.name) {
+           <div class="d-flex p-3 ms-5">
+             <div style="width: 38px; height: 28px;">
+               <i class="{{item.icon}} fs-4 side-nav-icons  align-self-center"></i>
+             </div>
+             <a class="gap-3 fs-6 align-self-end" [routerLink]="item.routing" routerLinkActive="activated" >{{item.name}}</a>
+           </div>
+         }
+      </div>
+    </div>
+
+

@@ -62,12 +62,20 @@
   color: #df6c3f;
 }
 
+.bg-plant-green {
+  background-color: #105635;
+}
+
 .bg-saffron {
   background-color: #df6c3f;
 }
 
 .bg-grey {
   background-color: #eeeded;
+}
+
+.bg-pale-green {
+  background-color: #c5ede9;
 }
 
 .specials-card {
@@ -95,3 +103,17 @@
 .bg-light-coffee {
   background-color: #ffb469;
 }
+
+.bg-pale-grey {
+  background-color: #e8fdff;
+}
+
+.text-pale-grey {
+  color: #e8fdff;
+}
+
+.content-height {
+  min-height: 635px;
+}
+
+
