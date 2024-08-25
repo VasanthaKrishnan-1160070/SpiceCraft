@@ -31,7 +31,7 @@ namespace SpiceCraft.Server.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            var existingUser = await _userRepository.GetUserCredentialByUsernameAsync(model.Username);
+            var existingUser = await _userRepository.GetUserCredentialByUsernameAsync(model.UserName);
             if (existingUser != null)
             {
                 return BadRequest(new { message = "Username is already taken" });
@@ -46,7 +46,7 @@ namespace SpiceCraft.Server.Controllers
 
             var credential = new UsersCredential
             {
-                UserName = model.Username,
+                UserName = model.UserName,
                 Password = PasswordHelper.HashPassword(model.Password),
                 User = user
             };

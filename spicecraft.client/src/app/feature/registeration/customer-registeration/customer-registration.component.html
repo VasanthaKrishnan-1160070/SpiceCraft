@@ -1,10 +1,13 @@
 <div class="row col-12 p-5">
   <sc-title [title]="'Customer Registration'"></sc-title>
 
+  <p *ngIf="isRegisterSuccess === true" class="text-center fw-semibold fs-3 text-success">Registration Successful</p>
+  <p *ngIf="isRegisterSuccess === false" class="text-center fw-semibold fs-3 text-danger">Registration Failed, Something went wrong. Please try again after sometime</p>
+
   <div class="mt-4 offset-3 col-6">
-    <form>
+    <form (ngSubmit)="onRegister($event)" >
       <dx-form
-        [formData]="customerRegistration"
+        [(formData)]="customerRegistration"
         [colCount]="2">
 
         <dxi-item itemType="group" caption="General Information">
@@ -20,21 +23,22 @@
           <dxi-item dataField="email" [label]="{ text: 'Email' }">
             <dxi-validation-rule type="required" message="Email is required"></dxi-validation-rule>
             <dxi-validation-rule type="email" message="Email is invalid"></dxi-validation-rule>
+            <dxi-validation-rule type="async"
+                                 [validationCallback]="emailAsyncValidation"
+                                 message="Email already taken"></dxi-validation-rule>
           </dxi-item>
 
-          <dxi-item dataField="phoneNumber" [label]="{ text: 'Phone Number' }">
+          <dxi-item dataField="phoneNumber" [editorOptions]="{mode: 'number'}" [label]="{ text: 'Phone Number' }">
             <dxi-validation-rule type="required" message="Phone Number is required"></dxi-validation-rule>
+            <dxi-validation-rule type="numeric"  message="Valid Numbers is required"></dxi-validation-rule>
             <dxi-validation-rule type="pattern"
                                  [pattern]="'^[0-9]{10}$'"
                                  message="Phone Number must be 10 digits"></dxi-validation-rule>
           </dxi-item>
 
-          <dxi-item dataField="dateOfBirth" [label]="{ text: 'Date of Birth' }">
+          <dxi-item dataField="dateOfBirth" editorType="dxDateBox" [editorOptions]="{type: 'date', displayFormat: 'dd/MM/yyyy', invalidDateMessage: 'Valid date is required'}" [label]="{ text: 'Date of Birth' }">
             <dxi-validation-rule type="required" message="Date of Birth is required"></dxi-validation-rule>
-            <dxi-validation-rule type="range"
-                                 [min]="minDobDate"
-                                 [max]="maxDobDate"
-                                 message="Date of Birth must be between 1900 and today"></dxi-validation-rule>
+
           </dxi-item>
         </dxi-item>
 
@@ -54,27 +58,30 @@
             <dxi-validation-rule type="required" message="State is required"></dxi-validation-rule>
           </dxi-item>
 
-          <dxi-item dataField="postalCode" [label]="{ text: 'Postal Code' }">
+          <dxi-item dataField="postalCode" [editorOptions]="{mode: 'number'}" [label]="{ text: 'Postal Code' }">
             <dxi-validation-rule type="required" message="Postal Code is required"></dxi-validation-rule>
             <dxi-validation-rule type="pattern"
-                                 [pattern]="'^[0-9]{5}$'"
-                                 message="Postal Code must be 5 digits"></dxi-validation-rule>
+                                 [pattern]="'^[0-9]{4}$'"
+                                 message="Postal Code must be 4 digits"></dxi-validation-rule>
           </dxi-item>
         </dxi-item>
 
         <dxi-item itemType="group" caption="Credentials">
           <dxi-item dataField="userName" [label]="{ text: 'User Name' }">
             <dxi-validation-rule type="required" message="User Name is required"></dxi-validation-rule>
+            <dxi-validation-rule type="async"
+                                 [validationCallback]="usernameAsyncValidation"
+                                 message="User Name already exists"></dxi-validation-rule>
           </dxi-item>
 
-          <dxi-item dataField="password" [label]="{ text: 'Password' }">
+          <dxi-item dataField="password" [editorOptions]="{mode: 'password'}" [label]="{ text: 'Password' }">
             <dxi-validation-rule type="required" message="Password is required"></dxi-validation-rule>
-            <dxi-validation-rule type="stringLength"
-                                 [min]="6"
-                                 message="Password must be at least 6 characters long"></dxi-validation-rule>
+            <dxi-validation-rule type="pattern"
+                                 [pattern]="'^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[a-zA-Z0-9]).{8,}$'"
+                                 message="Password must be at least 8 characters long, should contain one uppercase letter, and one special character"></dxi-validation-rule>
           </dxi-item>
 
-          <dxi-item dataField="confirmPassword" [label]="{ text: 'Confirm Password' }">
+          <dxi-item dataField="confirmPassword" [editorOptions]="{mode: 'password'}" [label]="{ text: 'Confirm Password' }">
             <dxi-validation-rule type="required" message="Confirm Password is required"></dxi-validation-rule>
             <dxi-validation-rule type="compare"
                                  [comparisonTarget]="confirmPasswordComparison"
@@ -82,18 +89,11 @@
           </dxi-item>
         </dxi-item>
 
+        <dxi-item itemType="button" [buttonOptions]="{type: 'success', text: 'Submit', useSubmitBehavior: true, stylingMode: 'contained' }" >
+
+        </dxi-item>
+
       </dx-form>
-
-      <br />
-
-      <dx-button
-        type="success"
-        [stylingMode]="'contained'"
-        [useSubmitBehavior]="true"
-        (onClick)="onRegister($event)"
-        [text]="'Submit'">
-      </dx-button>
-      <br />
     </form>
     <br />
   </div>

@@ -1,4 +1,4 @@
-import {Component, input, computed} from '@angular/core';
+import {Component, input, computed, Input} from '@angular/core';
 import {RouterLink, RouterLinkActive} from "@angular/router";
 
 @Component({
@@ -14,6 +14,7 @@ import {RouterLink, RouterLinkActive} from "@angular/router";
 export class SideNavigationComponent {
 
   userType = input<string>('client');
+  firstName = input<string>('');
 
   navigation = computed(() => {
     return this.getNavigation(this.userType());

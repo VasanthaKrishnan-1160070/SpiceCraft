@@ -23,6 +23,7 @@ export class AuthService {
           loggedInUser.email = response?.email;
           loggedInUser.userName = response?.userName;
           loggedInUser.firstName = response?.firstName;
+          loggedInUser.roleName = response?.roleName;
           this._userService.loggedInUser = loggedInUser;
           localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
         }
@@ -35,9 +36,9 @@ export class AuthService {
     );
   }
 
-
   logout() {
     localStorage.removeItem('authToken');  // Remove the token on logout
+    localStorage.removeItem('loggedInUser');
     // Redirect to login page or another page
   }
 

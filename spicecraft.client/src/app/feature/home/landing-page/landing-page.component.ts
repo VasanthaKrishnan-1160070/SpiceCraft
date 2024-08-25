@@ -34,6 +34,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   isAuthenticated: boolean = false;
   authService: AuthService = inject(AuthService);
   userType = 'client';
+  firstName: string = '';
 
   ngOnInit(): void {
     this.router.events.pipe(
@@ -44,8 +45,12 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.checkIsIntroPage(this.currentRoute);
       this.isAuthenticated = this.authService.isAuthenticated();
       if (this.isAuthenticated) {
-        const roleName = this.userService.getLoggedInUser().roleName;
-        this.userType = roleName === 'Customer' ? 'client' : 'admin';
+        const loggedInUser = this.userService.getLoggedInUser();
+        const roleName = loggedInUser.roleName;
+        this.firstName = loggedInUser.firstName;
+        if (roleName) {
+          this.userType = roleName === 'Customer' ? 'client' : 'admin';
+        }
       }
     });
   }

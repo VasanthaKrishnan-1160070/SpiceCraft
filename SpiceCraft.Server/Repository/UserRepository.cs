@@ -26,6 +26,14 @@ namespace SpiceCraft.Server.Repository
                                                  .FirstOrDefaultAsync(uc => uc.UserName == username);
         }
 
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users
+                           .Include(u => u.UsersCredential)
+                           .Include(u => u.UserAddresses)
+                           .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
         public async Task<User> GetUserByUserNameAsync(string username)
         {
             return await _context.Users
@@ -38,7 +46,17 @@ namespace SpiceCraft.Server.Repository
         public async Task AddUserAsync(User user, UsersCredential credential)
         {
             _context.Users.Add(user);
+            _context.UsersCredentials.Add(credential);          
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddUserAsync(User user, UsersCredential credential, UserAddress address)
+        {
+            _context.Users.Add(user);
             _context.UsersCredentials.Add(credential);
+            _context.UserAddresses.Add(address);
+
             await _context.SaveChangesAsync();
         }
     }
