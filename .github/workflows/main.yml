@@ -42,6 +42,19 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+    - name: Delete all images from the ECR repositories
+      env:
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        AWS_REGION: ${{ env.AWS_REGION }}
+      run: |
+        echo "Deleting all images from ECR repository: ${{ env.ECR_REPOSITORY_CLIENT }}"
+        aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY_CLIENT }} --image-ids \
+          $(aws ecr list-images --repository-name ${{ env.ECR_REPOSITORY_CLIENT }} --query 'imageIds[*]' --output json)
+        echo "Deleting all images from ECR repository: ${{ env.ECR_REPOSITORY_SERVER }}"
+        aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY_SERVER }} --image-ids \
+          $(aws ecr list-images --repository-name ${{ env.ECR_REPOSITORY_SERVER }} --query 'imageIds[*]' --output json)
+        echo "Deleted all images."
+
     - name: Install Docker Compose
       run: |
         sudo apt-get update
