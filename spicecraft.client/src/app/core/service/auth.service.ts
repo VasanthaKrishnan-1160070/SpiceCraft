@@ -2,13 +2,15 @@ import {inject, Injectable} from '@angular/core';
 import {WebAPIService} from "./webAPI.service";
 import {Observable, of} from "rxjs";
 import { tap, map, catchError } from 'rxjs/operators';
+import {UserService} from "./user.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  _api = inject(WebAPIService);
+  private _api = inject(WebAPIService);
+  private _userService = inject(UserService);
   constructor() { }
 
   login(username: string, password: string): Observable<boolean> {
@@ -17,6 +19,12 @@ export class AuthService {
         const token = response?.token;
         if (token) {
           localStorage.setItem('authToken', token);
+          let loggedInUser = this._userService.loggedInUser;
+          loggedInUser.email = response?.email;
+          loggedInUser.userName = response?.userName;
+          loggedInUser.firstName = response?.firstName;
+          this._userService.loggedInUser = loggedInUser;
+          localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
         }
       }),
       map((response) => !!response?.token), // Return true if the token exists, otherwise false

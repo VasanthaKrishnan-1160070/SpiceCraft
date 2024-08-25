@@ -31,14 +31,28 @@
   </div>
 }
 @else {
- <div class="bg-pale-green">
-  <div class="row col-12">
-    <div  class="navigation-content row col-2 vh-100">
-      <sc-side-navigation [userType]="'client'"></sc-side-navigation>
+  @if (userType === 'client') {
+    <div class="bg-pale-green">
+      <div class="row col-12">
+        <div  class="navigation-content row col-2">
+          <sc-side-navigation [userType]="userType"></sc-side-navigation>
+        </div>
+        <div class="col-10">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
     </div>
-    <div class="col-10 vh-100 bg-pale-green">
-      <router-outlet></router-outlet>
+  }
+  @else {
+    <div class="bg-pale-green">
+      <div class="row col-12">
+        <div  class="navigation-content row col-2">
+          <sc-side-navigation [userType]="userType"></sc-side-navigation>
+        </div>
+        <div class="col-10">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
     </div>
-  </div>
- </div>
+  }
 }
