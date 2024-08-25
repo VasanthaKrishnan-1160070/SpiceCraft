@@ -87,6 +87,17 @@ jobs:
         docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }}
         echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
 
+    - name: Stop existing tasks in ECS service
+      run: |
+          echo "Stopping existing tasks in ECS service: ${{ env.ECS_SERVICE }}"
+          task_arns=$(aws ecs list-tasks --cluster ${{ env.ECS_CLUSTER }} --service-name ${{ env.ECS_SERVICE }} --query 'taskArns' --output text)
+          if [ -n "$task_arns" ]; then
+            aws ecs stop-task --cluster ${{ env.ECS_CLUSTER }} --task "$task_arns"
+            echo "Stopped tasks: $task_arns"
+          else
+            echo "No running tasks to stop."
+          fi    
+
     - name: Print ECS Task Definition
       run: |
         echo "Printing ECS Task Definition for verification:"
