@@ -75,7 +75,7 @@ jobs:
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         AWS_REGION: ${{ env.AWS_REGION }}
       run: |
-        docker-compose build
+        docker-compose build --no-cache
         echo "Tagging and pushing images..."
         echo "Client Image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest"
         echo "Server Image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest"       
