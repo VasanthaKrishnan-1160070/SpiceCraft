@@ -13,7 +13,7 @@ namespace SpiceCraft.Server.SeedData
         public static async Task SeedUsers(IServiceProvider serviceProvider)
         {
             var context = serviceProvider.GetRequiredService<SpiceCraftContext>();
-            var password = "SpiceCraft@123";
+            var password = "!Apple123";
 
             // Seed roles
             var roles = new[] { "Admin", "Manager", "Staff", "Customer" };
