@@ -13,9 +13,9 @@ public partial class ItemCategory
 
     public virtual ICollection<ItemCategory> InverseParentCategory { get; set; } = new List<ItemCategory>();
 
-    public virtual ItemCategory? ParentCategory { get; set; }
+    public virtual ICollection<Item> Items { get; set; } = new List<Item>();
 
-    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+    public virtual ItemCategory? ParentCategory { get; set; }
 
     public virtual PromotionCategory? PromotionCategory { get; set; }
 }

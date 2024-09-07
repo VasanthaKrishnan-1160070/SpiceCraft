@@ -2,7 +2,7 @@
 
 namespace SpiceCraft.Server.Repository
 {
-    public class DealerRepository : IDealersRepository
+    public class DealersRepository : IDealersRepository
     {
     }
 }

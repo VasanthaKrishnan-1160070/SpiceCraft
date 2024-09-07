@@ -17,7 +17,7 @@ namespace SpiceCraft.Server.Controllers
 
         // GET api/<CartItemsController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public string Get(int id) 
         {
             return "value";
         }

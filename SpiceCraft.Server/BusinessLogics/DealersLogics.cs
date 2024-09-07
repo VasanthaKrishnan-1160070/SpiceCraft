@@ -2,7 +2,7 @@
 
 namespace SpiceCraft.Server.BusinessLogics
 {
-    public class DealersLogics
+    public class DealersLogics : IDealersLogics
     {
     }
 }

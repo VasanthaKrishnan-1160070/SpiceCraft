@@ -14,6 +14,16 @@ data "aws_subnets" "default" {
   }
 }
 
+# Fetch the latest Amazon Linux 2 AMI
+data "aws_ami" "amzn2" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
 # Create CloudWatch Log Groups
 resource "aws_cloudwatch_log_group" "spicecraft_client_logs" {
   name              = "/ecs/spicecraft-client-logs"
@@ -22,11 +32,6 @@ resource "aws_cloudwatch_log_group" "spicecraft_client_logs" {
 
 resource "aws_cloudwatch_log_group" "spicecraft_server_logs" {
   name              = "/ecs/spicecraft-server-logs"
-  retention_in_days = 30
-}
-
-resource "aws_cloudwatch_log_group" "mssql_logs" {
-  name              = "/ecs/mssql-logs"
   retention_in_days = 30
 }
 
@@ -42,7 +47,6 @@ resource "aws_ecr_repository" "spicecraft_client" {
 
   tags = {
     Name = "spicecraft-client"
-   
   }
 }
 
@@ -109,6 +113,7 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
+# Create Security Group for EC2 instance and RDS
 resource "aws_security_group" "ecs_security_group" {
   vpc_id = data.aws_vpc.default.id
 
@@ -126,6 +131,13 @@ resource "aws_security_group" "ecs_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -138,16 +150,42 @@ resource "aws_security_group" "ecs_security_group" {
   }
 }
 
+# Create EC2 Instance for ECS Cluster
+resource "aws_instance" "ecs_instance" {
+  ami                         = data.aws_ami.amzn2.id  # Use the fetched Amazon Linux 2 AMI ID
+  instance_type               = "t2.micro"
+  iam_instance_profile        = aws_iam_instance_profile.ecs_instance_profile.name
+  vpc_security_group_ids      = [aws_security_group.ecs_security_group.id]
+  subnet_id                   = data.aws_subnets.default.ids[0]
+  associate_public_ip_address = true
+
+  user_data = <<-EOF
+              #!/bin/bash
+              echo ECS_CLUSTER=${aws_ecs_cluster.spicecraft.name} >> /etc/ecs/ecs.config
+              EOF
+
+  tags = {
+    Name = "spicecraft-ec2-instance"
+  }
+}
+
+# Create IAM Instance Profile for EC2
+resource "aws_iam_instance_profile" "ecs_instance_profile" {
+  name = "ecsInstanceProfile"
+  role = aws_iam_role.ecs_task_execution_role.name
+}
+
+# Create ECS Cluster
 resource "aws_ecs_cluster" "spicecraft" {
   name = "spicecraft-cluster"
 }
 
+# Create ECS Task Definition
 resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = "1024"
-  memory                   = "2048"
+  network_mode             = "bridge"
+  cpu                      = "256"
+  memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
@@ -155,8 +193,8 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
     {
       name      = "spicecraft-client-container"
       image     = "${aws_ecr_repository.spicecraft_client.repository_url}:latest"
-      cpu       = 256
-      memory    = 512
+      cpu       = 128
+      memory    = 256
       essential = true
       portMappings = [
         {
@@ -177,8 +215,8 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
     {
       name      = "spicecraft-server-container"
       image     = "${aws_ecr_repository.spicecraft_server.repository_url}:latest"
-      cpu       = 256
-      memory    = 512
+      cpu       = 128
+      memory    = 256
       essential = true
       portMappings = [
         {
@@ -195,100 +233,48 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
           awslogs-stream-prefix = "spicecraft-server"
         }
       }
-    },
-    {
-      name      = "mssql-container"
-      image     = "mcr.microsoft.com/mssql/server:2022-latest"
-      cpu       = 512
-      memory    = 1024
-      essential = true
-      portMappings = [
-        {
-          containerPort = 1433
-          hostPort      = 1433
-          protocol      = "tcp"
-        }
-      ]
-      environment = [
-        {
-          name  = "ACCEPT_EULA"
-          value = "Y"
-        },
-        {
-          name  = "MSSQL_SA_PASSWORD"
-          value = var.mssql_sa_password
-        },
-        {
-          name  = "MSSQL_PID"
-          value = "Developer"
-        }
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.mssql_logs.name
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "mssql"
-        }
-      }
     }
   ])
 }
 
+# Create ECS Service to run on EC2
 resource "aws_ecs_service" "spicecraft_service" {
   name            = "spicecraft-service"
   cluster         = aws_ecs_cluster.spicecraft.id
   task_definition = aws_ecs_task_definition.spicecraft_task.arn
   desired_count   = 1
-  launch_type     = "FARGATE"
+  launch_type     = "EC2"
+}
 
-  network_configuration {
-    subnets         = data.aws_subnets.default.ids
-    security_groups = [aws_security_group.ecs_security_group.id]
-    assign_public_ip = true
+# Create RDS instance for SQL Server Express
+resource "aws_db_instance" "spicecraft_db" {
+  allocated_storage    = 20
+  storage_type         = "gp2"
+  engine               = "sqlserver-ex"  
+  engine_version       = "15.00.4043.16.v1"  # Example version; adjust as needed
+  instance_class       = "db.t3.micro"
+  username             = var.mssql_username
+  password             = var.mssql_sa_password
+  parameter_group_name = "default.sqlserver-ex-15.0"
+  publicly_accessible  = true
+  vpc_security_group_ids = [aws_security_group.ecs_security_group.id]
+  db_subnet_group_name = aws_db_subnet_group.spicecraft_subnet_group.name
+
+  # Backup settings
+  backup_retention_period = 7
+  backup_window           = "03:00-06:00"
+
+  tags = {
+    Name = "spicecraft-sql-server-express"
   }
 }
 
-resource "aws_ecr_lifecycle_policy" "spicecraft_client_lifecycle" {
-  repository = aws_ecr_repository.spicecraft_client.name
+# Create DB Subnet Group for RDS
+resource "aws_db_subnet_group" "spicecraft_subnet_group" {
+  name       = "spicecraft-subnet-group"
+  subnet_ids = data.aws_subnets.default.ids
 
-  policy = jsonencode({
-    rules = [
-      {
-        rulePriority = 1
-        description  = "Expire untagged images older than 1 day"
-        selection    = {
-          tagStatus     = "untagged"
-          countType     = "sinceImagePushed"
-          countUnit     = "days"
-          countNumber   = 1
-        }
-        action       = {
-          type = "expire"
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_ecr_lifecycle_policy" "spicecraft_server_lifecycle" {
-  repository = aws_ecr_repository.spicecraft_server.name
-
-  policy = jsonencode({
-    rules = [
-      {
-        rulePriority = 1
-        description  = "Expire untagged images older than 1 day"
-        selection    = {
-          tagStatus     = "untagged"
-          countType     = "sinceImagePushed"
-          countUnit     = "days"
-          countNumber   = 1
-        }
-        action       = {
-          type = "expire"
-        }
-      }
-    ]
-  })
+  tags = {
+    Name = "spicecraft-subnet-group"
+  }
 }

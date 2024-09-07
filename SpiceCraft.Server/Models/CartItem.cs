@@ -13,13 +13,11 @@ public partial class CartItem
 
     public int Quantity { get; set; }
 
-    public string? Size { get; set; }
-
-    public string? Color { get; set; }
+    public string? Description { get; set; }
 
     public decimal? PriceAtAdd { get; set; }
 
     public virtual ShoppingCart Cart { get; set; } = null!;
 
-    public virtual Product Item { get; set; } = null!;
+    public virtual Item Item { get; set; } = null!;
 }

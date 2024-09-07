@@ -17,6 +17,8 @@ public partial class Order
 
     public bool? IsFreeShipping { get; set; }
 
+    public string? Preference { get; set; }
+
     public string OrderStatus { get; set; } = null!;
 
     public DateTime? CreatedAt { get; set; }

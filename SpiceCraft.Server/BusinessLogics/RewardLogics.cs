@@ -1,6 +1,8 @@
-﻿namespace SpiceCraft.Server.BusinessLogics
+﻿using SpiceCraft.Server.BusinessLogics.Interface;
+
+namespace SpiceCraft.Server.BusinessLogics
 {
-    public class RewardLogics
+    public class RewardLogics : IRewardLogics
     {
     }
 }

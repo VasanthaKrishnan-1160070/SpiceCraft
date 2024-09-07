@@ -13,5 +13,5 @@ public partial class PromotionBulkItem
 
     public decimal? DiscountRate { get; set; }
 
-    public virtual Product Item { get; set; } = null!;
+    public virtual Item Item { get; set; } = null!;
 }

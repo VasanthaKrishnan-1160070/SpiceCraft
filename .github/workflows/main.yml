@@ -11,7 +11,7 @@ env:
   ECS_SERVICE: spicecraft-service                 # set this to Amazon ECS service name
   ECS_CLUSTER: spicecraft-cluster                 # set this to Amazon ECS cluster name
   ECS_TASK_DEFINITION: ecs-task-definition.json   # set this to the path to Amazon ECS task definition file
-  MSSQL_SA_PASSWORD: Admin@123
+  MSSQL_SA_PASSWORD: Admin123
   IMAGE_TAG: latest # ${{ github.sha }}
 
 permissions:

@@ -4,5 +4,6 @@ namespace SpiceCraft.Server.Repository
 {
     public class AdminRepository : IAdminRepository
     {
+
     }
 }

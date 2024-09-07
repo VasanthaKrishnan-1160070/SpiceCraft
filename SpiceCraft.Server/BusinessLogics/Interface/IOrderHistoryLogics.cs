@@ -1,6 +1,6 @@
 ﻿namespace SpiceCraft.Server.BusinessLogics.Interface
 {
-    public interface IOrderHistroyLogics
+    public interface IOrderHistoryLogics
     {
 
     }

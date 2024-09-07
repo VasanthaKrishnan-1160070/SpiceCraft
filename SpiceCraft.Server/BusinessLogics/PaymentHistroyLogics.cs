@@ -1,6 +1,8 @@
-﻿namespace SpiceCraft.Server.BusinessLogics
+﻿using SpiceCraft.Server.BusinessLogics.Interface;
+
+namespace SpiceCraft.Server.BusinessLogics
 {
-    public class PaymentHistroyLogics
+    public class PaymentHistroyLogics : IPaymentHistroyLogics
     {
     }
 }

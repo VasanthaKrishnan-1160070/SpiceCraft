@@ -13,9 +13,7 @@ public partial class OrderDetail
 
     public decimal? ActualPrice { get; set; }
 
-    public string? Size { get; set; }
-
-    public string? Color { get; set; }
+    public string? Description { get; set; }
 
     public decimal? DiscountRate { get; set; }
 
@@ -23,7 +21,7 @@ public partial class OrderDetail
 
     public decimal PurchasePrice { get; set; }
 
-    public virtual Product Item { get; set; } = null!;
+    public virtual Item Item { get; set; } = null!;
 
     public virtual Order Order { get; set; } = null!;
 }

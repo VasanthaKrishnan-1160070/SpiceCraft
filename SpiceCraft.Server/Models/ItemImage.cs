@@ -17,5 +17,5 @@ public partial class ItemImage
 
     public bool? IsMain { get; set; }
 
-    public virtual Product Item { get; set; } = null!;
+    public virtual Item Item { get; set; } = null!;
 }

@@ -2,7 +2,7 @@
 
 namespace SpiceCraft.Server.BusinessLogics
 {
-    public class OrderHistroyLogics
+    public class OrderHistoryLogics : IOrderHistoryLogics
     {
     }
 }

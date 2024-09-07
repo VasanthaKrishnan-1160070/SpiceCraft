@@ -2,7 +2,7 @@
 
 namespace SpiceCraft.Server.BusinessLogics
 {
-    public class EnquiryLogics
+    public class EnquiryLogics : IEnquiryLogics
     {
     }
 }

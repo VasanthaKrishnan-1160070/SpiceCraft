@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>4509411f-8f41-43d1-b510-1ce2122627e6</UserSecretsId>
@@ -28,6 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Enum\Actions\" />
+    <Folder Include="Helpers\Response\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 </Project>

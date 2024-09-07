@@ -75,7 +75,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddControllers();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddProjectServices(builder.Configuration);
 
 // Add CORS services

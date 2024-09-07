@@ -2,7 +2,7 @@
 
 namespace SpiceCraft.Server.BusinessLogics
 {
-    public class GiftCard
+    public class GiftCardLogics : IGiftCardLogics
     {
     }
 }
