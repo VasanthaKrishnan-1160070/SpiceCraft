@@ -26,6 +26,7 @@ import {B2bShippingComponent} from "./feature/admin/b2b-shipping/b2b-shipping.co
 import {B2bOrderComponent} from "./feature/admin/b2b-order/b2b-order.component";
 import {B2bInventoryComponent} from "./feature/admin/b2b-inventory/b2b-inventory.component";
 import {B2bResetPasswordComponent} from "./feature/admin/b2b-reset-password/b2b-reset-password.component";
+import {ItemListComponent} from "./feature/item/item-list/item-list.component";
 
 const routes: Routes = [
   { path: '', component: ClientHomeComponent},
@@ -35,6 +36,7 @@ const routes: Routes = [
   { path: 'staff-registration', component: StaffRegistrationComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'profile', component: ProfileComponent },
+  { path: 'item-list', component: ItemListComponent },
   { path: 'orders', component: OrderComponent },
   { path: 'payment', component: PaymentComponent },
   { path: 'enquiry', component: EnquiryComponent },
