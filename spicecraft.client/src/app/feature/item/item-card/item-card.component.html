@@ -1,0 +1,84 @@
+<div *ngIf="menuItem" class="d-flex flex-column m-4 bdr bdr-light-blue">
+  <!-- Show the main image within the link -->
+  <div [ngClass]="saleClass">
+    <span *ngIf="showDiscountRate" class="text-center text-light align-self-center flex-wrap rounded-end-5 border-end bg-bright-violet ps-2 pe-2">
+      {{ menuItem.discountRate }}% OFF
+    </span>
+    <span *ngIf="!showDiscountRate" class="text-center text-light align-self-center flex-wrap rounded-end-5 border-end ps-2 pe-2">&nbsp;</span>
+    <div class="sale-icon align-self-end">
+      <img class="img img-fluid" src="assets/images/sale.png" />
+    </div>
+  </div>
+
+  <div class="d-flex flex-column p-3">
+    <!-- Image with link -->
+    <a *ngIf="isUserAuthenticated" [routerLink]="['/item-detail', menuItem.itemId]">
+      <img class="img img-fluid pest-img-list" [src]="productImage" />
+    </a>
+    <img *ngIf="!isUserAuthenticated" class="img img-fluid pest-img-list" [src]="productImage" />
+
+    <span class="text-center justify-content-center mt-1 text-truncate flex-column-wrap gallery-max-product-title">
+      {{ menuItem.productName }}
+    </span>
+
+    <!-- Price and discount handling -->
+    <div *ngIf="showDiscountPrice" class="d-flex justify-content-center">
+      <span class="text-center justify-content-center mt-1 mb-1 flex-wrap orange-text text-decoration-line-through">
+        ${{ menuItem.price }}
+      </span>
+      <span class="text-center justify-content-center mt-1 mb-1 flex-wrap ms-3 text-bright-violet fw-bold">
+        ${{ menuItem.discountPrice }}
+      </span>
+    </div>
+    <span *ngIf="!showDiscountPrice" class="text-center justify-content-center mt-1 mb-1 flex-wrap orange-text">
+      ${{ menuItem.price }}
+    </span>
+
+    <!-- Stock Information -->
+    <div class="d-flex justify-content-center">
+      <span class="text-center text-blue-green mt-2 mb-2">Available Stock: {{ menuItem.currentStock }}</span>
+    </div>
+
+<!--    &lt;!&ndash; Add to Cart Section &ndash;&gt;-->
+<!--    <div *ngIf="showAddToCart">-->
+<!--      <p class="text-primary text-center">Please select Quantity, Size, Color. Or click Add to Cart for default values.</p>-->
+<!--      <p *ngIf="showBulkDiscount" class="text-success fw-bold text-center">-->
+<!--        Get {{ menuItem.bulkDiscountRate }}% discount by purchasing {{ menuItem.bulkDiscountRequiredQuantity }} quantity-->
+<!--      </p>-->
+
+<!--      &lt;!&ndash; Add to Cart Form &ndash;&gt;-->
+<!--      <form (ngSubmit)="addToCart()">-->
+<!--        <div>-->
+<!--          <label for="quantity">Quantity Required</label>-->
+<!--          <input type="number" id="quantity" name="quantity" [(ngModel)]="quantity" min="1" max="10000" required>-->
+<!--        </div>-->
+<!--        <div>-->
+<!--          <label for="size">Product Size</label>-->
+<!--          <select id="size" name="size" [(ngModel)]="selectedSize">-->
+<!--            <option *ngFor="let size of productSizes" [value]="size.key">{{ size.value }}</option>-->
+<!--          </select>-->
+<!--        </div>-->
+<!--        <div>-->
+<!--          <label for="color">Product Colors</label>-->
+<!--          <select id="color" name="color" [(ngModel)]="selectedColor">-->
+<!--            <option *ngFor="let color of productColors" [value]="color.key">{{ color.value }}</option>-->
+<!--          </select>-->
+<!--        </div>-->
+<!--        <input type="hidden" name="productId" [value]="menuItem.itemId">-->
+<!--        <input type="hidden" name="subAction" value="add_to_cart">-->
+<!--        <input type="submit" class="btn btn-info" value="Add To Cart">-->
+<!--      </form>-->
+<!--    </div>-->
+
+    <!-- Admin Actions -->
+    <div *ngIf="!showAddToCart && isUserInternal">
+      <a class="btn btn-info" [routerLink]="['/product', menuItem.itemId]">View Detail</a>
+      <a *ngIf="!isRemoved" class="btn btn-danger mt-3" href="#" (click)="removeProductFromListing(menuItem.itemId)">
+        Remove From listing
+      </a>
+      <a *ngIf="isRemoved" class="btn btn-info mt-3" href="#" (click)="addProductToListing(menuItem.itemId)">
+        Add To listing
+      </a>
+    </div>
+  </div>
+</div>

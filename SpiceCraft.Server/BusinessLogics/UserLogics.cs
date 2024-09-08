@@ -58,7 +58,7 @@ namespace SpiceCraft.Server.BusinessLogics
             {
                 return HelperFactory.Msg.Error(result, "No Users Found for the given Role");
             }
-            return HelperFactory.Msg.Success< IEnumerable<UserDTO>>(result);
+            return HelperFactory.Msg.Success<IEnumerable<UserDTO>>(result);
         }
 
         public async Task<ResultDetail<bool>> CreateUserAsync(CreateUserRequest userRequest)

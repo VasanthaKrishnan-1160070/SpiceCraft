@@ -1,0 +1,211 @@
+/*
+   With only using boostrap its hard to acheive 100% of the theme so I have to use custom css.
+*/
+
+.stick-bttom {
+  bottom: 0;
+  width: 100%;
+}
+
+.back {
+  background: url("/static/images/botton_pattern.webp") repeat-x 20% 20%;
+  background-size: contain;
+  height: 75px;
+}
+
+.nav-background {
+  /* background-color: #19410f; */
+  background-color: #0f2b41;
+}
+
+.nav-header-background {
+  /* background-color: #a0db71; */
+  background-color: #71d7db;
+}
+
+.nav-link {
+  color: rgb(249 255 0)
+}
+
+.nav-link:hover {
+  color: #fff;
+
+}
+
+.title-banner {
+  /* background-color: #a36f3c; */
+  background-color: #345ea7;
+  color: #ffff;
+}
+
+.center-content {
+  /* background-color: #d9edd2; */
+  background-color: #d2eced;
+}
+
+.bg-orange {
+  background-color: #e9510b;
+}
+
+.bg-steel-blue {
+  background-color: #0ba3e9;
+}
+
+.bg-light-steel-blue {
+  background-color: #a1cbf3;
+}
+
+
+.bg-green {
+  background-color: #0a9269;
+}
+
+.text-green {
+  color: #0a9269;
+}
+
+.text-blue-green {
+  color: #2dbdb8;
+}
+
+
+.bg-slate-black {
+  background-color: #44413f;
+}
+
+.bg-coffee {
+  background-color: #d9971f;
+}
+
+.bg-rose {
+  background-color: #bd2ac2;
+}
+
+.bg-twilight {
+  background-color: #c7227e;
+}
+
+.bg-bright-violet {
+  background-color: rgb(201 28 235);
+}
+
+.text-bright-violet {
+  color: rgb(201 28 235);
+}
+
+.text-bright-violet-2 {
+  color: rgb(253 0 255);
+}
+
+.bg-khaki {
+  background-color: #eeb618;
+}
+
+.bg-table-filter {
+  background-color: #8bd3d5
+}
+
+.bdr {
+  border: 2px solid #000;
+}
+
+/*.bdr-blue {*/
+/*    border-color: #408485;*/
+/*}*/
+
+.bdr-light-blue:hover {
+  border-color: #408485;
+  border-width: 2px;
+  box-shadow: 4px 4px 10px 4px #9f9d9f
+}
+
+.bdr-light-blue {
+  border-color: #b9cdcd;
+}
+
+.link-box {
+  cursor: pointer;
+}
+
+.pest-img {
+  width: 200px;
+  height: 200px;
+}
+
+.pest-img-list {
+  width: 250px;
+  height: 250px;
+}
+
+.action-button {
+  width: 140px;
+}
+
+.table-delete-button {
+  width: 100px;
+}
+
+.table-header {
+  background-color: #9119a9;
+  color: #fff;
+}
+
+.nav-profile-img {
+  width: 70px;
+  height: 70px;
+}
+
+.dashboard-profile-img {
+  width: 40px;
+  height: 40px;
+}
+
+body {
+  /* background-color: #d1e3d5; */
+  /* background-color: #d4f1f7; */
+  background: linear-gradient(90deg, rgb(227 242 249) 0%, rgb(245, 251, 252) 19%, rgb(242, 247, 248) 80%, rgb(224 243 251) 100%);
+}
+
+.home-title-banner {
+  background-color: #346fc3;
+}
+
+.blue-text {
+  color: #0ba3e9;
+}
+
+.text-steel-blue {
+  color: #0ba3e9;
+}
+
+.text-steel-blue-2 {
+  color: #217da9;
+}
+
+.border-steel-blue {
+  border-color: #5599b9 !important;
+}
+
+.orange-text {
+  color: #e9510b;
+}
+
+.sale-icon {
+  align-self: end;
+  width: 60px;
+}
+
+/*th {*/
+/*  color: white;*/
+/*  background: #a62f2f;*/
+/*}*/
+
+.gallery-max-product-title {
+  max-width: 245px;
+}
+
+.checkout-box {
+  border: 8px solid #daebeb;
+  padding: 14px;
+  border-radius: 8px;
+}

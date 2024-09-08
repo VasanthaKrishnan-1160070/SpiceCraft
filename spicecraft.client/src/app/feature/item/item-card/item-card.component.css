@@ -1,0 +1,58 @@
+
+.link-box {
+  cursor: pointer;
+}
+
+.pest-img {
+  width: 200px;
+  height: 200px;
+}
+
+.pest-img-list {
+  width: 250px;
+  height: 250px;
+}
+
+.home-title-banner {
+  background-color: #346fc3;
+}
+
+.blue-text {
+  color: #0ba3e9;
+}
+
+.text-steel-blue {
+  color: #0ba3e9;
+}
+
+.text-steel-blue-2 {
+  color: #217da9;
+}
+
+.border-steel-blue {
+  border-color: #5599b9 !important;
+}
+
+.orange-text {
+  color: #e9510b;
+}
+
+.sale-icon {
+  align-self: end;
+  width: 60px;
+}
+
+/*th {*/
+/*  color: white;*/
+/*  background: #a62f2f;*/
+/*}*/
+
+.gallery-max-product-title {
+  max-width: 245px;
+}
+
+.checkout-box {
+  border: 8px solid #daebeb;
+  padding: 14px;
+  border-radius: 8px;
+}

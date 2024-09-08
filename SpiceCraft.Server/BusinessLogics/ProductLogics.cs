@@ -3,6 +3,7 @@ using SpiceCraft.Server.DTO.Product;
 using SpiceCraft.Server.Helpers;
 using SpiceCraft.Server.Helpers.Request;
 using SpiceCraft.Server.Repository.Interface;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SpiceCraft.Server.BusinessLogics
 {
@@ -23,13 +24,12 @@ namespace SpiceCraft.Server.BusinessLogics
             // If products are found, return them with a success message
             if (result != null && result.Any())
             {
-                return new ResultDetail<IEnumerable<ProductCatalogItemDTO>>() { Message = "", IsSuccess = true, Data = result, Notify = false };
+                return HelperFactory.Msg.SuccessList(result);                
             }
             else
             {
                 // If no products are found, return an empty product list with a failure message
-
-                return new ResultDetail<IEnumerable<ProductCatalogItemDTO>>() { Message = "", IsSuccess = false, Data = result, Notify = false };
+                return HelperFactory.Msg.Error(result);               
             }
         }
 

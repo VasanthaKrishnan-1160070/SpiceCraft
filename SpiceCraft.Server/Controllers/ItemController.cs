@@ -18,7 +18,7 @@ public class ItemController(SpiceCraftContext context, IProductLogics productLog
     }
 
     [HttpGet("{itemId:int}")]
-    public ActionResult<ResultDetail<ProductDetailDTO>> GetItems(int itemId)
+    public ActionResult<ResultDetail<ProductDetailDTO>> GetItem(int itemId)
     {
         return productLogics.GetProductDetail(itemId);
     }
