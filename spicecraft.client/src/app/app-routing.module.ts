@@ -27,6 +27,9 @@ import {B2bOrderComponent} from "./feature/admin/b2b-order/b2b-order.component";
 import {B2bInventoryComponent} from "./feature/admin/b2b-inventory/b2b-inventory.component";
 import {B2bResetPasswordComponent} from "./feature/admin/b2b-reset-password/b2b-reset-password.component";
 import {ItemListComponent} from "./feature/item/item-list/item-list.component";
+import {B2bStaffListComponent} from "./feature/admin/b2b-staff/b2b-staff-list/b2b-staff-list.component";
+import {B2bCustomerComponent} from "./feature/admin/b2b-customer/b2b-customer.component";
+import {B2bCustomerListComponent} from "./feature/admin/b2b-customer/b2b-customer-list/b2b-customer-list.component";
 
 const routes: Routes = [
   { path: '', component: ClientHomeComponent},
@@ -47,14 +50,15 @@ const routes: Routes = [
   // b2b routes
   { path: 'b2b-dashboard', component: B2bDashboardComponent },
   { path: 'b2b-profile', component: B2bProfileComponent },
-  { path: 'b2b-dealer', component: B2bDealersComponent },
-  { path: 'b2b-staff', component: B2bStaffComponent },
-  { path: 'b2b-payment', component: B2bPaymentComponent },
-  { path: 'b2b-enquiry', component: B2bEnquiryComponent },
+  { path: 'b2b-dealer-list', component: B2bDealersComponent },
+  { path: 'b2b-staff-list', component: B2bStaffListComponent },
+  { path: 'b2b-customer-list', component: B2bCustomerListComponent },
+  { path: 'b2b-staff-detail', component: B2bStaffComponent },
+  { path: 'b2b-payment-list', component: B2bPaymentComponent },
+  { path: 'b2b-enquiry-list', component: B2bEnquiryComponent },
   { path: 'b2b-report', component: B2bReportComponent },
-  { path: 'b2b-payment', component: B2bPaymentComponent },
   { path: 'b2b-shipping', component: B2bShippingComponent },
-  { path: 'b2b-order', component: B2bOrderComponent },
+  { path: 'b2b-order-list', component: B2bOrderComponent },
   { path: 'b2b-inventory', component: B2bInventoryComponent },
   { path: 'b2b-reset-password', component: B2bResetPasswordComponent },
 ];

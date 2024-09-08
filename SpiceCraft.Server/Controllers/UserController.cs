@@ -50,6 +50,12 @@ namespace SpiceCraft.Server.Controllers
             return Ok(new { valid = true });
         }
 
+        [HttpGet("user-role/{roleId:int}")]
+        public async Task<IEnumerable<UserDTO>> GetUserByRole(int roleId)
+        {
+            return await _userRepository.GetUserByRoleAsync(roleId);
+        }
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {

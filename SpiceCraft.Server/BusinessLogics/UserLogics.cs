@@ -51,9 +51,9 @@ namespace SpiceCraft.Server.BusinessLogics
             return HelperFactory.Msg.Success(result);
         }
 
-        public async Task<ResultDetail<IEnumerable<UserDTO>>> GetUserByRole(int roleId)
+        public async Task<ResultDetail<IEnumerable<UserDTO>>> GetUserByRoleAsync(int roleId)
         {
-            var result = await userRepository.GetUserByRole(roleId);
+            var result = await userRepository.GetUserByRoleAsync(roleId);
             if (result == null || !result.Any())
             {
                 return HelperFactory.Msg.Error(result, "No Users Found for the given Role");

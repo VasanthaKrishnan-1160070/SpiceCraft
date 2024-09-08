@@ -1,6 +1,6 @@
 <div *ngIf="menuItem" class="d-flex flex-column m-4 bdr bdr-light-blue">
   <!-- Show the main image within the link -->
-  <div [ngClass]="saleClass">
+  <div [ngClass]="{ 'visible': menuItem.isInSale === 'Yes' && !isUserCorporateClient, 'invisible': menuItem.isInSale === 'No' || isUserCorporateClient}" class="d-flex flex-row justify-content-between pe-3 pt-2">
     <span *ngIf="showDiscountRate" class="text-center text-light align-self-center flex-wrap rounded-end-5 border-end bg-bright-violet ps-2 pe-2">
       {{ menuItem.discountRate }}% OFF
     </span>
@@ -71,8 +71,8 @@
 <!--    </div>-->
 
     <!-- Admin Actions -->
-    <div *ngIf="!showAddToCart && isUserInternal">
-      <a class="btn btn-info" [routerLink]="['/product', menuItem.itemId]">View Detail</a>
+    <div *ngIf="isUserInternal">
+      <a class="btn btn-success" [routerLink]="['/item-detail', menuItem.itemId]">View Detail</a>
       <a *ngIf="!isRemoved" class="btn btn-danger mt-3" href="#" (click)="removeProductFromListing(menuItem.itemId)">
         Remove From listing
       </a>

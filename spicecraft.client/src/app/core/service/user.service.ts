@@ -5,6 +5,8 @@ import {HttpResponse} from "@angular/common/http";
 import {map} from "rxjs/operators";
 import {RegisterModel} from "../interface/register-user.interface";
 import {ActionSuccessModel} from "../interface/action-success.interface";
+import {UserRoleEnum} from "../enum/user-role.enum";
+import {UserModel} from "../model/user/user.model";
 
 
 
@@ -47,5 +49,13 @@ export class UserService {
 
   registerStaff(customer: RegisterModel) {
     return this._api.post<ActionSuccessModel>('/user/register', customer)
+  }
+
+  getStaffs() {
+    return this._api.get<UserModel[]>(`/user/user-role/${UserRoleEnum.Staff}`);
+  }
+
+  getCustomers() {
+    return this._api.get<UserModel[]>(`/user/user-role/${UserRoleEnum.Customer}`);
   }
 }

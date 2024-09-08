@@ -11,7 +11,7 @@ namespace SpiceCraft.Server.BusinessLogics.Interface
         Task<ResultDetail<UsersCredential>> GetUserCredentialByUsernameAsync(string username);
         Task<ResultDetail<User>> GetUserByEmailAsync(string email);
         Task<ResultDetail<User>> GetUserByUserNameAsync(string username);
-        Task<ResultDetail<IEnumerable<UserDTO>>> GetUserByRole(int roleId);
+        Task<ResultDetail<IEnumerable<UserDTO>>> GetUserByRoleAsync(int roleId);
         Task<ResultDetail<bool>> CreateUserAsync(CreateUserRequest userRequest);
         Task<ResultDetail<bool>> CreateUpdateUserAsync(CreateUserRequest userRequest);
     }

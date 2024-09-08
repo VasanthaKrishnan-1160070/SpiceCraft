@@ -1,0 +1,86 @@
+<div class="p-4">
+  <sc-title [title]="'Staff List'"></sc-title>
+</div>
+
+<div class="ms-5 me-5">
+
+  <dx-data-grid
+    [dataSource]="staffs$ | async"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnReordering]="true"
+    [filterRow]="{ visible: true }"
+    [paging]="{ enabled: true, pageSize: 10 }"
+    [groupPanel]="{ visible: true }"
+    [grouping]="{ autoExpandAll: true }"
+    [sorting]="{ mode: 'multiple' }"
+    [selection]="{ mode: 'single' }"
+  >
+    <!-- Column Chooser -->
+    <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
+    <dxo-paging
+      [enabled]="true"
+      [pageSize]="5"
+      [pageIndex]="1"
+    >
+    </dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [displayMode]="'full'"
+      [showInfo]="true"
+      [showPageSizeSelector]="true"
+      [allowedPageSizes]="[10, 20, 50]"
+      infoText="Page #{0}. Total: {1} ({2} items)"
+      [showNavigationButtons]="true">
+    </dxo-pager>
+
+    <!-- Load Panel -->
+    <dxo-load-panel [enabled]="true"></dxo-load-panel>
+
+    <!-- Define columns for Staff -->
+    <dxi-column dataField="title" caption="Title"></dxi-column>
+    <dxi-column dataField="userName" caption="User Name"></dxi-column>
+    <dxi-column dataField="firstName" caption="First Name"></dxi-column>
+    <dxi-column dataField="lastName" caption="Last Name"></dxi-column>
+    <dxi-column dataField="email" caption="Email"></dxi-column>
+    <dxi-column dataField="isActive" caption="Active" [dataType]="'boolean'"></dxi-column>
+    <dxi-column dataField="phone" caption="Phone"></dxi-column>
+
+    <dxi-column caption="Edit" [width]="70" [cellTemplate]="'editButtonTemplate'" >
+      <div *dxTemplate="let data of 'editButtonTemplate'">
+        <button class="btn btn-success">Edit</button>
+      </div>
+    </dxi-column>
+
+    <dxi-column caption="Delete" [width]="90" [cellTemplate]="'deleteButtonTemplate'" >
+      <div *dxTemplate="let data of 'deleteButtonTemplate'">
+        <button class="btn btn-danger">Delete</button>
+      </div>
+    </dxi-column>
+
+    <!-- Master-Detail for User Address -->
+    <dxo-master-detail [enabled]="true" [autoExpandAll]="false" template="detail" >
+
+    </dxo-master-detail>
+
+    <div *dxTemplate="let data of 'detail'">
+      {{ data | json }}
+      <!-- Detail grid (User Address) -->
+      <dx-data-grid
+        *ngIf="data.data.userAddress"
+        [dataSource]="[data.data.userAddress]"
+        [showBorders]="true"
+        [columnAutoWidth]="true"
+      >
+        <dxi-column dataField="streetAddress1" caption="Street Address 1"></dxi-column>
+        <dxi-column dataField="streetAddress2" caption="Street Address 2"></dxi-column>
+        <dxi-column dataField="city" caption="City"></dxi-column>
+        <dxi-column dataField="stateOrProvince" caption="State/Province"></dxi-column>
+        <dxi-column dataField="postalCode" caption="Postal Code"></dxi-column>
+        <dxi-column dataField="addressType" caption="Address Type"></dxi-column>
+      </dx-data-grid>
+    </div>
+
+</dx-data-grid>
+
+</div>

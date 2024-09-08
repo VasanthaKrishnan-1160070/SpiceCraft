@@ -94,7 +94,8 @@
 </div>
 
 <!-- Showing menu items in gallery view-->
-  <div class="d-flex justify-content-center flex-wrap">
+<div class="offset-1 col-10">
+  <div class="d-flex justify-content-start flex-wrap">
     @for (item of menuItems; track item) {
       <sc-item-card [menuItem]="item" [showAddToCart]="isUserExternal"></sc-item-card>
     } @empty {
@@ -105,4 +106,4 @@
       </div>
     }
   </div>
-
+</div>

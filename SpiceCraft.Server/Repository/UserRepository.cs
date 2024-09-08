@@ -45,7 +45,7 @@ namespace SpiceCraft.Server.Repository
                                  .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<UserDTO>> GetUserByRole(int roleId)
+        public async Task<IEnumerable<UserDTO>> GetUserByRoleAsync(int roleId)
         {
             return await _context.Users
                                  .AsNoTracking()

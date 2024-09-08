@@ -37,7 +37,7 @@ export class ItemCardComponent {
 
   get isUserInternal(): boolean {
     // Replace with actual logic to check if the user is internal
-    return true;
+    return false;
   }
 
   get productImage(): string {

@@ -1,13 +1,13 @@
 @if (userType() === 'client')     {
-  <div class="side-navigation bg-plant-green">
-    <div class="mb-3 d-flex flex-column p-3 side-nav-header">
+  <div class="min-vh-100 d-flex flex-column side-navigation">
+    <div class="mb-3 d-flex flex-column p-5 side-nav-header">
       <i class="fa-solid fa-user fa-4x text-pale-grey align-self-center"></i>
       <p class="align-self-center fs-5 mt-3 text-light">{{firstName()}}</p>
     </div>
 
     <div class="d-flex flex-column justify-content-start">
       @for(item of  navigation(); track item.name) {
-        <div class="d-flex p-3 ps-1 ms-4">
+        <div class="d-flex p-3 ps-3 ms-4">
           <div style="width: 38px; height: 28px;">
             <i class="{{item.icon}} fs-4 side-nav-icons  align-self-center"></i>
           </div>
@@ -19,8 +19,7 @@
 }
 
 @else {
-  <div class="side-navigation bg-royal-blue">
-
+  <div class="side-navigation">
     <div class="mb-3 d-flex flex-column p-3 bg-royal-blue-green">
       <i class="fa-solid fa-user fa-4x text-pale-grey align-self-center"></i>
       <p class="align-self-center fs-5 mt-3 text-light">{{firstName()}}</p>
@@ -28,7 +27,7 @@
 
     <div class="d-flex flex-column justify-content-start">
       @for(item of  navigation(); track item.name) {
-        <div class="d-flex p-3 ps-1 ms-4">
+        <div class="d-flex p-3 ps-3 ms-4">
           <div style="width: 38px; height: 28px;">
             <i class="{{item.icon}} fs-4 side-nav-icons  align-self-center"></i>
           </div>
