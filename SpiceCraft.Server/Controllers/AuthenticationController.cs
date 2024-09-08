@@ -26,35 +26,7 @@ namespace SpiceCraft.Server.Controllers
             _userRepository = userRepository;
             _jwtService = jwtService;
             _configuration = configuration;
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
-        {
-            var existingUser = await _userRepository.GetUserCredentialByUsernameAsync(model.UserName);
-            if (existingUser != null)
-            {
-                return BadRequest(new { message = "Username is already taken" });
-            }
-
-            var user = new User
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-            };
-
-            var credential = new UsersCredential
-            {
-                UserName = model.UserName,
-                Password = PasswordHelper.HashPassword(model.Password),
-                User = user
-            };
-
-            await _userRepository.AddUserAsync(user, credential);
-
-            return Ok(new { message = "User registered successfully" });
-        }
+        }        
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SpiceCraft.Server.DTO.User;
 using SpiceCraft.Server.Helpers;
 using SpiceCraft.Server.IndentityModels;
 using SpiceCraft.Server.Models;
@@ -56,12 +57,7 @@ namespace SpiceCraft.Server.Controllers
             if (existingUser != null)
             {
                 return BadRequest(new { message = "Username is already taken" });
-            }
-
-            if (string.IsNullOrWhiteSpace(model.Password))
-            {
-                model.Password = "!Apple123";
-            }
+            }           
 
             var user = new User
             {
@@ -87,8 +83,7 @@ namespace SpiceCraft.Server.Controllers
                 StreetAddress2 = model.StreetAddress2,
                 City = model.City,
                 StateOrProvince = model.State,
-                PostalCode = model.PostalCode,
-                User = user
+                PostalCode = model.PostalCode               
             };
 
             await _userRepository.AddUserAsync(user, credential, address);

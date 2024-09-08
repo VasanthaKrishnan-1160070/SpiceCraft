@@ -97,14 +97,22 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Use custom exception middleware
+app.UseMiddleware<CustomExceptionMiddleware>();
+
 // Seed data
 // Calling the seeding extension method
 await app.SeedDataAsync();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error");
 }
 
 app.UseRouting();

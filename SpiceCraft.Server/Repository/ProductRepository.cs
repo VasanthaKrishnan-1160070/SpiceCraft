@@ -119,21 +119,21 @@ namespace SpiceCraft.Server.Repository
             return query;
         }
 
-        public IQueryable<ProductCatalogItemDTO> ApplySortingCondition(IQueryable<ProductCatalogItemDTO> query, string sorting)
+        public IQueryable<ProductCatalogItemDTO> ApplySortingCondition(IQueryable<ProductCatalogItemDTO> query, ProductSortingEnum sorting)
         {
             // Apply sorting conditions based on your requirements
             switch (sorting)
             {
-                case "price_asc":
+                case ProductSortingEnum.PriceLowToHigh:
                     query = query.OrderBy(p => p.Price);
                     break;
-                case "price_desc":
+                case ProductSortingEnum.PriceHighToLow:
                     query = query.OrderByDescending(p => p.Price);
                     break;
-                case "name_asc":
+                case ProductSortingEnum.NameAToZ:
                     query = query.OrderBy(p => p.ProductName);
                     break;
-                case "name_desc":
+                case ProductSortingEnum.NameZToA:
                     query = query.OrderByDescending(p => p.ProductName);
                     break;
                 default:
@@ -142,6 +142,49 @@ namespace SpiceCraft.Server.Repository
             }
 
             return query;
+        }
+
+        public ProductSummaryDTO CreateUpdateProduct(ProductSummaryDTO product)
+        {
+            Item item = new Item()
+            {
+                CategoryId = product.SubCategoryId,
+                Description = product.Description,
+                Discount = product.DiscountRate,
+                ItemName = product.ItemName,
+                Price = product.Price,
+                OwnProduct = product.OwnProduct
+            };
+
+            if (product?.ItemId != null && product?.ItemId != 0)
+            {
+                _context.Update(item);
+            }
+            _context.Items.Add(item);
+
+            _context.SaveChanges();
+            return product;
+        }
+
+        public bool CreateUpdateItemImages(IEnumerable<ProductImageDto> productImages)
+        {
+            List<ItemImage> itemImages = new();
+            foreach (var image in productImages)
+            {
+                var itemImage = new ItemImage()
+                {
+                    ImageCode = image.ImageCode,
+                    ImageIndex = image.ImageIndex,
+                    ImageName = image.ImageName,
+                    IsMain = image.IsMain,
+                    ItemId = image.ItemId
+                };
+                itemImages.Add(itemImage);
+            }
+            _context.ItemImages.AddRange(itemImages);
+            int status = _context.SaveChanges();
+
+            return status > 0;
         }
 
         public IEnumerable<CategoryDTO> GetSubCategories(int? parentCategoryId)
@@ -159,23 +202,22 @@ namespace SpiceCraft.Server.Repository
             return subCategories;
         }
 
-        public int GetProductImageNextIndex(int productId)
+        public int GetProductImageNextIndex(int itemId)
         {
             // Query to get the maximum image index for the given product ID
             var maxIndex = _context.ItemImages
-                .Where(pi => pi.ItemId == productId)
+                .Where(pi => pi.ItemId == itemId)
                 .Max(pi => (int?)pi.ImageIndex) ?? 0;
 
             // Increment the max index by 1
             return maxIndex + 1;
         }
 
-
-        public void UpdateMainImage(int productId, string imageCode)
+        public void UpdateMainImage(int ItemId, string imageCode)
         {
             // First, set `IsMain = false` for all images except the given main image
             var imagesToUpdate = _context.ItemImages
-                .Where(pi => pi.ItemId == productId && pi.ImageCode != imageCode)
+                .Where(pi => pi.ItemId == ItemId && pi.ImageCode != imageCode)
                 .ToList();
 
             foreach (var image in imagesToUpdate)
@@ -188,7 +230,7 @@ namespace SpiceCraft.Server.Repository
 
             // Then, set `IsMain = true` for the given main image
             var mainImage = _context.ItemImages
-                .FirstOrDefault(pi => pi.ItemId == productId && pi.ImageCode == imageCode);
+                .FirstOrDefault(pi => pi.ItemId == ItemId && pi.ImageCode == imageCode);
 
             if (mainImage != null)
             {
@@ -196,7 +238,6 @@ namespace SpiceCraft.Server.Repository
                 _context.SaveChanges();
             }
         }
-
 
         public IEnumerable<ItemImageDTO> GetProductImages(int? productId)
         {
@@ -216,7 +257,6 @@ namespace SpiceCraft.Server.Repository
             return productImages;
         }
 
-
         public IEnumerable<CategoryDTO> GetParentCategories()
         {
             var categories = _context.ItemCategories
@@ -230,7 +270,6 @@ namespace SpiceCraft.Server.Repository
 
             return categories;
         }
-
 
         public ProductDetailDTO GetProductDetail(int? productId)
         {
@@ -294,6 +333,23 @@ namespace SpiceCraft.Server.Repository
                 SubCategories = subCategories,
                 ProductImages = productImages
             };
+        }
+
+        public bool AddOrRemoveProductFromListing(int ItemId, bool isRemove = false)
+        {
+            // Find the product by productId
+            var product = _context.Items.FirstOrDefault(p => p.ItemId == ItemId);
+
+            if (product != null)
+            {
+                // Update the `IsRemoved` status
+                product.IsRemoved = isRemove;
+                _context.SaveChanges();
+
+                return true; // Return true if the update was successful
+            }
+
+            return false; // Return false if the product was not found
         }
 
     }
