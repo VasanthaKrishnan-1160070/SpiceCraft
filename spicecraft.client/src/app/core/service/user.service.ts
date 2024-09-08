@@ -7,6 +7,7 @@ import {RegisterModel} from "../interface/register-user.interface";
 import {ActionSuccessModel} from "../interface/action-success.interface";
 import {UserRoleEnum} from "../enum/user-role.enum";
 import {UserModel} from "../model/user/user.model";
+import {LoggedInUserModel} from "../model/user/logged-in-user.model";
 
 
 
@@ -17,8 +18,9 @@ export class UserService {
 
   private _api = inject(WebAPIService)
 
-  loggedInUser = {
+  loggedInUser: LoggedInUserModel = {
     firstName: '',
+    lastName: '',
     email: '',
     roleName: '',
     userName: ''
@@ -26,11 +28,22 @@ export class UserService {
 
   constructor() { }
 
-  getLoggedInUser() {
+  getLoggedInUser(): LoggedInUserModel {
     let loggedInUser = localStorage.getItem('loggedInUser');
     if (loggedInUser) {
-      return JSON.parse(loggedInUser);
+      return JSON.parse(loggedInUser) as LoggedInUserModel;
     }
+    return this.loggedInUser;
+  }
+
+  getCurrentUserName(): string {
+    const loggedInUser = this.getLoggedInUser();
+    return `${loggedInUser.firstName} ${loggedInUser.lastName}`;
+  }
+
+  getCurrentUserRole(): string {
+    const loggedInUser = this.getLoggedInUser();
+    return loggedInUser.roleName;
   }
 
   checkUserName(userName: string) {
@@ -57,5 +70,9 @@ export class UserService {
 
   getCustomers() {
     return this._api.get<UserModel[]>(`/user/user-role/${UserRoleEnum.Customer}`);
+  }
+
+  getDealers() {
+    return this._api.get<UserModel[]>(`/user/user-role/${UserRoleEnum.Manager}`);
   }
 }

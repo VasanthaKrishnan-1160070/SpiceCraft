@@ -47,7 +47,16 @@ export class ItemListComponent implements OnInit, OnDestroy {
   public subCategories!: LookupModel[];
 
   ngOnInit() {
-    this._itemService.getItems().pipe(
+    this.filterForm = {
+      keyword: " ",
+      categoryId: 0,
+      subCategoryId: 0,
+      filter: ItemFilterEnum.None,
+      sorting: ItemFilterSortingEnum.None,
+      includeRemovedProducts: true
+    }
+
+    this._itemService.getItems(this.filterForm).pipe(
       takeUntil(this._destroy$)
     )
     .subscribe(
@@ -58,54 +67,54 @@ export class ItemListComponent implements OnInit, OnDestroy {
     );
 
     this.getCategories();
-    this.productFilters = this._lookupService.enumToDataSource(ItemFilterEnum);
-    this.productSorting = this._lookupService.enumToDataSource(ItemFilterSortingEnum);
-    this.filterForm = {
-      keyword: '',
-      categoryId: 0,
-      subCategoryId: 0,
-      filter: ItemFilterEnum.InStock,
-      sorting: ItemFilterSortingEnum.NameAToZ,
-      includeRemovedProducts: true
-    }
+    this.productFilters = this._lookupService.enumToDataSource(ItemFilterEnum, 'Select Filter');
+    this.productSorting = this._lookupService.enumToDataSource(ItemFilterSortingEnum, 'Select Sorting');
+
   }
 
   public getCategories() {
     this._categoryService.getCategories()
       .pipe(
-        map((categories: CategoryModel[]) =>
-          categories.map(category => ({
+        map((categories: CategoryModel[]) => [
+          // Add the default "Select Category" option with key 0
+          { key: 0, value: 'Select Category' },
+          ...categories.map(category => ({
             key: category.categoryId,
             value: category.categoryName
           }))
-        ),
+        ]),
         takeUntil(this._destroy$)
       )
       .subscribe((mappedCategories) => {
-        this.categories = mappedCategories;
+        this.categories = mappedCategories;  // Assign the mapped categories to the categories array
       });
   }
+
 
   public getSubCategories() {
     const selectedCategory = this.filterForm.categoryId;
 
     this._categoryService.getSubCategories(selectedCategory)
       .pipe(
-        map((subCategories: CategoryModel[]) =>
-          subCategories.map(subCategory => ({
+        map((subCategories: CategoryModel[]) => [
+          // Add the default "Select Subcategory" option with key 0
+          { key: 0, value: 'Select Subcategory' },
+          ...subCategories.map(subCategory => ({
             key: subCategory.categoryId,
             value: subCategory.categoryName
           }))
-        ),
+        ]),
         takeUntil(this._destroy$)
       )
       .subscribe((mappedSubCategories) => {
-        this.subCategories = mappedSubCategories;  // Assign the mapped categories to subCategories
+        this.subCategories = mappedSubCategories;  // Assign the mapped subcategories to the subCategories array
+        console.log(this.subCategories);
       });
   }
 
+
   public applyFilter() {
-    this._itemService.getItems().pipe(
+    this._itemService.getItems(this.filterForm).pipe(
      take(1)
     )
       .subscribe(
@@ -115,7 +124,14 @@ export class ItemListComponent implements OnInit, OnDestroy {
   }
 
   public resetFilter() {
-
+    this.filterForm = {
+      keyword: " ",
+      categoryId: 0,
+      subCategoryId: 0,
+      filter: ItemFilterEnum.None,
+      sorting: ItemFilterSortingEnum.None,
+      includeRemovedProducts: true
+    }
   }
 
   ngOnDestroy() {

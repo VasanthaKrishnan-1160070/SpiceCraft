@@ -3,6 +3,7 @@ import {WebAPIService} from "./webAPI.service";
 import {Observable, of} from "rxjs";
 import { tap, map, catchError } from 'rxjs/operators';
 import {UserService} from "./user.service";
+import {LoggedInUserModel} from "../model/user/logged-in-user.model";
 
 @Injectable({
   providedIn: 'root'
@@ -19,9 +20,10 @@ export class AuthService {
         const token = response?.token;
         if (token) {
           localStorage.setItem('authToken', token);
-          let loggedInUser = this._userService.loggedInUser;
+          let loggedInUser: LoggedInUserModel = this._userService.loggedInUser;
           loggedInUser.email = response?.email;
           loggedInUser.userName = response?.userName;
+          loggedInUser.lastName = response?.lastName;
           loggedInUser.firstName = response?.firstName;
           loggedInUser.roleName = response?.roleName;
           this._userService.loggedInUser = loggedInUser;

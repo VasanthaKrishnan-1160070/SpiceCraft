@@ -11,75 +11,86 @@
 <!-- Product Filter form section -->
 <div class="offset-1 col-10 mt-4 bg-light rounded-2 border border-3 brdr-red-saffron">
   <div>
-    <div class="p-3 bg-light-coffee-2 border-bottom border-3 brdr-red-saffron">
+    <div class="pt-1 pb-1 ps-4 pe-4 bg-light-coffee-2 border-bottom border-3 brdr-red-saffron">
       <h4 class="text-center">Filter Product</h4>
       <form (ngSubmit)="applyFilter()">
         <div class="row">
           <div class="col">
-            <!-- Keyword input -->
-            <dx-text-box
-              [(value)]="filterForm.keyword"
-              placeholder="Enter keyword to search..."
-              [disabled]="false"
-            >
-              <dxo-label text="Keyword"></dxo-label>
-            </dx-text-box>
+            <!-- Keyword input with label -->
+            <div class="form-group">
+              <label class="form-label" for="keyword">Keyword</label>
+              <dx-text-box
+                id="keyword"
+                [(value)]="filterForm.keyword"
+                placeholder="Enter keyword to search..."
+                [disabled]="false"
+              ></dx-text-box>
+            </div>
           </div>
           <div class="col">
-            <!-- Category select box -->
-            <dx-select-box
-              [(value)]="filterForm.categoryId"
-              [items]="categories"
-              displayExpr="category_name"
-              valueExpr="category_id"
-              placeholder="Select Category"
-              [disabled]="false"
-              (onValueChanged)="getSubCategories()"
-            >
-              <dxo-label text="Category"></dxo-label>
-            </dx-select-box>
+            <!-- Category select box with label -->
+            <div class="form-group">
+              <label class="form-label" for="category">Category</label>
+              <dx-select-box
+                id="category"
+                [(value)]="filterForm.categoryId"
+                [items]="categories"
+                displayExpr="value"
+                valueExpr="key"
+                placeholder="Select Category"
+                [disabled]="false"
+                (onValueChanged)="getSubCategories()"
+              ></dx-select-box>
+            </div>
           </div>
           <div class="col">
-            <!-- Sub Category select box -->
-            <dx-select-box
-              [(value)]="filterForm.subCategoryId"
-              [items]="subCategories"
-              displayExpr="category_name"
-              valueExpr="category_id"
-              placeholder="Select Sub Category"
-              [disabled]="false"
-            >
-              <dxo-label text="Sub Category"></dxo-label>
-            </dx-select-box>
+            <!-- Sub Category select box with label -->
+            <div class="form-group">
+              <label class="form-label" for="subCategory">Sub Category</label>
+              <dx-select-box
+                id="subCategory"
+                [(value)]="filterForm.subCategoryId"
+                [items]="subCategories"
+                displayExpr="value"
+                valueExpr="key"
+                placeholder="Select Sub Category"
+                [disabled]="false"
+              ></dx-select-box>
+            </div>
           </div>
         </div>
 
+        <div class="p-1"></div>
         <div class="row">
           <div class="col">
-            <!-- Filter By select box -->
-            <dx-select-box
-              [(value)]="filterForm.filter"
-              [items]="productFilters"
-              displayExpr="value"
-              valueExpr="key"
-              placeholder="Filter By"
-              [disabled]="false"
-            >
-              <dxo-label text="Filter By"></dxo-label>
-            </dx-select-box>
+            <!-- Filter By select box with label -->
+            <div class="form-group">
+              <label class="form-label" for="filterBy">Filter By</label>
+              <dx-select-box
+                id="filterBy"
+                [(value)]="filterForm.filter"
+                [items]="productFilters"
+                displayExpr="value"
+                valueExpr="key"
+                placeholder="Filter By"
+                [disabled]="false"
+              ></dx-select-box>
+            </div>
           </div>
           <div class="col">
-            <!-- Sort By select box -->
-            <dx-select-box
-              [(value)]="filterForm.sorting"
-              [items]="productSorting"
-              displayExpr="value"
-              valueExpr="key"
-              placeholder="Sort By"
-              [disabled]="false"
-            >
-              <dxo-label text="Sort By"></dxo-label>
-            </dx-select-box>
+            <!-- Sort By select box with label -->
+            <div class="form-group">
+              <label class="form-label" for="sortBy">Sort By</label>
+              <dx-select-box
+                id="sortBy"
+                [(value)]="filterForm.sorting"
+                [items]="productSorting"
+                displayExpr="value"
+                valueExpr="key"
+                placeholder="Sort By"
+                [disabled]="false"
+              ></dx-select-box>
+            </div>
           </div>
           <div class="col d-flex align-items-center">
             <!-- Apply Filter Button -->
@@ -89,9 +100,11 @@
           </div>
         </div>
       </form>
+      <div class="p-1"></div>
     </div>
   </div>
 </div>
+
 
 <!-- Showing menu items in gallery view-->
 <div class="offset-1 col-10">
@@ -99,7 +112,7 @@
     @for (item of menuItems; track item) {
       <sc-item-card [menuItem]="item" [showAddToCart]="isUserExternal"></sc-item-card>
     } @empty {
-      <div class="p-5 center-content">
+      <div class="p-3 center-content flex-grow-1 mt-4">
         <div class="alert alert-warning text-center mt-3">
           <span>Sorry No Menu Items found</span>
         </div>

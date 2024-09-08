@@ -2,6 +2,7 @@
 
 public enum ProductSortingEnum
 {
+    None = 0,
     PriceLowToHigh,
     PriceHighToLow,
     NameAToZ,

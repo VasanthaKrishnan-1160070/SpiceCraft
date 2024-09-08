@@ -1,5 +1,6 @@
 export enum ItemFilterSortingEnum
 {
+  None = 0,
   PriceLowToHigh,
   PriceHighToLow,
   NameAToZ,

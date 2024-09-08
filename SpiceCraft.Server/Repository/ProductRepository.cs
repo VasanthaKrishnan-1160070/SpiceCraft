@@ -70,7 +70,7 @@ namespace SpiceCraft.Server.Repository
             // Filtering based on keyword
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                query = query.Where(p => p.ProductName.Contains(keyword) || p.Description.Contains(keyword));
+                query = query.Where(p => p.ProductName.Contains(keyword.Trim()) || p.Description.Contains(keyword.Trim()));
             }
 
             // Exclude removed products if specified

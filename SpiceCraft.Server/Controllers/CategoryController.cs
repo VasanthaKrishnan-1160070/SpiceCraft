@@ -25,9 +25,8 @@ namespace SpiceCraft.Server.Controllers
         [HttpGet("{categoryId:int}/sub-categories")]
         public async Task<IEnumerable<CategoryDTO>> GetSubCategory(int categoryId)
         {
-            return await context.ItemCategories
-                           .Where(w => w.CategoryId == categoryId)
-                           .Where(w => w.ParentCategoryId != null)
+            return await context.ItemCategories                           
+                           .Where(w => w.ParentCategoryId == categoryId)
                            .Select(c => new CategoryDTO
                            {
                                CategoryId = c.CategoryId,

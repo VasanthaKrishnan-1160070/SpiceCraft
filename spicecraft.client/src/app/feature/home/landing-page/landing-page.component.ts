@@ -56,7 +56,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   checkIsIntroPage(currentRoute: string): void {
-    this.isIntroPage = currentRoute === 'home' || currentRoute === 'login' || currentRoute === 'customer-registration' || currentRoute === 'staff-registration';
+    this.isIntroPage = currentRoute === '' ||  currentRoute === 'home' || currentRoute === 'login' || currentRoute === 'customer-registration' || currentRoute === 'staff-registration';
   }
 
   ngOnDestroy() {

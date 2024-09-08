@@ -5,6 +5,7 @@ import {ItemSummaryModel} from "../model/item/item-summary-item.model";
 import {HttpClient} from "@angular/common/http";
 import {WebAPIService} from "./webAPI.service";
 import {MenuItemModel} from "../model/item/menu-item.model";
+import {ItemFilterModel} from "../model/item/item-filter.model";
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ import {MenuItemModel} from "../model/item/menu-item.model";
 export class ItemService {
   private _api = inject(WebAPIService)
 
-  getItems(): Observable<ResultDetailModel<MenuItemModel>> {
-    return this._api.get<ResultDetailModel<MenuItemModel>>('/item');
+  getItems(filterForm: ItemFilterModel): Observable<ResultDetailModel<MenuItemModel>> {
+    return this._api.get<ResultDetailModel<MenuItemModel>>('/item', filterForm);
   }
 }
