@@ -32,6 +32,7 @@ import {B2bCustomerComponent} from "./feature/admin/b2b-customer/b2b-customer.co
 import {B2bCustomerListComponent} from "./feature/admin/b2b-customer/b2b-customer-list/b2b-customer-list.component";
 import {EnquiryListComponent} from "./feature/enquiry/enquiry-list/enquiry-list.component";
 import {EnquiryDetailComponent} from "./feature/enquiry/enquiry-detail/enquiry-detail.component";
+import {CartListComponent} from "./feature/cart/cart-list/cart-list.component";
 
 const routes: Routes = [
   { path: '', component: ClientHomeComponent},
@@ -42,6 +43,7 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'item-list', component: ItemListComponent },
+  { path: 'cart-list', component: CartListComponent },
   { path: 'orders', component: OrderComponent },
   { path: 'payment', component: PaymentComponent },
   { path: 'enquiry-list', component: EnquiryListComponent },

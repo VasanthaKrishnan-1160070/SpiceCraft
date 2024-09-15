@@ -1,6 +1,7 @@
 ﻿using SpiceCraft.Server.BusinessLogics.Interface;
 using SpiceCraft.Server.DTO.Cart;
 using SpiceCraft.Server.Helpers;
+using SpiceCraft.Server.Helpers.Request;
 using SpiceCraft.Server.Repository.Interface;
 
 namespace SpiceCraft.Server.BusinessLogics
@@ -54,9 +55,14 @@ namespace SpiceCraft.Server.BusinessLogics
         return HelperFactory.Msg.Success("Quantity decreased successfully.");
     }
 
-    public async Task<ResultDetail<string>> AddOrUpdateCartItemAsync(CartItemDTO cartItemDTO)
+    public async Task<ResultDetail<string>> AddOrUpdateCartItemAsync(CreateUpdateCartItemRequest cartItemRequest)
     {
-        await _shoppingCartService.CreateOrUpdateCartItemAsync(cartItemDTO);
+        // first we need to check if the shopping cart exists for the user
+        int cartid = await _shoppingCartService.CreateOrGetShoppingCartAsync(cartItemRequest.UserId);
+        
+        // now we can add/update the item in the cart
+        cartItemRequest.CartId = cartid;
+        await _shoppingCartService.CreateOrUpdateCartItemAsync(cartItemRequest);
         return HelperFactory.Msg.Success("Cart item added/updated successfully.");
     }
 

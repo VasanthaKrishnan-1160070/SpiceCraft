@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, inject, OnDestroy, OnInit, Output, signal} from '@angular/core';
 import {TitleComponent} from "../../../shared/components/title/title.component";
 import {ItemService} from "../../../core/service/item.service";
 import {map, take, takeUntil} from "rxjs/operators";
@@ -43,6 +43,7 @@ export class ItemListComponent implements OnInit, OnDestroy {
   private _cartService = inject(CartService);
   private _destroy$: Subject<void> = new Subject<void>();
 
+
   public menuItems!: MenuItemModel[] | null | undefined;
   public isUserExternal = true;
   public filterForm!: ItemFilterModel;
@@ -50,6 +51,7 @@ export class ItemListComponent implements OnInit, OnDestroy {
   public productFilters!: LookupModel[];
   public productSorting!: LookupModel[];
   public subCategories!: LookupModel[];
+  public itemIdToAddToCart = signal(0);
 
   ngOnInit() {
     this.filterForm = {
@@ -125,7 +127,8 @@ export class ItemListComponent implements OnInit, OnDestroy {
         })
   }
 
-  public onAddToCartClick(eventParam: any) {
+  public onAddToCartClick(itemId: number) {
+    this.itemIdToAddToCart.set(itemId);
     this._cartService.showCartDialog();
   }
 

@@ -2,6 +2,7 @@
 using SpiceCraft.Server.BusinessLogics.Interface;
 using SpiceCraft.Server.Context;
 using SpiceCraft.Server.DTO.Cart;
+using SpiceCraft.Server.Helpers.Request;
 using SpiceCraft.Server.Models;
 using SpiceCraft.Server.Repository.Interface;
 
@@ -15,8 +16,30 @@ public class CartRepository : ICartRepository
     {
         _context = context;
     }
+    
+    // Creaete Shopping Cart for the given user ID
+    public async Task<int> CreateOrGetShoppingCartAsync(int userId)
+    {
+        // first check shopping cart for the user exists
+        ShoppingCart? cart = await _context.ShoppingCarts
+                                .Where(w => w.UserId == userId)
+                                .FirstOrDefaultAsync();
+        if (cart!= null) return cart.CartId;
 
-     // Retrieves all shopping cart items for a given user ID
+        // if not, create a new one and return the ID
+        int cartId = 0;
+        await _context.ShoppingCarts.AddAsync(new ShoppingCart { UserId = userId });
+        if (await _context.SaveChangesAsync() > 0)
+        {
+             cartId = await _context.ShoppingCarts
+                        .Where(w => w.UserId == userId)
+                        .Select(s => s.CartId)
+                        .FirstOrDefaultAsync();
+        }
+        return cartId;
+    }
+
+    // Retrieves all shopping cart items for a given user ID
      public async Task<ShoppingCartDTO> GetShoppingCartsByUserIdAsync(int userId)
 {
     var cartItems = await (from sc in _context.ShoppingCarts
@@ -194,7 +217,7 @@ public class CartRepository : ICartRepository
     }
 
     // Creates a new cart item or updates an existing one
-    public async Task CreateOrUpdateCartItemAsync(CartItemDTO cartItemDTO)
+    public async Task CreateOrUpdateCartItemAsync(CreateUpdateCartItemRequest cartItemDTO)
     {
         var cartItem = await _context.CartItems
             .FirstOrDefaultAsync(ci => ci.CartId == cartItemDTO.CartId && ci.ItemId == cartItemDTO.ItemId);

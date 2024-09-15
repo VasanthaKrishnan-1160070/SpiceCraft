@@ -1,0 +1,91 @@
+<div class="container mt-3">
+  <!-- Checkout button displayed if there are items in the cart -->
+  <div *ngIf="cartItems.length > 0" class="d-flex justify-content-end mb-3">
+    <dx-button text="Checkout" type="success" (onClick)="checkout()"></dx-button>
+  </div>
+
+  <!-- DevExtreme DataGrid for displaying the shopping cart items -->
+  <dx-data-grid
+    [dataSource]="cartItems"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnReordering]="true"
+    [filterRow]="{ visible: true }"
+    [paging]="{ enabled: true, pageSize: 5 }"
+    [groupPanel]="{ visible: true }"
+    [grouping]="{ autoExpandAll: true }"
+    [sorting]="{ mode: 'multiple' }"
+
+  >
+    <!-- Column Chooser -->
+    <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
+    <dxo-paging
+      [enabled]="true"
+      [pageSize]="5"
+      [pageIndex]="1"
+    >
+    </dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [displayMode]="'full'"
+      [showInfo]="true"
+      [showPageSizeSelector]="true"
+      [allowedPageSizes]="[10, 20, 50]"
+      infoText="Page #{0}. Total: {1} ({2} items)"
+      [showNavigationButtons]="true">
+    </dxo-pager>
+
+    <!-- Load Panel -->
+    <dxo-load-panel [enabled]="true"></dxo-load-panel>
+
+    <!-- Define columns -->
+    <dxi-column dataField="itemName" caption="Product Name"></dxi-column>
+    <dxi-column [width]="90" dataField="quantity" caption="Quantity"></dxi-column>
+    <dxi-column dataField="actualPrice" caption="Price" [cellTemplate]="'priceTemplate'"></dxi-column>
+    <dxi-column dataField="finalPrice" caption="Final Price" [cellTemplate]="'priceTemplate'"></dxi-column>
+
+    <div *dxTemplate="let data of 'priceTemplate'">
+      <!-- Template for rendering price fields with currency formatting -->
+      <span>{{ data.value }}</span>
+    </div>
+
+    <!-- Action buttons for add/remove quantity and delete -->
+    <dxi-column [width]="300" caption="Actions" cellTemplate="actionsTemplate">
+      <!-- Template for action buttons -->
+      <div *dxTemplate="let data of 'actionsTemplate'">
+        <dx-button
+          text="Add Qty"
+          type="success"
+          (onClick)="updateQuantity(data.data.cartItemId, 1, 'increment')">
+        </dx-button>
+        <dx-button
+          text="Remove Qty"
+          type="success"
+          class="ms-3"
+          (onClick)="updateQuantity(data.data.cartItemId, 1, 'decrement')">
+        </dx-button>
+        <dx-button
+          text="Delete"
+          type="success"
+          class="ms-3"
+          (onClick)="updateQuantity(data.data.cartItemId, 0, 'delete')">
+        </dx-button>
+      </div>
+    </dxi-column>
+  </dx-data-grid>
+
+  <!-- Total price and savings section -->
+  <div *ngIf="cartItems.length > 0" class="text-light p-2 d-flex justify-content-center align-items-center">
+    <h4 class="align-self-center text-info me-5">
+      To Pay: <span class="fw-bold text-bright-violet-2">${{ totalPrice.totalPrice }}</span>
+      <span *ngIf="totalPrice.totalSavings && totalPrice.totalSavings !== '0.00'">
+        , You save in total <span class="fw-bold text-bright-violet-2">${{ totalPrice.totalSavings }}</span>
+      </span>
+    </h4>
+  </div>
+
+  <!-- Image section -->
+  <div class="d-flex justify-content-center mt-4">
+    <img class="align-self-end" style="width: 50vw; height: 61vh;" src="assets/images/model_cooking_cart.webp"/>
+  </div>
+</div>

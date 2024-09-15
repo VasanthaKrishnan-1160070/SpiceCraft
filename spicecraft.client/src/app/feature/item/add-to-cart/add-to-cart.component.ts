@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, input, Input, OnDestroy, OnInit} from '@angular/core';
 import {DxButtonModule, DxFormModule, DxPopupModule, DxTemplateModule} from "devextreme-angular";
 import {
   DxiItemModule,
@@ -10,8 +10,10 @@ import {CartService} from "../../../core/service/cart.service";
 import {BehaviorSubject, of, Subject} from "rxjs";
 import {AsyncPipe, NgIf} from "@angular/common";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {takeUntil} from "rxjs/operators";
+import {take, takeUntil} from "rxjs/operators";
 import {FormsModule} from "@angular/forms";
+import {CreateUpdateCartItemRequest} from "../../../core/model/cart/create-update-cart-item-request.model";
+import {UserService} from "../../../core/service/user.service";
 
 @Component({
   selector: 'sc-add-to-cart',
@@ -35,7 +37,9 @@ import {FormsModule} from "@angular/forms";
 })
 export class AddToCartComponent implements OnInit, OnDestroy {
 
+  itemId = input<number>(0);
   private _cartService = inject(CartService);
+  private _userService = inject(UserService);
   private destroy$: Subject<void> = new Subject<void>();
 
   public ngOnInit() {
@@ -44,7 +48,7 @@ export class AddToCartComponent implements OnInit, OnDestroy {
     )
     .subscribe(showAddToCart => {
       this.isPopupVisible = showAddToCart;
-    })
+    });
   }
 
   isPopupVisible: boolean = false;
@@ -84,9 +88,21 @@ export class AddToCartComponent implements OnInit, OnDestroy {
   // Handles form submission
   addToCart() {
     if (this.formData.quantity && this.formData.selectedSize && this.formData.selectedColor) {
-       this.closePopup();
-    } else {
-      console.log('Form is incomplete');
+       const createUpdateCartItem: CreateUpdateCartItemRequest = {
+         itemId: this.itemId(),
+         quantity: this.formData.quantity,
+         size: this.formData.size,
+         spiceLevel: 'Medium',
+         userId: 0,
+         description: '',
+       }
+
+       this._cartService.addToCart(this.formData.quantity, this.formData.size,'', this.itemId()).pipe(
+        take(1)
+       )
+         .subscribe(res => {
+           this.closePopup();
+         });
     }
   }
 

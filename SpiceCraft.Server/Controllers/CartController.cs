@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SpiceCraft.Server.BusinessLogics.Interface;
+using SpiceCraft.Server.Helpers.Request;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -89,9 +90,9 @@ namespace SpiceCraft.Server.Controllers
 
         // Adds or updates a cart item
         [HttpPost("cart-item")]
-        public async Task<IActionResult> AddOrUpdateCartItem([FromBody] CartItemDTO cartItemDTO)
+        public async Task<IActionResult> AddOrUpdateCartItem([FromBody] CreateUpdateCartItemRequest cartItemRequest)
         {
-            var result = await _shoppingCartBusinessLogic.AddOrUpdateCartItemAsync(cartItemDTO);
+            var result = await _shoppingCartBusinessLogic.AddOrUpdateCartItemAsync(cartItemRequest);
 
             if (result.IsSuccess)
             {

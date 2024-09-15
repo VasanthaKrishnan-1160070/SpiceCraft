@@ -7,6 +7,8 @@
     public string DiscountRate { get; set; }
     public string FinalPrice { get; set; }
     
+    public int UserId { get; set; }
+    
     public int CartItemId { get; set; }
     public int CartId { get; set; }
     public int ItemId { get; set; }

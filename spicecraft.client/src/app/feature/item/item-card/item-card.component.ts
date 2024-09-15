@@ -27,7 +27,7 @@ export class ItemCardComponent {
   @Input() showAddToCart: boolean = false;
   @Input() productSizes: Array<{key: string, value: string}> = [];
   @Input() productColors: Array<{key: string, value: string}> = [];
-  @Output() addToCart: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() addToCart: EventEmitter<number> = new EventEmitter<number>();
 
   quantity: number = 1;
   selectedSize: string = 'L';
@@ -75,7 +75,7 @@ export class ItemCardComponent {
   addItemToCart(): void {
     // Implement the logic to add the product to the cart
     console.log("Add to Cart clicked");
-    this.addToCart.emit(true);
+    this.addToCart.emit(this.menuItem.productId);
   }
 
   removeProductFromListing(itemId: number): void {

@@ -28,6 +28,7 @@ export class SideNavigationComponent {
        {name: 'Profile', icon: 'fa-regular fa-address-card', routing: '/profile'},
        {name: 'Menu', icon: 'fa-solid fa-box-open', routing: '/item-list'},
        {name: 'Orders', icon: 'fa-solid fa-box-open', routing: '/order'},
+       {name: 'Cart', icon: 'fa-solid fa-box-open', routing: '/cart-list'},
        {name: 'Payments', icon: 'fa-solid fa-file-invoice-dollar', routing: '/payment'},
        {name: 'Enquiry', icon: 'fa-solid fa-question', routing: '/enquiry-list'},
        {name: 'Returns', icon: 'fa-solid fa-arrow-rotate-left', routing: '/returns'},

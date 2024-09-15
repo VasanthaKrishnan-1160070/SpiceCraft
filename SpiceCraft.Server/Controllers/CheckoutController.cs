@@ -24,8 +24,9 @@ namespace SpiceCraft.Server.Controllers
 
         // POST api/<CheckoutController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public string Post([FromBody] string value)
         {
+            return "working";
         }
 
         // PUT api/<CheckoutController>/5
