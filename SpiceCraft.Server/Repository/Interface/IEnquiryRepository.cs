@@ -9,8 +9,9 @@ namespace SpiceCraft.Server.Repository.Interface
         InternalEnquiryDTO GetEnquiryByForInternalUser(int userId);
         MessageDTO GetLatestMessageByEnquiryId(int enquiryId);
         EnquiryMessagesDTO GetEnquiryMessagesByEnquiryId(int enquiryId);
-        int CreateEnquiry(Enquiry enquiry, Message message);
-        void CreateMessage(Message message);
+        int CreateEnquiry(EnquiryCreationDTO enquiryDto);
+        void CreateMessage(MessageDTO messageDto);
         MessageDTO GetMessageByMessageId(int messageId);
+        Task<IEnumerable<EnquiryTypeDTO>> GetEnquiryTypes();
     }
 }

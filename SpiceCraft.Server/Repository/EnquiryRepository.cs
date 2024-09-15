@@ -1,4 +1,5 @@
-﻿using SpiceCraft.Server.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using SpiceCraft.Server.Context;
 using SpiceCraft.Server.DTO.Enquiry;
 using SpiceCraft.Server.Models;
 using SpiceCraft.Server.Repository.Interface;
@@ -136,28 +137,56 @@ namespace SpiceCraft.Server.Repository
             };
         }
 
-        public int CreateEnquiry(Enquiry enquiry, Message message)
+        // This method accepts the DTO and maps it to entities internally
+        public int CreateEnquiry(EnquiryCreationDTO enquiryDto)
         {
+            // Map DTO to Enquiry entity
+            var enquiry = new Enquiry
+            {
+                CreatedAt = DateTime.Now,
+                EnquiryTypeId = enquiryDto.EnquiryTypeId,
+                // Add any other necessary fields from the DTO...
+            };
+
+            // Save the enquiry to the database
             _context.Enquiries.Add(enquiry);
             _context.SaveChanges();
 
             // Get the newly created enquiry ID
             int enquiryId = enquiry.EnquiryId;
 
-            // Create the associated message
-            message.EnquiryId = enquiryId;
-            CreateMessage(message);
+            // Map DTO to Message entity
+            var message = new Message
+            {
+                EnquiryId = enquiryId,
+                MessageContent = enquiryDto.InitialMessage,
+                SenderUserId = enquiryDto.SenderUserId,
+                ReceiverUserId = enquiryDto.ReceiverUserId,
+                CreatedAt = DateTime.Now
+            };
 
-            return enquiryId;
+            // Save the message to the database
+            _context.Messages.Add(message);
+            _context.SaveChanges();
+
+            return enquiryId;  // Return the newly created enquiry ID
         }
 
-        public void CreateMessage(Message message)
-        {
-            if (message.ReceiverUserId == 0)
-            {
-                message.ReceiverUserId = null;
-            }
 
+        // This method accepts the DTO and maps it to the entity internally
+        public void CreateMessage(MessageDTO messageDto)
+        {
+            // Map the DTO to the Message entity
+            var message = new Message
+            {
+                EnquiryId = messageDto.EnquiryId,
+                MessageContent = messageDto.MessageContent,
+                SenderUserId = messageDto.SenderUserId,
+                ReceiverUserId = messageDto.ReceiverUserId,
+                CreatedAt = DateTime.Now
+            };
+
+            // Save the message to the database
             _context.Messages.Add(message);
             _context.SaveChanges();
         }
@@ -172,6 +201,7 @@ namespace SpiceCraft.Server.Repository
                            {
                                MessageId = m.MessageId,
                                EnquiryId = m.EnquiryId,
+                               Subject = m.Subject,
                                SenderUserId = m.SenderUserId,
                                ReceiverUserId = m.ReceiverUserId,
                                MessageContent = m.MessageContent,
@@ -181,6 +211,15 @@ namespace SpiceCraft.Server.Repository
                            }).FirstOrDefault();
 
             return message;
+        }
+
+        public async Task<IEnumerable<EnquiryTypeDTO>> GetEnquiryTypes()
+        {
+            return await _context.EnquiryTypes.Select(s => new EnquiryTypeDTO()
+            {
+                EnquiryTypeId = s.EnquiryTypeId,
+                EnquiryName = s.EnquiryName
+            }).ToListAsync();
         }
     }
 }

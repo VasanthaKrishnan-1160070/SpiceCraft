@@ -1,4 +1,5 @@
 export interface LoggedInUserModel {
+  userId: number,
   firstName: string;
   lastName: string;
   email: string;

@@ -39,36 +39,7 @@
       <span class="text-center text-blue-green mt-2 mb-2">Available Stock: {{ menuItem.currentStock }}</span>
     </div>
 
-<!--    &lt;!&ndash; Add to Cart Section &ndash;&gt;-->
-<!--    <div *ngIf="showAddToCart">-->
-<!--      <p class="text-primary text-center">Please select Quantity, Size, Color. Or click Add to Cart for default values.</p>-->
-<!--      <p *ngIf="showBulkDiscount" class="text-success fw-bold text-center">-->
-<!--        Get {{ menuItem.bulkDiscountRate }}% discount by purchasing {{ menuItem.bulkDiscountRequiredQuantity }} quantity-->
-<!--      </p>-->
-
-<!--      &lt;!&ndash; Add to Cart Form &ndash;&gt;-->
-<!--      <form (ngSubmit)="addToCart()">-->
-<!--        <div>-->
-<!--          <label for="quantity">Quantity Required</label>-->
-<!--          <input type="number" id="quantity" name="quantity" [(ngModel)]="quantity" min="1" max="10000" required>-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <label for="size">Product Size</label>-->
-<!--          <select id="size" name="size" [(ngModel)]="selectedSize">-->
-<!--            <option *ngFor="let size of productSizes" [value]="size.key">{{ size.value }}</option>-->
-<!--          </select>-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <label for="color">Product Colors</label>-->
-<!--          <select id="color" name="color" [(ngModel)]="selectedColor">-->
-<!--            <option *ngFor="let color of productColors" [value]="color.key">{{ color.value }}</option>-->
-<!--          </select>-->
-<!--        </div>-->
-<!--        <input type="hidden" name="productId" [value]="menuItem.itemId">-->
-<!--        <input type="hidden" name="subAction" value="add_to_cart">-->
-<!--        <input type="submit" class="btn btn-info" value="Add To Cart">-->
-<!--      </form>-->
-<!--    </div>-->
+    <input class="btn btn-success" (click)="addItemToCart()" value="Add To Cart" type="button"/>
 
     <!-- Admin Actions -->
     <div *ngIf="isUserInternal">

@@ -1,8 +1,10 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ItemSummaryModel} from "../../../core/model/item/item-summary-item.model";
 import {MenuItemModel} from "../../../core/model/item/menu-item.model";
 import {RouterLink} from "@angular/router";
-import {NgClass, NgIf} from "@angular/common";
+import {NgClass, NgForOf, NgIf} from "@angular/common";
+import {FormsModule} from "@angular/forms";
+import {DxButtonModule, DxFormModule, DxPopupModule} from "devextreme-angular";
 
 @Component({
   selector: 'sc-item-card',
@@ -10,7 +12,12 @@ import {NgClass, NgIf} from "@angular/common";
   imports: [
     RouterLink,
     NgClass,
-    NgIf
+    NgIf,
+    FormsModule,
+    NgForOf,
+    DxPopupModule,
+    DxFormModule,
+    DxButtonModule
   ],
   templateUrl: './item-card.component.html',
   styleUrl: './item-card.component.css'
@@ -20,6 +27,7 @@ export class ItemCardComponent {
   @Input() showAddToCart: boolean = false;
   @Input() productSizes: Array<{key: string, value: string}> = [];
   @Input() productColors: Array<{key: string, value: string}> = [];
+  @Output() addToCart: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   quantity: number = 1;
   selectedSize: string = 'L';
@@ -64,9 +72,10 @@ export class ItemCardComponent {
     return this.menuItem.isRemoved === 1;
   }
 
-  addToCart(): void {
+  addItemToCart(): void {
     // Implement the logic to add the product to the cart
     console.log("Add to Cart clicked");
+    this.addToCart.emit(true);
   }
 
   removeProductFromListing(itemId: number): void {

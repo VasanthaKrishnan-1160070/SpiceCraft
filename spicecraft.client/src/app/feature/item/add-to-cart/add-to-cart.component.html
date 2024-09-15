@@ -1,0 +1,50 @@
+<div>
+  <!-- Add to Cart Form -->
+  <!-- Popup Dialog -->
+  <dx-popup
+    [(visible)]="isPopupVisible"
+    [width]="400"
+    [height]="'auto'"
+    [showTitle]="true"
+    [title]="'Add to Cart'"
+    [closeOnOutsideClick]="true"
+    (onHiding)="onPopupHiding()">
+
+    <div *dxTemplate="let data of 'content'">
+
+<!--      <div>-->
+<!--        <p class="text-primary text-center">Please select Quantity, Size, Color. Or click Add to Cart for default values.</p>-->
+<!--        <p *ngIf="showBulkDiscount" class="text-success fw-bold text-center">-->
+<!--          Get {{ menuItem.bulkDiscountRate }}% discount by purchasing {{ menuItem.bulkDiscountRequiredQuantity }} quantity-->
+<!--        </p>-->
+<!--      </div>-->
+
+      <!-- DevExtreme Form -->
+      <dx-form
+        [formData]="formData"
+        [labelLocation]="'top'">
+
+        <dxi-item dataField="quantity" editorType="dxNumberBox">
+          <dxo-label text="Quantity Required"></dxo-label>
+            <dxi-validation-rule type="required" message="Quantity is required"></dxi-validation-rule>
+            <dxi-validation-rule type="range" [min]="1" [max]="10000" message="Quantity must be between 1 and 10,000"></dxi-validation-rule>
+          </dxi-item>
+
+        <dxi-item dataField="selectedSize" editorType="dxSelectBox" [editorOptions]="{ items: productSizes, displayExpr: 'value', valueExpr: 'key' }">
+          <dxo-label text="Product Size"></dxo-label>
+            <dxi-validation-rule type="required" message="Size is required"></dxi-validation-rule>
+        </dxi-item>
+
+        <dxi-item dataField="selectedColor" editorType="dxSelectBox" [editorOptions]="{ items: productColors, displayExpr: 'value', valueExpr: 'key' }">
+          <dxo-label text="Product Colors"></dxo-label>
+            <dxi-validation-rule type="required" message="Color is required"></dxi-validation-rule>
+        </dxi-item>
+
+      </dx-form>
+
+      <div class="text-center mt-4">
+        <dx-button text="Add To Cart" type="success" (onClick)="addToCart()"></dx-button>
+      </div>
+    </div>
+  </dx-popup>
+</div>

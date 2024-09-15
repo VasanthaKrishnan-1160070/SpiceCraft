@@ -110,7 +110,13 @@
 <div class="offset-1 col-10">
   <div class="d-flex justify-content-start flex-wrap">
     @for (item of menuItems; track item) {
-      <sc-item-card [menuItem]="item" [showAddToCart]="isUserExternal"></sc-item-card>
+      <sc-item-card
+         [menuItem]="item"
+         [showAddToCart]="isUserExternal"
+         (addToCart)="onAddToCartClick($event)"
+      >
+
+      </sc-item-card>
     } @empty {
       <div class="p-3 center-content flex-grow-1 mt-4">
         <div class="alert alert-warning text-center mt-3">
@@ -119,4 +125,8 @@
       </div>
     }
   </div>
+</div>
+
+<div>
+  <sc-add-to-cart></sc-add-to-cart>
 </div>

@@ -21,6 +21,7 @@ export class AuthService {
         if (token) {
           localStorage.setItem('authToken', token);
           let loggedInUser: LoggedInUserModel = this._userService.loggedInUser;
+          loggedInUser.userId = response?.userId;
           loggedInUser.email = response?.email;
           loggedInUser.userName = response?.userName;
           loggedInUser.lastName = response?.lastName;

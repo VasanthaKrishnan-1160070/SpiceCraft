@@ -29,7 +29,7 @@ export class SideNavigationComponent {
        {name: 'Menu', icon: 'fa-solid fa-box-open', routing: '/item-list'},
        {name: 'Orders', icon: 'fa-solid fa-box-open', routing: '/order'},
        {name: 'Payments', icon: 'fa-solid fa-file-invoice-dollar', routing: '/payment'},
-       {name: 'Enquiry', icon: 'fa-solid fa-question', routing: '/enquiry'},
+       {name: 'Enquiry', icon: 'fa-solid fa-question', routing: '/enquiry-list'},
        {name: 'Returns', icon: 'fa-solid fa-arrow-rotate-left', routing: '/returns'},
        {name: 'Gift Card', icon: 'fa-solid fa-hand-holding-dollar', routing: '/gift-card'},
        {name: 'Logout', icon: 'fa-solid fa-right-from-bracket', routing: '/logout'},

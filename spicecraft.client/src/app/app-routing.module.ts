@@ -30,6 +30,8 @@ import {ItemListComponent} from "./feature/item/item-list/item-list.component";
 import {B2bStaffListComponent} from "./feature/admin/b2b-staff/b2b-staff-list/b2b-staff-list.component";
 import {B2bCustomerComponent} from "./feature/admin/b2b-customer/b2b-customer.component";
 import {B2bCustomerListComponent} from "./feature/admin/b2b-customer/b2b-customer-list/b2b-customer-list.component";
+import {EnquiryListComponent} from "./feature/enquiry/enquiry-list/enquiry-list.component";
+import {EnquiryDetailComponent} from "./feature/enquiry/enquiry-detail/enquiry-detail.component";
 
 const routes: Routes = [
   { path: '', component: ClientHomeComponent},
@@ -42,7 +44,8 @@ const routes: Routes = [
   { path: 'item-list', component: ItemListComponent },
   { path: 'orders', component: OrderComponent },
   { path: 'payment', component: PaymentComponent },
-  { path: 'enquiry', component: EnquiryComponent },
+  { path: 'enquiry-list', component: EnquiryListComponent },
+  { path: 'enquiry-details/:id', component: EnquiryDetailComponent },
   { path: 'returns', component: ReturnsComponent },
   { path: 'gift-card', component: GiftCardComponent },
   { path: 'logout', component: LogoutComponent },

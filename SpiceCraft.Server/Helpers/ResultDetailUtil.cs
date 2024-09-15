@@ -1,4 +1,6 @@
-﻿namespace SpiceCraft.Server.Helpers;
+﻿using SpiceCraft.Server.DTO;
+
+namespace SpiceCraft.Server.Helpers;
 
 public class ResultDetailUtil
 {
@@ -32,6 +34,11 @@ public class ResultDetailUtil
     public ResultDetail<T> Error<T>(T? data, string message = "", bool notify = true)
     {
         return new ResultDetail<T>() { IsSuccess = false, Notify = notify, Message = message };
+    }
+    
+    public ResultDetail<IResponse> ErrorDetail( string message = "", bool notify = true)
+    {
+        return new ResultDetail<IResponse>() { IsSuccess = false, Notify = notify, Message = message };
     }
 
     public ResultDetail ErrorResponse(string message = "")

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SpiceCraft.Server.BusinessLogics.Interface;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,36 +9,110 @@ namespace SpiceCraft.Server.Controllers
     [ApiController]
     public class CartController : ControllerBase
     {
-        // GET: api/<CartController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+
+        private readonly ICartLogics _shoppingCartBusinessLogic;
+
+        public CartController(ICartLogics shoppingCartBusinessLogic)
         {
-            return new string[] { "value1", "value2" };
+            _shoppingCartBusinessLogic = shoppingCartBusinessLogic;
         }
 
-        // GET api/<CartController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // Retrieves shopping cart for a specific user
+        [HttpGet("user/{userId}/cart")]
+        public async Task<IActionResult> GetShoppingCartByUserId(int userId)
         {
-            return "value";
+            var result = await _shoppingCartBusinessLogic.GetShoppingCartByUserIdAsync(userId);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new { data = result.Data, message = result.Message });
+            }
+
+            return NotFound(new { message = result.Message });
         }
 
-        // POST api/<CartController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // Retrieves shopping cart for a corporate client
+        [HttpGet("user/{userId}/corporate-cart")]
+        public async Task<IActionResult> GetShoppingCartForCorporateClients(int userId)
         {
+            var result = await _shoppingCartBusinessLogic.GetShoppingCartForCorporateClientsAsync(userId);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new { data = result.Data, message = result.Message });
+            }
+
+            return NotFound(new { message = result.Message });
         }
 
-        // PUT api/<CartController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // Retrieves total cart price for a specific user
+        [HttpGet("user/{userId}/total-price")]
+        public async Task<IActionResult> GetTotalCartPrice(int userId)
         {
+            var result = await _shoppingCartBusinessLogic.GetTotalCartPriceAsync(userId);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new { totalPrice = result.Data, message = result.Message });
+            }
+
+            return BadRequest(new { message = result.Message });
         }
 
-        // DELETE api/<CartController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // Increments the quantity of a specific cart item
+        [HttpPost("cart-item/{cartItemId}/increment")]
+        public async Task<IActionResult> IncrementCartItemQuantity(int cartItemId, [FromQuery] int quantity)
         {
+            var result = await _shoppingCartBusinessLogic.IncrementCartItemQuantityAsync(cartItemId, quantity);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new { message = result.Message });
+            }
+
+            return BadRequest(new { message = result.Message });
+        }
+
+        // Decrements the quantity of a specific cart item
+        [HttpPost("cart-item/{cartItemId}/decrement")]
+        public async Task<IActionResult> DecrementCartItemQuantity(int cartItemId, [FromQuery] int quantity)
+        {
+            var result = await _shoppingCartBusinessLogic.DecrementCartItemQuantityAsync(cartItemId, quantity);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new { message = result.Message });
+            }
+
+            return BadRequest(new { message = result.Message });
+        }
+
+        // Adds or updates a cart item
+        [HttpPost("cart-item")]
+        public async Task<IActionResult> AddOrUpdateCartItem([FromBody] CartItemDTO cartItemDTO)
+        {
+            var result = await _shoppingCartBusinessLogic.AddOrUpdateCartItemAsync(cartItemDTO);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new { message = result.Message });
+            }
+
+            return BadRequest(new { message = result.Message });
+        }
+
+        // Removes a cart item
+        [HttpDelete("cart-item/{cartItemId}")]
+        public async Task<IActionResult> RemoveCartItem(int cartItemId)
+        {
+            var result = await _shoppingCartBusinessLogic.RemoveCartItemAsync(cartItemId);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new { message = result.Message });
+            }
+
+            return BadRequest(new { message = result.Message });
         }
     }
 }

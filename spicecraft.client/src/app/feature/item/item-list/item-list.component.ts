@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, EventEmitter, inject, OnDestroy, OnInit, Output} from '@angular/core';
 import {TitleComponent} from "../../../shared/components/title/title.component";
 import {ItemService} from "../../../core/service/item.service";
 import {map, take, takeUntil} from "rxjs/operators";
@@ -16,6 +16,8 @@ import {CategoryService} from "../../../core/service/category.service";
 import {CategoryModel} from "../../../core/model/category/category.model";
 import {ItemFilterEnum} from "../../../core/enum/item-filter.enum";
 import {ItemFilterSortingEnum} from "../../../core/enum/item-filter-sorting.enum";
+import {AddToCartComponent} from "../add-to-cart/add-to-cart.component";
+import {CartService} from "../../../core/service/cart.service";
 
 @Component({
   selector: 'sc-item-list',
@@ -27,15 +29,18 @@ import {ItemFilterSortingEnum} from "../../../core/enum/item-filter-sorting.enum
     DxTextBoxModule,
     DxSelectBoxModule,
     DxoLabelModule,
-    FormsModule
+    FormsModule,
+    AddToCartComponent
   ],
   templateUrl: './item-list.component.html',
   styleUrl: './item-list.component.css'
 })
 export class ItemListComponent implements OnInit, OnDestroy {
+
   private _itemService = inject(ItemService);
   private _categoryService = inject(CategoryService);
   private _lookupService = inject(LookupService);
+  private _cartService = inject(CartService);
   private _destroy$: Subject<void> = new Subject<void>();
 
   public menuItems!: MenuItemModel[] | null | undefined;
@@ -69,7 +74,6 @@ export class ItemListComponent implements OnInit, OnDestroy {
     this.getCategories();
     this.productFilters = this._lookupService.enumToDataSource(ItemFilterEnum, 'Select Filter');
     this.productSorting = this._lookupService.enumToDataSource(ItemFilterSortingEnum, 'Select Sorting');
-
   }
 
   public getCategories() {
@@ -89,7 +93,6 @@ export class ItemListComponent implements OnInit, OnDestroy {
         this.categories = mappedCategories;  // Assign the mapped categories to the categories array
       });
   }
-
 
   public getSubCategories() {
     const selectedCategory = this.filterForm.categoryId;
@@ -112,7 +115,6 @@ export class ItemListComponent implements OnInit, OnDestroy {
       });
   }
 
-
   public applyFilter() {
     this._itemService.getItems(this.filterForm).pipe(
      take(1)
@@ -121,6 +123,10 @@ export class ItemListComponent implements OnInit, OnDestroy {
         s =>  {
           this.menuItems = s.data as any;
         })
+  }
+
+  public onAddToCartClick(eventParam: any) {
+    this._cartService.showCartDialog();
   }
 
   public resetFilter() {
