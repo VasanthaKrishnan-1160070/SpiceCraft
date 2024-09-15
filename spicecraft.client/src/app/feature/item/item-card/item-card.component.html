@@ -38,9 +38,9 @@
     <div class="d-flex justify-content-center">
       <span class="text-center text-blue-green mt-2 mb-2">Available Stock: {{ menuItem.currentStock }}</span>
     </div>
-
-    <input class="btn btn-success" (click)="addItemToCart()" value="Add To Cart" type="button"/>
-
+    <div *ngIf="!isUserInternal">
+      <input class="btn btn-success" (click)="addItemToCart()" value="Add To Cart" type="button"/>
+    </div>
     <!-- Admin Actions -->
     <div *ngIf="isUserInternal">
       <a class="btn btn-success" [routerLink]="['/item-detail', menuItem.itemId]">View Detail</a>

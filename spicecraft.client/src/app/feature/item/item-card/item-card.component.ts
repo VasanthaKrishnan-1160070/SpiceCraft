@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {ItemSummaryModel} from "../../../core/model/item/item-summary-item.model";
 import {MenuItemModel} from "../../../core/model/item/menu-item.model";
 import {RouterLink} from "@angular/router";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {DxButtonModule, DxFormModule, DxPopupModule} from "devextreme-angular";
+import {UserService} from "../../../core/service/user.service";
 
 @Component({
   selector: 'sc-item-card',
@@ -28,6 +29,8 @@ export class ItemCardComponent {
   @Input() productSizes: Array<{key: string, value: string}> = [];
   @Input() productColors: Array<{key: string, value: string}> = [];
   @Output() addToCart: EventEmitter<number> = new EventEmitter<number>();
+
+  private _userService = inject(UserService);
 
   quantity: number = 1;
   selectedSize: string = 'L';
