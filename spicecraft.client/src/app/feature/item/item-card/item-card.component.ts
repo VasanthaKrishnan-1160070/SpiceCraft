@@ -6,6 +6,10 @@ import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {DxButtonModule, DxFormModule, DxPopupModule} from "devextreme-angular";
 import {UserService} from "../../../core/service/user.service";
+import {AuthService} from "../../../core/service/auth.service";
+import {ItemService} from "../../../core/service/item.service";
+import DevExpress from "devextreme";
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'sc-item-card',
@@ -24,13 +28,15 @@ import {UserService} from "../../../core/service/user.service";
   styleUrl: './item-card.component.css'
 })
 export class ItemCardComponent {
-  @Input() menuItem: any;
+  @Input() menuItem!: MenuItemModel;
   @Input() showAddToCart: boolean = false;
   @Input() productSizes: Array<{key: string, value: string}> = [];
   @Input() productColors: Array<{key: string, value: string}> = [];
   @Output() addToCart: EventEmitter<number> = new EventEmitter<number>();
 
   private _userService = inject(UserService);
+  private _authService = inject(AuthService);
+  private _itemService = inject(ItemService);
 
   quantity: number = 1;
   selectedSize: string = 'L';
@@ -38,7 +44,7 @@ export class ItemCardComponent {
 
   get isUserAuthenticated(): boolean {
     // Replace with actual logic to check if user is authenticated
-    return true;
+    return this._authService.isAuthenticated();
   }
 
   get isUserCorporateClient(): boolean {
@@ -48,7 +54,7 @@ export class ItemCardComponent {
 
   get isUserInternal(): boolean {
     // Replace with actual logic to check if the user is internal
-    return false;
+    return this._authService.isInternalUser();
   }
 
   get productImage(): string {
@@ -71,23 +77,32 @@ export class ItemCardComponent {
     return this.isUserCorporateClient && !!this.menuItem.bulkDiscountRate && !!this.menuItem.bulkDiscountRequiredQuantity;
   }
 
-  get isRemoved(): boolean {
-    return this.menuItem.isRemoved === 1;
-  }
-
   addItemToCart(): void {
     // Implement the logic to add the product to the cart
     console.log("Add to Cart clicked");
-    this.addToCart.emit(this.menuItem.productId);
+    this.addToCart.emit(this.menuItem.itemId);
   }
 
   removeProductFromListing(itemId: number): void {
     // Implement the logic to remove the product from the listing
     console.log(`Removing product with id: ${itemId}`);
+    this._itemService.addOrRemoveItemFromListing(itemId, false).subscribe(
+      s => {
+        notify('Item is removed from the listing successfully', 'success');
+        this.menuItem.isRemoved = true;
+      }
+    );
   }
 
   addProductToListing(itemId: number): void {
     // Implement the logic to add the product back to the listing
     console.log(`Adding product with id: ${itemId} to the listing`);
+    this._itemService.addOrRemoveItemFromListing(itemId).subscribe(
+      s => {
+        notify('Item is add back to the listing successfully', 'success');
+        this.menuItem.isRemoved = false;
+      }
+    );
+
   }
 }

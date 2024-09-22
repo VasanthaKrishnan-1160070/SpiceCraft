@@ -20,7 +20,7 @@ export class AuthService {
         const token = response?.token;
         if (token) {
           localStorage.setItem('authToken', token);
-          let loggedInUser: LoggedInUserModel = this._userService.loggedInUser;
+          let loggedInUser: LoggedInUserModel = this.getLoggedInUser();
           loggedInUser.userId = response?.userId;
           loggedInUser.email = response?.email;
           loggedInUser.userName = response?.userName;
@@ -39,6 +39,10 @@ export class AuthService {
     );
   }
 
+  getLoggedInUser() {
+    return this._userService.getLoggedInUser();
+  }
+
   logout() {
     localStorage.removeItem('authToken');  // Remove the token on logout
     localStorage.removeItem('loggedInUser');
@@ -47,6 +51,32 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem('authToken');  // Check if token exists
+  }
+
+  // check is admin
+  isUserAdmin(): boolean {
+    const role = this.getCurrentUserRole();
+    return role === 'Admin';
+  }
+
+  isInternalUser(): boolean {
+    const role = this.getCurrentUserRole();
+    return role === 'Admin' || role === 'Staff' || role === 'Manager';
+  }
+
+  isUserCustomer(): boolean {
+    const role = this.getCurrentUserRole();
+    return role === 'Customer';
+  }
+
+  isUserStaff(): boolean {
+    const role = this.getCurrentUserRole();
+    return role === 'Staff';
+  }
+
+  getCurrentUserRole(): string {
+    const loggedInUser = this.getLoggedInUser();
+    return loggedInUser.roleName;
   }
 
   getToken(): string | null {

@@ -1,15 +1,15 @@
 export interface MenuItemModel {
   price: number;
-  productName: string;
+  itemName: string;
   description: string;
   createdDate?: Date | null;    // Nullable Date
-  isRemoved?: boolean | null;   // Nullable boolean
+  isRemoved: boolean;   // Nullable boolean
   currentStock: number;
-  ownProduct?: boolean | null;  // Nullable boolean
+  ownProduct?: boolean;  // Nullable boolean
   categoryId: number;
   imageCode: string;
   categoryName: string;
-  productId: number;
+  itemId: number;
   discountRate?: number | null; // Nullable decimal
   bulkDiscountRate?: number | null; // Nullable decimal
   bulkDiscountRequiredQuantity: number;

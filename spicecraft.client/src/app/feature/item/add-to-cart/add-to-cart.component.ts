@@ -14,6 +14,8 @@ import {take, takeUntil} from "rxjs/operators";
 import {FormsModule} from "@angular/forms";
 import {CreateUpdateCartItemRequest} from "../../../core/model/cart/create-update-cart-item-request.model";
 import {UserService} from "../../../core/service/user.service";
+import DevExpress from "devextreme";
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'sc-add-to-cart',
@@ -102,6 +104,7 @@ export class AddToCartComponent implements OnInit, OnDestroy {
        )
          .subscribe(res => {
            this.closePopup();
+           notify('Item is added to cart successfully', 'success');
          });
     }
   }

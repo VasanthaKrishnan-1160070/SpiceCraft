@@ -10,6 +10,7 @@ import {UserModel} from "../model/user/user.model";
 import {LoggedInUserModel} from "../model/user/logged-in-user.model";
 import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 import {CreateUpdateCartItemRequest} from "../model/cart/create-update-cart-item-request.model";
+import {AuthService} from "./auth.service";
 
 
 
@@ -18,7 +19,7 @@ import {CreateUpdateCartItemRequest} from "../model/cart/create-update-cart-item
 })
 export class UserService {
 
-  private _api = inject(WebAPIService)
+  private _api = inject(WebAPIService);
 
   loggedInUser: LoggedInUserModel = {
     userId: 0,
@@ -42,11 +43,6 @@ export class UserService {
   getCurrentUserName(): string {
     const loggedInUser = this.getLoggedInUser();
     return `${loggedInUser.firstName} ${loggedInUser.lastName}`;
-  }
-
-  getCurrentUserRole(): string {
-    const loggedInUser = this.getLoggedInUser();
-    return loggedInUser.roleName;
   }
 
   getCurrentUserId(): number {

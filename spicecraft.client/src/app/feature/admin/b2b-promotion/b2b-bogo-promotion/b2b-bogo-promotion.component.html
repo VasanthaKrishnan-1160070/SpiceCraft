@@ -2,9 +2,6 @@
 <div class="d-flex justify-content-end">
   <button class="btn btn-danger mb-3" (click)="removeAllBogoPromotions()">Remove All Promotions</button>
 </div>
-
-
-
 <dx-data-grid
   [dataSource]="bogoPromotions$ | async"
   [showBorders]="true"

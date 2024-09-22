@@ -37,7 +37,7 @@ namespace SpiceCraft.Server.Repository
                         select new ProductCatalogItemDTO
                         {
                             Price = p.Price,
-                            ProductName = p.ItemName,
+                            ItemName = p.ItemName,
                             Description = p.Description,
                             CreatedDate = p.CreatedAt,
                             IsRemoved = p.IsRemoved,
@@ -46,7 +46,7 @@ namespace SpiceCraft.Server.Repository
                             CategoryId = p.CategoryId,
                             ImageCode = pi.ImageCode,
                             CategoryName = pc.CategoryName,
-                            ProductId = p.ItemId,
+                            ItemId = p.ItemId,
                             DiscountRate = pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0),
                             BulkDiscountRate = pbp != null ? pbp.DiscountRate : 0,
                             BulkDiscountRequiredQuantity = pbp != null ? pbp.RequiredQuantity : 0,
@@ -70,7 +70,7 @@ namespace SpiceCraft.Server.Repository
             // Filtering based on keyword
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                query = query.Where(p => p.ProductName.Contains(keyword.Trim()) || p.Description.Contains(keyword.Trim()));
+                query = query.Where(p => p.ItemName.Contains(keyword.Trim()) || p.Description.Contains(keyword.Trim()));
             }
 
             // Exclude removed products if specified
@@ -131,10 +131,10 @@ namespace SpiceCraft.Server.Repository
                     query = query.OrderByDescending(p => p.Price);
                     break;
                 case ProductSortingEnum.NameAToZ:
-                    query = query.OrderBy(p => p.ProductName);
+                    query = query.OrderBy(p => p.ItemName);
                     break;
                 case ProductSortingEnum.NameZToA:
-                    query = query.OrderByDescending(p => p.ProductName);
+                    query = query.OrderByDescending(p => p.ItemName);
                     break;
                 default:
                     query = query.OrderBy(p => p.CreatedDate);

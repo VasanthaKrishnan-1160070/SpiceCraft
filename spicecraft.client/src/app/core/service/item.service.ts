@@ -17,4 +17,8 @@ export class ItemService {
   getItems(filterForm: ItemFilterModel): Observable<ResultDetailModel<MenuItemModel>> {
     return this._api.get<ResultDetailModel<MenuItemModel>>('/item', filterForm);
   }
+
+  addOrRemoveItemFromListing(itemId: number, isAdd = true) {
+    return this._api.get<ResultDetailModel<boolean>>(`/item/listing/${itemId}?isAdd=${isAdd}`);
+  }
 }

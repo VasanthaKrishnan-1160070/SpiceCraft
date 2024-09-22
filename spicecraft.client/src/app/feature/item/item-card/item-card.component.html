@@ -18,7 +18,7 @@
     <img *ngIf="!isUserAuthenticated" class="img img-fluid pest-img-list" [src]="productImage" />
 
     <span class="text-center justify-content-center mt-1 text-truncate flex-column-wrap gallery-max-product-title">
-      {{ menuItem.productName }}
+      {{ menuItem.itemName }}
     </span>
 
     <!-- Price and discount handling -->
@@ -38,18 +38,20 @@
     <div class="d-flex justify-content-center">
       <span class="text-center text-blue-green mt-2 mb-2">Available Stock: {{ menuItem.currentStock }}</span>
     </div>
-    <div *ngIf="!isUserInternal">
-      <input class="btn btn-success" (click)="addItemToCart()" value="Add To Cart" type="button"/>
+    <div class="d-flex justify-content-center mt-2" *ngIf="!isUserInternal">
+      <input class="btn btn-success text-light text-white" (click)="addItemToCart()" value="Add To Cart" type="button"/>
     </div>
+
     <!-- Admin Actions -->
-    <div *ngIf="isUserInternal">
-      <a class="btn btn-success" [routerLink]="['/item-detail', menuItem.itemId]">View Detail</a>
-      <a *ngIf="!isRemoved" class="btn btn-danger mt-3" href="#" (click)="removeProductFromListing(menuItem.itemId)">
+    <div class="d-flex flex-column align-items-center" *ngIf="isUserInternal">
+      <a class="text-info text-decoration-none" [routerLink]="['/item-detail', menuItem.itemId]">View Detail</a>
+
+      <button *ngIf="!menuItem.isRemoved" class="btn btn-danger text-white mt-3" (click)="removeProductFromListing(menuItem.itemId)">
         Remove From listing
-      </a>
-      <a *ngIf="isRemoved" class="btn btn-info mt-3" href="#" (click)="addProductToListing(menuItem.itemId)">
+      </button>
+      <button *ngIf="menuItem.isRemoved" class="btn btn-success  text-white mt-3" (click)="addProductToListing(menuItem.itemId)">
         Add To listing
-      </a>
+      </button>
     </div>
   </div>
 </div>
