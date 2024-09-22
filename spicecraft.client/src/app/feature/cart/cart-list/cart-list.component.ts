@@ -22,18 +22,10 @@ export class CartListComponent implements OnInit {
   cartItems: CartItemModel[] = [];
   private _cartService: CartService = inject(CartService);
   private _destroy$ = new Subject<void>();
-  totalPrice: { totalPrice: string, totalSavings: string } = { totalPrice: '0.00', totalSavings: '0.00' };
+  cartSummary: { finalPrice: string, savings: string } = { finalPrice: '0.00', savings: '0.00' };
 
-  constructor() {
-    // Sample data, replace with real data fetching logic
-    // this.cartItems = [
-    //   { itemName: 'Product 1', quantity: 1, actualPrice: '50.00', finalPrice: '45.00', cartItemId: 1, cartId: 1, itemId: 1, priceAtAdd: 45.00 },
-    //   { itemName: 'Product 2', quantity: 2, actualPrice: '100.00', finalPrice: '90.00', cartItemId: 2, cartId: 1, itemId: 2, priceAtAdd: 90.00 }
-    // ];
+  constructor() {}
 
-    // Sample total price and savings
-    this.totalPrice = { totalPrice: '135.00', totalSavings: '15.00' };
-  }
 
   ngOnInit(): void {
      this.getCartItems();
@@ -51,6 +43,8 @@ export class CartListComponent implements OnInit {
     )
       .subscribe(shoppingCart => {
         this.cartItems = shoppingCart.data?.cartItems as CartItemModel[];
+        this.cartSummary.finalPrice = shoppingCart.data?.finalPrice?.toString() || '';
+        this.cartSummary.savings = shoppingCart.data?.savings?.toString() || '';
         console.log(shoppingCart);
       });
   }

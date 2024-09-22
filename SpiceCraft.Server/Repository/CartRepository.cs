@@ -75,12 +75,16 @@ public class CartRepository : ICartRepository
         ItemId = cartItem.ItemId
     }).ToList();
 
-    var totalPrice = await GetTotalCartPrice(userId);
+    var cartSummary = await GetCartSummary(userId);
+    
+    // var finalPrice = cartItemDTOs.Select(cartItem => cartItem.FinalPrice).Sum(decimal.Parse);
 
     return new ShoppingCartDTO
     {
         CartItems = cartItemDTOs,
-        TotalPrice = totalPrice
+        TotalPrice = cartSummary.TotalPrice ?? 0,
+        FinalPrice = cartSummary.FinalPrice?? 0,
+        Savings = cartSummary.Savings?? 0
     };
 }
 
@@ -197,7 +201,7 @@ public class CartRepository : ICartRepository
     // Increments the quantity of a specific cart item
     public async Task IncrementCartItemQtyAsync(int cartItemId, int quantity)
     {
-        var cartItem = await GetCartItemByIdAsync(cartItemId);
+        var cartItem = await GetCartItem(cartItemId);
         if (cartItem != null)
         {
             cartItem.Quantity += quantity;
@@ -208,8 +212,8 @@ public class CartRepository : ICartRepository
     // Decrements the quantity of a specific cart item
     public async Task DecrementCartItemQtyAsync(int cartItemId, int quantity)
     {
-        var cartItem = await GetCartItemByIdAsync(cartItemId);
-        if (cartItem != null && cartItem.Quantity > 1)
+        var cartItem = await GetCartItem(cartItemId);
+        if (cartItem != null && cartItem?.Quantity > 1)
         {
             cartItem.Quantity -= quantity;
             await _context.SaveChangesAsync();
@@ -249,6 +253,35 @@ public class CartRepository : ICartRepository
             _context.CartItems.Remove(cartItem);
             await _context.SaveChangesAsync();
         }
+    }
+    
+    private async Task<CartItem?> GetCartItem(int cartItemId)
+    {
+        return await _context.CartItems.FindAsync(cartItemId);
+    }
+    
+    private async Task<(decimal? TotalPrice, decimal? FinalPrice, decimal? Savings)> GetCartSummary(int userId)
+    {
+        var result = await (from sc in _context.ShoppingCarts
+                join ci in _context.CartItems on sc.CartId equals ci.CartId
+                join p in _context.Items on ci.ItemId equals p.ItemId
+                join pp in _context.PromotionItems on p.ItemId equals pp.ItemId into ppGroup
+                from pp in ppGroup.DefaultIfEmpty()
+                join prc in _context.PromotionCategories on p.CategoryId equals prc.CategoryId into prcGroup
+                from prc in prcGroup.DefaultIfEmpty()
+                where sc.UserId == userId && sc.IsOrdered == false
+                select new
+                {
+                    TotalPrice = p.Price * ci.Quantity,
+                    FinalPrice = p.Price * ci.Quantity * (1 - ((pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0)) / 100))
+                })
+            .ToListAsync();
+
+        var totalPrice = result.Sum(x => x.TotalPrice);
+        var finalPrice = result.Sum(x => x.FinalPrice);
+        var savings = totalPrice - finalPrice;
+
+        return (TotalPrice: totalPrice, FinalPrice: finalPrice, Savings: savings);
     }
 }
 

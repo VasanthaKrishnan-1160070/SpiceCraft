@@ -77,9 +77,9 @@
   <!-- Total price and savings section -->
   <div *ngIf="cartItems.length > 0" class="text-light p-2 d-flex justify-content-center align-items-center">
     <h4 class="align-self-center text-info me-5">
-      To Pay: <span class="fw-bold text-bright-violet-2">${{ totalPrice.totalPrice }}</span>
-      <span *ngIf="totalPrice.totalSavings && totalPrice.totalSavings !== '0.00'">
-        , You save in total <span class="fw-bold text-bright-violet-2">${{ totalPrice.totalSavings }}</span>
+      To Pay: <span class="fw-bold text-bright-violet-2">${{ cartSummary.finalPrice }}</span>
+      <span *ngIf="cartSummary.savings && cartSummary.savings !== '0.00'">
+        , You save in total <span class="fw-bold text-bright-violet-2">${{ cartSummary.savings }}</span>
       </span>
     </h4>
   </div>

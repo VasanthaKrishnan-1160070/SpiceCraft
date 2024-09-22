@@ -21,8 +21,8 @@ namespace SpiceCraft.Server.Repository
                            where p.IsRemoved == false
                            select new ProductInventoryDTO
                            {
-                               ProductId = p.ItemId,
-                               ProductName = p.ItemName,
+                               ItemId = p.ItemId,
+                               ItemName = p.ItemName,
                                CategoryName = _context.ItemCategories
                                                    .Where(pc => pc.CategoryId == p.CategoryId)
                                                    .Select(pc => pc.CategoryName.ToUpper())
@@ -36,10 +36,10 @@ namespace SpiceCraft.Server.Repository
         }
 
         // Get the current stock for a given product ID
-        public int GetStock(int productId)
+        public int GetStock(int itemId)
         {
             var stockInfo = _context.Inventories
-                                    .Where(i => i.ItemId == productId)
+                                    .Where(i => i.ItemId == itemId)
                                     .Select(i => i.CurrentStock)
                                     .FirstOrDefault();
 
@@ -47,46 +47,46 @@ namespace SpiceCraft.Server.Repository
         }
 
         // Update the stock for a given product ID
-        public bool UpdateStock(int productId, int currentStock)
+        public bool UpdateStock(int itemId, int currentStock)
         {
-            var inventoryItem = _context.Inventories.FirstOrDefault(i => i.ItemId == productId);
+            var inventoryItem = _context.Inventories.FirstOrDefault(i => i.ItemId == itemId);
 
             if (inventoryItem != null)
             {
                 inventoryItem.CurrentStock = currentStock;
                 _context.SaveChanges();
-                return GetStock(productId) == currentStock;
+                return GetStock(itemId) == currentStock;
             }
 
             return false;
         }
 
         // Insert a new product into the inventory
-        public bool InsertProductToInventory(int productId, int currentStock, int lowStockThreshold)
+        public bool InsertProductToInventory(int itemId, int currentStock, int lowStockThreshold)
         {
-            var existingItem = _context.Inventories.FirstOrDefault(i => i.ItemId == productId);
+            var existingItem = _context.Inventories.FirstOrDefault(i => i.ItemId == itemId);
 
             if (existingItem == null)
             {
                 var newInventoryItem = new Inventory
                 {
-                    ItemId = productId,
+                    ItemId = itemId,
                     CurrentStock = currentStock,
                     LowStockThreshold = lowStockThreshold
                 };
 
                 _context.Inventories.Add(newInventoryItem);
                 _context.SaveChanges();
-                return GetStock(productId) == currentStock;
+                return GetStock(itemId) == currentStock;
             }
 
             return false;
         }
 
-        // Decrement the stock for a given product ID by a specified quantity
-        public int DecrementProductStock(int productId, int quantity)
+        // Decrement the stock for a given Item Id by a specified quantity
+        public int DecrementProductStock(int itemId, int quantity)
         {
-            var inventoryItem = _context.Inventories.FirstOrDefault(i => i.ItemId == productId);
+            var inventoryItem = _context.Inventories.FirstOrDefault(i => i.ItemId == itemId);
 
             if (inventoryItem != null)
             {
@@ -94,7 +94,7 @@ namespace SpiceCraft.Server.Repository
                 _context.SaveChanges();
             }
 
-            return GetStock(productId);
+            return GetStock(itemId);
         }
     }
 }

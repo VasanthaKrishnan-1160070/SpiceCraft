@@ -2,8 +2,8 @@
 {
     public class ProductInventoryDTO
     {
-        public int ProductId { get; set; }
-        public string ProductName { get; set; }
+        public int ItemId { get; set; }
+        public string ItemName { get; set; }
         public string CategoryName { get; set; }
         public string ProductPrice { get; set; }
         public int AvailableStock { get; set; }

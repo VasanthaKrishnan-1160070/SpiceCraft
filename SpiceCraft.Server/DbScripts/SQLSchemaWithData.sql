@@ -9,7 +9,8 @@ create table Roles (
 create table ShippingOptions (
     ShippingOptionId int primary key identity(1,1),
     ShippingOptionName varchar(100) not null unique,
-    Description varchar(100) not null
+    Description varchar(100) not null,
+    cost decimal(10,2) not null
 );
 
 create table Users (
@@ -285,26 +286,10 @@ INSERT INTO Roles (RoleName) VALUES
 
 -- ShippingOptions
 INSERT INTO ShippingOptions (ShippingOptionName, Description) VALUES 
-('Standard Shipping', 'Delivers in 5-7 business days'),
-('Express Shipping', 'Delivers in 2-3 business days'),
-('Overnight Shipping', 'Delivers the next business day'),
-('Same Day Delivery', 'Delivers on the same day'),
+('Standard Delivery', 'Delivers in 3 hours'),
+('Express Delivery', 'Immediate Delivery'),
 ('Pickup in Store', 'Pick up the order from store'),
-('Free Shipping', 'Free delivery in 7-10 business days'),
-('International Shipping', 'Delivers internationally in 10-15 business days'),
-('Priority Mail', 'Fast shipping with priority'),
-('Weekend Delivery', 'Delivers on weekends'),
-('Drone Delivery', 'Experimental fast delivery via drones'),
-('Economy Shipping', 'Cheapest option, 10-15 days'),
-('Scheduled Delivery', 'Select a date for delivery'),
-('White Glove Service', 'Includes setup and removal of packaging'),
-('Curbside Pickup', 'Delivered to your vehicle at the store'),
-('No-Rush Shipping', 'Free with no rush delivery'),
-('Pallet Shipping', 'For large orders delivered by pallet'),
-('Local Courier', 'Delivered by local courier service'),
-('Freight Shipping', 'For bulk items, delivered by freight'),
-('Subscription Delivery', 'Recurring delivery of subscribed items'),
-('Cold Chain Shipping', 'Specialized for perishable items');
+('Free Shipping', 'Free delivery');
 
 -- Users
 INSERT INTO Users (Title, FirstName, LastName, Email, Phone, ProfileImg, RoleId, IsActive) VALUES 
@@ -418,23 +403,23 @@ INSERT INTO Orders (UserId, OrderDate, ShippingOptionId, TotalCost, OrderStatus)
 (1, DATEADD(DAY, -20, @CurrentDate), 1, 50.00, 'Prepared'),
 (2, DATEADD(DAY, -19, @CurrentDate), 2, 75.00, 'Shipped'),
 (3, DATEADD(DAY, -18, @CurrentDate), 3, 65.00, 'Ready To Ship'),
-(4, DATEADD(DAY, -17, @CurrentDate), 4, 45.00, 'Ready For Pickup'),
-(5, DATEADD(DAY, -16, @CurrentDate), 5, 95.00, 'Cancelled'),
-(6, DATEADD(DAY, -15, @CurrentDate), 6, 85.00, 'Returned'),
-(7, DATEADD(DAY, -14, @CurrentDate), 7, 35.00, 'Prepared'),
-(8, DATEADD(DAY, -13, @CurrentDate), 8, 25.00, 'Shipped'),
-(9, DATEADD(DAY, -12, @CurrentDate), 9, 15.00, 'Ready To Ship'),
-(10, DATEADD(DAY, -11, @CurrentDate), 10, 55.00, 'Ready For Pickup'),
-(11, DATEADD(DAY, -10, @CurrentDate), 11, 65.00, 'Cancelled'),
-(12, DATEADD(DAY, -9, @CurrentDate), 12, 75.00, 'Returned'),
-(13, DATEADD(DAY, -8, @CurrentDate), 13, 85.00, 'Prepared'),
-(14, DATEADD(DAY, -7, @CurrentDate), 14, 95.00, 'Shipped'),
-(15, DATEADD(DAY, -6, @CurrentDate), 15, 105.00, 'Ready To Ship'),
-(16, DATEADD(DAY, -5, @CurrentDate), 16, 115.00, 'Ready For Pickup'),
-(17, DATEADD(DAY, -4, @CurrentDate), 17, 125.00, 'Cancelled'),
-(18, DATEADD(DAY, -3, @CurrentDate), 18, 135.00, 'Returned'),
-(19, DATEADD(DAY, -2, @CurrentDate), 19, 145.00, 'Prepared'),
-(20, DATEADD(DAY, -1, @CurrentDate), 20, 155.00, 'Shipped');
+(4, DATEADD(DAY, -17, @CurrentDate), 1, 45.00, 'Ready For Pickup'),
+(5, DATEADD(DAY, -16, @CurrentDate), 2, 95.00, 'Cancelled'),
+(6, DATEADD(DAY, -15, @CurrentDate), 3, 85.00, 'Returned'),
+(7, DATEADD(DAY, -14, @CurrentDate), 1, 35.00, 'Prepared'),
+(8, DATEADD(DAY, -13, @CurrentDate), 2, 25.00, 'Shipped'),
+(9, DATEADD(DAY, -12, @CurrentDate), 3, 15.00, 'Ready To Ship'),
+(10, DATEADD(DAY, -11, @CurrentDate), 1, 55.00, 'Ready For Pickup'),
+(11, DATEADD(DAY, -10, @CurrentDate), 2, 65.00, 'Cancelled'),
+(12, DATEADD(DAY, -9, @CurrentDate), 3, 75.00, 'Returned'),
+(13, DATEADD(DAY, -8, @CurrentDate), 1, 85.00, 'Prepared'),
+(14, DATEADD(DAY, -7, @CurrentDate), 2, 95.00, 'Shipped'),
+(15, DATEADD(DAY, -6, @CurrentDate), 3, 105.00, 'Ready To Ship'),
+(16, DATEADD(DAY, -5, @CurrentDate), 1, 115.00, 'Ready For Pickup'),
+(17, DATEADD(DAY, -4, @CurrentDate), 2, 125.00, 'Cancelled'),
+(18, DATEADD(DAY, -3, @CurrentDate), 3, 135.00, 'Returned'),
+(19, DATEADD(DAY, -2, @CurrentDate), 1, 145.00, 'Prepared'),
+(20, DATEADD(DAY, -1, @CurrentDate), 2, 155.00, 'Shipped');
 
 
 -- OrderDetails
