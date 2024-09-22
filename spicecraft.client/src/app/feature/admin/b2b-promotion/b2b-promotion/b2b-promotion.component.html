@@ -1,0 +1,43 @@
+<div class="p-4">
+  <sc-title [title]="'Manage Promotions'"></sc-title>
+</div>
+
+<div class="ms-5 me-5">
+<dx-tab-panel
+  [dataSource]="promotionTabs"
+  [selectedIndex]="0"
+  [itemTitleTemplate]="'title'"
+  [animationEnabled]="true"
+  [swipeEnabled]="true"
+  [loop]="true"
+>
+  <!-- Item Promotions Tab -->
+  <div *dxTemplate="let data of 'itemPromotion'">
+    <div class="p-4">
+       <sc-b2b-item-promotion></sc-b2b-item-promotion>
+    </div>
+  </div>
+
+  <!-- Category Promotions Tab -->
+  <div *dxTemplate="let data of 'categoryPromotion'">
+    <div class="p-4">
+      <sc-b2b-category-promotion></sc-b2b-category-promotion>
+    </div>
+  </div>
+
+  <!-- BOGO Promotions Tab -->
+  <div *dxTemplate="let data of 'bogoPromotion'">
+    <div class="p-4">
+     <sc-b2b-bogo-promotion></sc-b2b-bogo-promotion>
+    </div>
+  </div>
+
+  <!-- Bulk Promotions Tab -->
+  <div *dxTemplate="let data of 'bulkPromotion'">
+    <div class="p-4">
+      <sc-b2b-bulk-promotion></sc-b2b-bulk-promotion>
+    </div>
+  </div>
+</dx-tab-panel>
+</div>
+

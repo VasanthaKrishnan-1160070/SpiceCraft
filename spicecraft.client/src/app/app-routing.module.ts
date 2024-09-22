@@ -33,6 +33,8 @@ import {B2bCustomerListComponent} from "./feature/admin/b2b-customer/b2b-custome
 import {EnquiryListComponent} from "./feature/enquiry/enquiry-list/enquiry-list.component";
 import {EnquiryDetailComponent} from "./feature/enquiry/enquiry-detail/enquiry-detail.component";
 import {CartListComponent} from "./feature/cart/cart-list/cart-list.component";
+import {B2bInventoryListComponent} from "./feature/admin/b2b-inventory/b2b-inventory-list/b2b-inventory-list.component";
+import {B2bPromotionComponent} from "./feature/admin/b2b-promotion/b2b-promotion/b2b-promotion.component";
 
 const routes: Routes = [
   { path: '', component: ClientHomeComponent},
@@ -64,7 +66,8 @@ const routes: Routes = [
   { path: 'b2b-report', component: B2bReportComponent },
   { path: 'b2b-shipping', component: B2bShippingComponent },
   { path: 'b2b-order-list', component: B2bOrderComponent },
-  { path: 'b2b-inventory', component: B2bInventoryComponent },
+  { path: 'b2b-inventory', component: B2bInventoryListComponent },
+  { path: 'b2b-promotion-list', component: B2bPromotionComponent},
   { path: 'b2b-reset-password', component: B2bResetPasswordComponent },
 ];
 

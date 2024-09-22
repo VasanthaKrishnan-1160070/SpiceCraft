@@ -1,6 +1,17 @@
 USE master;
-ALTER DATABASE SpiceCraft SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-DROP DATABASE SpiceCraft ;
+
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'SpiceCraft')
+BEGIN
+    -- Set the database to single-user mode
+    ALTER DATABASE SpiceCraft SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    
+    -- Drop the database
+    DROP DATABASE SpiceCraft;
+END
+ELSE
+BEGIN
+    PRINT 'Database SpiceCraft does not exist.';
+END;
 
 create database SpiceCraft;
 

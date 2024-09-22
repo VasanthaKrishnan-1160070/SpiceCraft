@@ -48,6 +48,7 @@ export class SideNavigationComponent {
         {name: 'Enquiry', icon: 'fa-solid fa-question', routing: '/b2b-enquiry-list'},
         {name: 'Reports', icon: 'fa-solid fa-arrow-rotate-left', routing: '/b2b-report'},
         {name: 'Payments', icon: 'fa-solid fa-hand-holding-dollar', routing: 'b2b-payment-list'},
+        {name: 'Promotion', icon: 'fa-solid fa-hand-holding-dollar', routing: 'b2b-promotion-list'},
        // {name: 'Shipping', icon: 'fa-solid fa-hand-holding-dollar', routing: 'b2b-shipping'},
         {name: 'Orders', icon: 'fa-solid fa-hand-holding-dollar', routing: '/b2b-order-list'},
         {name: 'Inventory', icon: 'fa-solid fa-hand-holding-dollar', routing: 'b2b-inventory'},

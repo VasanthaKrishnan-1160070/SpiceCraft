@@ -1,0 +1,83 @@
+<!-- Remove All Button -->
+<div class="d-flex justify-content-end">
+  <button class="btn btn-danger mb-3" (click)="removeAllBogoPromotions()">Remove All Promotions</button>
+</div>
+
+
+
+<dx-data-grid
+  [dataSource]="bogoPromotions$ | async"
+  [showBorders]="true"
+  [columnAutoWidth]="true"
+  [allowColumnReordering]="true"
+  [paging]="{ enabled: true, pageSize: 10 }"
+  [filterRow]="{ visible: true }"
+  [groupPanel]="{ visible: true }"
+  [grouping]="{ autoExpandAll: true }"
+  [sorting]="{ mode: 'multiple' }"
+  [selection]="{ mode: 'single' }"
+>
+  <!-- Column Chooser -->
+  <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
+  <dxo-paging
+    [enabled]="true"
+    [pageSize]="5"
+    [pageIndex]="1"
+  >
+  </dxo-paging>
+  <dxo-pager
+    [visible]="true"
+    [displayMode]="'full'"
+    [showInfo]="true"
+    [showPageSizeSelector]="true"
+    [allowedPageSizes]="[5, 10, 20, 50]"
+    infoText="Page #{0}. Total: {1} ({2} items)"
+    [showNavigationButtons]="true">
+  </dxo-pager>
+  <dxi-column dataField="itemId" caption="Item ID"></dxi-column>
+  <dxi-column dataField="itemName" caption="Item Name"></dxi-column>
+  <dxi-column dataField="categoryName" caption="Category"></dxi-column>
+  <dxi-column dataField="actualPrice" caption="Actual Price"></dxi-column>
+  <dxi-column dataField="comboName" caption="Combo Name"></dxi-column>
+  <dxi-column dataField="buyQuantity" caption="Buy Quantity"></dxi-column>
+  <dxi-column dataField="getQuantity" caption="Get Quantity"></dxi-column>
+  <!-- Action Button (Delete or Add Promotion) -->
+  <dxi-column caption="Action" width="120" [cellTemplate]="'buttonTemplate'" >
+    <div *dxTemplate="let data of 'buttonTemplate'">
+      <!-- If there's a promotion, show delete, otherwise show add -->
+      <button *ngIf="data.data.comboName !== 'Not Specified'; else addButtonTemplate"
+              class="btn btn-danger"
+              (click)="removeBogoPromotion(data.data.itemId)">
+        Delete
+      </button>
+      <ng-template #addButtonTemplate>
+        <button class="btn btn-success" (click)="showAddPromotionModal(data.data)">Add</button>
+      </ng-template>
+    </div>
+  </dxi-column>
+</dx-data-grid>
+
+<!-- Add Promotion Popup with DevExtreme Form -->
+<dx-popup
+  [(visible)]="showAddPromotionPopup"
+  title="Add BOGO Promotion"
+  [showTitle]="true"
+  [width]="300"
+  [height]="300"
+  [enableBodyScroll]="false"
+  [dragEnabled]="true"
+  [contentTemplate]="'content'"
+  [closeOnOutsideClick]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+  <dx-form [formData]="selectedItem">
+    <dxi-item dataField="comboName" label="Combo Name" [editorOptions]="{ value: '' }"></dxi-item>
+    <dxi-item dataField="buyQuantity" label="Buy Quantity" [editorOptions]="{ min: 1, step: 1 }" editorType="dxNumberBox"></dxi-item>
+    <dxi-item dataField="getQuantity" label="Get Quantity" [editorOptions]="{ min: 1, step: 1 }" editorType="dxNumberBox"></dxi-item>
+
+  </dx-form>
+  <div class="d-flex mt-5 justify-content-center">
+    <button class="btn btn-success" (click)="addBogoPromotion()">Save</button>
+  </div>
+  </div>
+</dx-popup>

@@ -58,6 +58,9 @@ namespace SpiceCraft.Server
 
             // UserRepository
             services.AddScoped<IUserRepository, UserRepository>();
+            
+            // Inventory Repository
+            services.AddScoped<IInventoryRepository, InventoryRepository>();
 
             // Register Business Logics
             // AdminLogics
@@ -110,6 +113,8 @@ namespace SpiceCraft.Server
             
             // Helpers
             services.AddScoped<ICurrentUser, CurrentUser>();
+            
+            services.AddScoped<IInventoryLogics, InventoryLogics>();
         }
     }
 }

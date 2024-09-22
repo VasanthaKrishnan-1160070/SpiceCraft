@@ -1,0 +1,77 @@
+<div class="p-4">
+  <sc-title [title]="'Inventory List'"></sc-title>
+</div>
+
+<div class="ms-5 me-5">
+  <!-- Data Grid for Inventory -->
+  <dx-data-grid
+    [dataSource]="inventory$ | async"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnReordering]="true"
+    [filterRow]="{ visible: true }"
+    [paging]="{ enabled: true, pageSize: 10 }"
+    [groupPanel]="{ visible: true }"
+    [grouping]="{ autoExpandAll: true }"
+    [sorting]="{ mode: 'multiple' }"
+    [selection]="{ mode: 'single' }"
+  >
+    <!-- Column Chooser -->
+    <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
+    <dxo-paging [enabled]="true" [pageSize]="5" [pageIndex]="1"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [displayMode]="'full'"
+      [showInfo]="true"
+      [showPageSizeSelector]="true"
+      [allowedPageSizes]="[10, 20, 50]"
+      infoText="Page #{0}. Total: {1} ({2} items)"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+
+    <!-- Load Panel -->
+    <dxo-load-panel [enabled]="true"></dxo-load-panel>
+
+    <!-- Define columns for Inventory -->
+    <dxi-column dataField="itemId" caption="Item ID"></dxi-column>
+    <dxi-column dataField="itemName" caption="Item Name"></dxi-column>
+    <dxi-column dataField="categoryName" caption="Category"></dxi-column>
+    <dxi-column dataField="productPrice" caption="Price"></dxi-column>
+    <dxi-column dataField="availableStock" caption="Available Stock"></dxi-column>
+    <dxi-column dataField="minimumRequiredStock" caption="Min. Required Stock"></dxi-column>
+
+    <!-- Edit Button to open Popup -->
+    <dxi-column caption="Edit Stock" [width]="100" [cellTemplate]="'editButtonTemplate'">
+      <div *dxTemplate="let data of 'editButtonTemplate'">
+        <button class="btn btn-success" (click)="openEditPopup(data.data)">Edit Stock</button>
+      </div>
+    </dxi-column>
+  </dx-data-grid>
+
+  <!-- DevExtreme Popup for Editing Available Stock -->
+  <dx-popup
+    [(visible)]="editPopupVisible"
+    [width]="400"
+    [height]="250"
+    [showTitle]="true"
+    title="Edit Available Stock"
+    [contentTemplate]="'content'"
+    [dragEnabled]="true"
+    [closeOnOutsideClick]="true"
+  >
+    <div *dxTemplate="let data of 'content'">
+      <dx-form [formData]="selectedProduct">
+        <dxi-item dataField="itemName" [isRequired]="true" [editorOptions]="{ disabled: true }" caption="Item Name"></dxi-item>
+        <dxi-item dataField="availableStock" [isRequired]="true" caption="Available Stock">
+
+        </dxi-item>
+      </dx-form>
+
+      <div class="d-flex gap-3 mt-4">
+        <button class="btn btn-success" (click)="saveStock()">Save</button>
+        <button class="btn btn-danger" (click)="closeEditPopup()">Cancel</button>
+      </div>
+    </div>
+  </dx-popup>
+</div>
+

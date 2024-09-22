@@ -1,0 +1,79 @@
+<!-- Remove All Button -->
+<div class="d-flex justify-content-end">
+<button class="btn btn-danger mb-3" (click)="removeAllCategoryPromotions()">Remove All Promotions</button>
+</div>
+
+<dx-data-grid
+  [dataSource]="categoryPromotions$ | async"
+  [showBorders]="true"
+  [columnAutoWidth]="true"
+  [allowColumnReordering]="true"
+  [paging]="{ enabled: true, pageSize: 10 }"
+  [filterRow]="{ visible: true }"[groupPanel]="{ visible: true }"
+  [grouping]="{ autoExpandAll: true }"
+  [sorting]="{ mode: 'multiple' }"
+  [selection]="{ mode: 'single' }"
+>
+  <!-- Column Chooser -->
+  <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
+  <dxo-paging
+    [enabled]="true"
+    [pageSize]="5"
+    [pageIndex]="1"
+  >
+  </dxo-paging>
+  <dxo-pager
+    [visible]="true"
+    [displayMode]="'full'"
+    [showInfo]="true"
+    [showPageSizeSelector]="true"
+    [allowedPageSizes]="[5, 10, 20, 50]"
+    infoText="Page #{0}. Total: {1} ({2} items)"
+    [showNavigationButtons]="true">
+  </dxo-pager>
+
+  <!-- Load Panel -->
+  <dxo-load-panel [enabled]="true"></dxo-load-panel>
+
+
+  <dxi-column dataField="categoryId" caption="Category ID"></dxi-column>
+  <dxi-column dataField="categoryName" caption="Category Name"></dxi-column>
+  <dxi-column dataField="parentCategoryName" caption="Parent Category"></dxi-column>
+  <dxi-column dataField="discountRate" caption="Discount Rate"></dxi-column>
+  <!-- Action Button (Delete or Add Promotion) -->
+  <dxi-column caption="Action" width="120" [cellTemplate]="'buttonTemplate'" >
+    <div *dxTemplate="let data of 'buttonTemplate'">
+      <!-- If there's a promotion, show delete, otherwise show add -->
+      <button *ngIf="data.data.hasPromotion === 'Yes'; else addButtonTemplate"
+              class="btn btn-danger"
+              (click)="removeCategoryPromotion(data.data.categoryId)">
+        Delete
+      </button>
+      <ng-template #addButtonTemplate>
+        <button class="btn btn-success" (click)="showAddPromotionModal(data.data)">Add</button>
+      </ng-template>
+    </div>
+  </dxi-column>
+</dx-data-grid>
+
+<!-- Add Promotion Popup with DevExtreme Form -->
+<dx-popup
+  [(visible)]="showAddPromotionPopup"
+  title="Add Category Promotion"
+  [showTitle]="true"
+  [width]="500"
+  [height]="400"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+  [contentTemplate]="'content'"
+>
+  <div *dxTemplate="let data of 'content'">
+    <dx-form [formData]="selectedItem">
+      <dxi-item dataField="discountRate" label="Discount Rate (%)" [editorOptions]="{ format: '#0%' }" editorType="dxTextBox"></dxi-item>
+
+    </dx-form>
+      <div class="form-group mt-2">
+        <button class="btn btn-primary" (click)="addCategoryPromotion()">Save</button>
+      </div>
+    </div>
+</dx-popup>
