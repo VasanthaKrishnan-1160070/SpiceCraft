@@ -1,44 +1,56 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using SpiceCraft.Server.BusinessLogics.Interface;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace SpiceCraft.Server.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class PaymentController : ControllerBase
     {
-        // GET: api/<PaymentController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly IPaymentLogics _paymentLogic;
+
+        public PaymentController(IPaymentLogics paymentBusinessLogic)
         {
-            return new string[] { "value1", "value2" };
+            _paymentLogic = paymentBusinessLogic;
         }
 
-        // GET api/<PaymentController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // Get payments for a specific user
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetPaymentsForUser(int userId)
         {
-            return "value";
+            var result = await _paymentLogic.GetPaymentsForUserAsync(userId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return NotFound(result.Message);
         }
 
-        // POST api/<PaymentController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // Get payments for internal users
+        [HttpGet("internal")]
+        public async Task<IActionResult> GetPaymentsForInternalUsers()
         {
+            var result = await _paymentLogic.GetPaymentsForInternalUsersAsync();
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return NotFound(result.Message);
         }
 
-        // PUT api/<PaymentController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // Get payment invoice details by transaction ID
+        [HttpGet("invoice/{transactionId}")]
+        public async Task<IActionResult> GetPaymentInvoiceDetails(int transactionId)
         {
-        }
-
-        // DELETE api/<PaymentController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            var result = await _paymentLogic.GetPaymentInvoiceDetailsAsync(transactionId);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return NotFound(result.Message);
         }
     }
 }

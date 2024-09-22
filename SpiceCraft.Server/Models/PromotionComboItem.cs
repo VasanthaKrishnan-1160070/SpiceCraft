@@ -9,7 +9,7 @@ public partial class PromotionComboItem
 
     public int ItemId { get; set; }
 
-    public string? ComboName { get; set; }
+    public string ComboName { get; set; } = null!;
 
     public int BuyQuantity { get; set; }
 

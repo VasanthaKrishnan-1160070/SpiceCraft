@@ -11,7 +11,7 @@ namespace SpiceCraft.Server.DTO.User
         public string Email { get; set; } = string.Empty;
         public int RoleId { get; set; }
 
-        public bool? IsActive { get; set; } = false;
+        public bool IsActive { get; set; } = false;
         public string Phone { get; set; } = string.Empty;
         public string ProfileImg { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;

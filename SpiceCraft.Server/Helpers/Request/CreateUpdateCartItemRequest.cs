@@ -6,6 +6,6 @@ public class CreateUpdateCartItemRequest
     public int UserId { get; set; }
     public int CartId { get; set; } = 0;
     public int ItemId { get; set; }
-    public decimal? PriceAtAdd { get; set; }
+    public decimal PriceAtAdd { get; set; }
     public string Description { get; set; } = string.Empty;
 }

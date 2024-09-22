@@ -73,6 +73,17 @@ namespace SpiceCraft.Server.BusinessLogics
 
             return HelperFactory.Msg.Success(orders);
         }
+        
+        public async Task<ResultDetail<UserOrderDTO>> GetFirstUnpaidUserOrdersAsync(int userId)
+        {
+            var firstUnpaidOrder = await _orderRepo.GetFirstUnpaidUserOrdersAsync(userId);
+            if (firstUnpaidOrder == null)
+            {
+                return HelperFactory.Msg.Error<UserOrderDTO>("No unpaid orders found for the user.");
+            }
+
+            return HelperFactory.Msg.Success(firstUnpaidOrder);
+        }
 
         // Change the order status
         public async Task<ResultDetail<bool>> ChangeOrderStatusAsync(int orderId, string newStatus)
@@ -115,6 +126,18 @@ namespace SpiceCraft.Server.BusinessLogics
             }
 
             return HelperFactory.Msg.Success(true);
+        }
+
+        public async Task<ResultDetail<bool>> CreateUserOrderAsync(OrderDTO order)
+        {
+            var status = await _orderRepo.CreateUserOrderAsync(order);
+            return status? HelperFactory.Msg.Success(true) : HelperFactory.Msg.Error<bool>("Failed to create order.");
+        }
+
+        public async Task<ResultDetail<bool>> InsertOrderItemsFromShoppingCartAsync(int userId, int orderId)
+        {
+            var status = await _orderRepo.InsertOrderItemsFromShoppingCartAsync(userId, orderId);
+            return status > 0 ? HelperFactory.Msg.Success(true) : HelperFactory.Msg.Error<bool>("Failed to insert order items from shopping cart.");
         }
     }
 }

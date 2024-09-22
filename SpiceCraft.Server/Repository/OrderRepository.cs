@@ -45,7 +45,7 @@ namespace SpiceCraft.Server.Repository
                     DiscountRate = pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0),
                     Quantity = ci.Quantity,
                     PurchasePrice = p.Price * ci.Quantity *
-                                    (1 - ((pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0)) / 100)) ?? 0,
+                                    (1 - ((pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0)) / 100)),
                     Description = ci.Description
                 }).ToListAsync();
 
@@ -112,13 +112,13 @@ namespace SpiceCraft.Server.Repository
                     ActualPrice = p.Price,
                     DiscountRate = (pbp != null && ci.Quantity >= pbp.RequiredQuantity) ? pbp.DiscountRate : 0,
                     Quantity = ci.Quantity,
-                    PurchasePrice = ((pbp != null && ci.Quantity >= pbp.RequiredQuantity)
+                    PurchasePrice = (pbp != null && ci.Quantity >= pbp.RequiredQuantity)
                         ? p.Price * ci.Quantity * (1 - pbp.DiscountRate / 100)
-                        : p.Price * ci.Quantity) ?? 0,
+                        : p.Price * ci.Quantity,
                     Description = ci.Description
                 }).ToListAsync();
 
-            if (cartItems.Count == 0)
+            if (!cartItems.Any())
             {
                 return 0;
             }
@@ -208,6 +208,7 @@ namespace SpiceCraft.Server.Repository
                 orderby o.OrderDate descending
                 select new UserOrderDTO
                 {
+                    UserId = o.UserId,
                     OrderId = o.OrderId,
                     OrderDate = o.OrderDate.ToString("dd/MM/yyyy"),
                     PaymentStatus = pyt != null ? pyt.PaymentStatus : "Pending",
@@ -222,6 +223,40 @@ namespace SpiceCraft.Server.Repository
 
             return userOrders;
         }
+
+        public async Task<UserOrderDTO> GetFirstUnpaidUserOrdersAsync(int userId)
+        {
+            var userOrder = await (from o in _context.Orders
+                join pyt in _context.Payments on o.OrderId equals pyt.OrderId into paymentGroup
+                from pyt in paymentGroup.DefaultIfEmpty()
+                // join shc in _context.CountryShippingOptions on o.CountryShippingOptionId equals shc
+                //     .CountryShippingOptionId into shippingGroup
+                // from shc in shippingGroup.DefaultIfEmpty()
+                // join sh in _context.ShippingOptions on shc.ShippingOptionId equals sh.ShippingOptionId into
+                //     shippingOptGroup
+                // from sh in shippingOptGroup.DefaultIfEmpty()
+                // join ct in _context.Countries on shc.CountryId equals ct.CountryId into countryGroup
+                // from ct in countryGroup.DefaultIfEmpty()
+                where o.UserId == userId && o.OrderStatus == "Pending"
+                orderby o.OrderDate descending
+                select new UserOrderDTO
+                {
+                    UserId = o.UserId,
+                    OrderId = o.OrderId,
+                    OrderDate = o.OrderDate.ToString("dd/MM/yyyy"),
+                    PaymentStatus = pyt != null ? pyt.PaymentStatus : "Pending",
+                    OrderStatus = o.OrderStatus,
+                    // ShippingInfo = o.IsFreeShipping
+                    //     ? "Free Shipping"
+                    //     : (sh.ShippingOptionId != 4
+                    //         ? $"{sh.ShippingOptionName} to {ct.Name}"
+                    //         : sh.ShippingOptionName),
+                    TotalCost = o.TotalCost
+                }).FirstOrDefaultAsync();
+
+            return userOrder;
+        }
+        
         // Get Inventory details for a specific product
         public async Task<ProductInventoryDTO> GetInventoryForProductAsync(int itemId)
         {
@@ -240,6 +275,24 @@ namespace SpiceCraft.Server.Repository
 
             return inventory;
         }
-        
+
+        public async Task<bool> CreateUserOrderAsync(OrderDTO order)
+        {
+            var newOrder = new Order
+            {
+                UserId = order.UserId,
+                OrderDate = DateTime.Now,
+                TotalCost = order.TotalCost,
+                OrderStatus = order.OrderStatus,
+                IsFreeShipping = order.IsFreeShipping,
+                Preference = order.Preference,
+                ShippingOptionId = order.ShippingOptionId
+            };
+
+            var entity = _context.Orders.Add(newOrder);
+            await _context.SaveChangesAsync();
+
+            return newOrder.OrderId > 0;
+        }
     }
 }

@@ -1,3 +1,9 @@
+USE master;
+ALTER DATABASE SpiceCraft SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+DROP DATABASE SpiceCraft ;
+
+create database SpiceCraft;
+
 use SpiceCraft;
 
 -- Create Tables
@@ -10,19 +16,20 @@ create table ShippingOptions (
     ShippingOptionId int primary key identity(1,1),
     ShippingOptionName varchar(100) not null unique,
     Description varchar(100) not null,
-    cost decimal(10,2) not null
+    Cost decimal(10,2) default 5.00 not null,
+    FreeShippingThreshold decimal(10,2) not null
 );
 
 create table Users (
     UserId int primary key identity(1,1),
     Title varchar(5) check (Title in ('Mr.', 'Ms.', 'Dr.', 'Mr.')),
-    FirstName varchar(100),
-    LastName varchar(100),
-    Email varchar(100) unique,
+    FirstName varchar(100) not null,
+    LastName varchar(100) not null,
+    Email varchar(100) unique  not null,
     Phone varchar(12),
     ProfileImg varchar(200),
     RoleId int not null,
-    IsActive bit default 1,
+    IsActive bit default 1 not null,
     CreatedAt datetime default getdate(),
     UpdatedAt datetime default getdate(),
     foreign key (RoleId) references Roles (RoleId)
@@ -38,6 +45,32 @@ create table UsersCredential (
     foreign key (UserId) references Users (UserId)
 );
 
+-- Create CorporateClients table
+CREATE TABLE CorporateClients (
+      CorporateId INT IDENTITY(1,1) PRIMARY KEY,
+      UserId INT NOT NULL UNIQUE,
+      Approved BIT DEFAULT 0,
+      CompanyName varchar(100) UNIQUE NOT NULL,
+      CompanyDescription varchar(MAX),
+      DiscountRate DECIMAL(5,2) DEFAULT 0,
+      CreditLimit DECIMAL(10,2) DEFAULT 0,
+      CreditUsed DECIMAL(10,2) DEFAULT 0,
+      PaymentOption varchar(10) NOT NULL CHECK (PaymentOption IN ('pay_now', 'pay_later')) DEFAULT 'pay_now',
+      CreatedAt DATETIME DEFAULT GETDATE(),
+      UpdatedAt DATETIME DEFAULT GETDATE(),
+      CONSTRAINT FK_CorporateClients_Users FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE
+);
+
+-- Create PaymentSchedules table
+CREATE TABLE PaymentSchedules (
+      ScheduleId INT IDENTITY(1,1) PRIMARY KEY,
+      CorporateId INT NOT NULL,
+      ScheduleType varchar(10) NOT NULL CHECK (ScheduleType IN ('immediate', 'monthly')),
+      LastPaymentDate DATE,
+      NextPaymentDue DATE,
+      CONSTRAINT FK_PaymentSchedules_CorporateClients FOREIGN KEY (CorporateId) REFERENCES CorporateClients(CorporateId) ON DELETE CASCADE
+);
+
 create table ItemCategories (
     CategoryId int primary key identity(1,1),
     CategoryName varchar(300) not null unique,
@@ -49,11 +82,11 @@ create table Items (
     ItemId int primary key identity(1,1),
     CategoryId int not null,
     ItemName varchar(300) not null,
-    OwnProduct bit,
-    Discount decimal(10,2) default 0,
+    OwnProduct bit default 1 not null,
+    Discount decimal(10,2) default 0 not null,
     Description text,
     Price decimal(10,2) not null,
-    IsRemoved bit default 0,
+    IsRemoved bit default 0 not null,
     CreatedDate date default null,
     CreatedAt datetime default getdate(),
     UpdatedAt datetime default getdate(),
@@ -67,7 +100,7 @@ create table Orders (
     OrderDate datetime not null,
     ShippingOptionId int null,
     TotalCost decimal(10,2) not null,
-    IsFreeShipping bit default 0,
+    IsFreeShipping bit default 0 not null,
 	Preference varchar(100),
     OrderStatus varchar(50) check (OrderStatus in ('Prepared', 'Ready To Ship', 'Shipped', 'Ready For Pickup', 'Cancelled', 'Returned')) not null,
     CreatedAt datetime default getdate(),
@@ -81,11 +114,13 @@ create table OrderDetails (
     OrderDetailsId int primary key identity(1,1),
     OrderId int not null,
     ItemId int not null,
-    ActualPrice decimal(10,2),
+    ActualPrice decimal(10,2) not null,
     [Description] varchar(100),
-    DiscountRate decimal(10,2) default 0,
+    DiscountRate decimal(10,2) default 0 not null,
     Quantity int not null,
     PurchasePrice decimal(10,2) not null,
+    SpiceLevel varchar(100) check (SpiceLevel in ('Mild', 'Medium', 'Hot', 'Extra Hot')) default 'Medium',
+    size varchar(100) check (size in ('Small', 'Medium', 'Large', 'Family Pack')) default 'Medium',
     foreign key (OrderId) references Orders(OrderId),
     foreign key (ItemId) references Items(ItemId),
     unique(OrderId, ItemId)
@@ -96,7 +131,7 @@ create table ShoppingCarts (
     UserId int not null unique,
     CreatedAt datetime default getdate(),
     UpdatedAt datetime default getdate(),
-    IsOrdered bit default 0,
+    IsOrdered bit default 0 not null,
     foreign key (UserId) references Users(UserId)
 );
 
@@ -106,7 +141,7 @@ create table CartItems (
     ItemId int not null,
     Quantity int not null,
     [Description] varchar(100),
-    PriceAtAdd decimal(10, 2),
+    PriceAtAdd decimal(10, 2) not null,
     foreign key (CartId) references ShoppingCarts(CartId),
     foreign key (ItemId) references Items(ItemId),
     unique(CartId, ItemId)
@@ -125,7 +160,7 @@ create table Inventory (
 create table PromotionItems (
     PromotionItemId int primary key identity(1,1),
     ItemId int not null,
-    DiscountRate decimal(5,2) default 0,
+    DiscountRate decimal(5,2) default 0 not null,
     foreign key (ItemId) references Items(ItemId),
     unique(ItemId)
 );
@@ -133,7 +168,7 @@ create table PromotionItems (
 create table PromotionCategories (
     PromotionCategoryId int primary key identity(1,1),
     CategoryId int not null,
-    DiscountRate decimal(5,2) default 0,
+    DiscountRate decimal(5,2) default 0 not null,
     foreign key (CategoryId) references ItemCategories(CategoryId),
     unique(CategoryId)
 );
@@ -141,7 +176,7 @@ create table PromotionCategories (
 create table PromotionComboItems (
     PromotionComboItemsId int primary key identity(1,1),
     ItemId int not null,
-    ComboName varchar(100),
+    ComboName varchar(100) not null,
     BuyQuantity int not null default 2,
     GetQuantity int not null default 1,
     foreign key (ItemId) references Items(ItemId),
@@ -152,7 +187,7 @@ create table PromotionBulkItems (
     PromotionBulkItemId int primary key identity(1,1),
     ItemId int not null,
     RequiredQuantity int not null default 0,
-    DiscountRate decimal(5,2) default 0,
+    DiscountRate decimal(5,2) default 0  not null,
     foreign key (ItemId) references Items(ItemId),
     unique(ItemId)
 );
@@ -167,7 +202,7 @@ create table CustomerRewards (
     CustomerRewardsId int primary key identity(1,1),
     RewardId int not null,
     UserId int not null,
-    IsUsed bit,
+    IsUsed bit default 0 not null,
     foreign key (RewardId) references Rewards (RewardId),
     foreign key (UserId) references Users (UserId)
 );
@@ -178,7 +213,7 @@ create table Invoices (
     IssueDate date not null,
     DueDate date not null,
     TotalAmount decimal(10,2) not null,
-    Paid bit default 0,    
+    Paid bit default 0 not null,
     foreign key (OrderId) references Orders(OrderId)
 );
 
@@ -228,7 +263,7 @@ create table GiftCards (
     Code varchar(50) unique not null,
     Balance decimal(10,2) not null,
     ExpirationDate date,
-    IsActive bit default 1,
+    IsActive bit default 1 not null,
     CreatedAt datetime default getdate(),
     UpdatedAt datetime default getdate()
 );
@@ -282,14 +317,14 @@ INSERT INTO Roles (RoleName) VALUES
 ('Admin'),
 ('Manager'),
 ('Staff'),
-('Customer');
+('Customer'),
+('CorporateClient');
 
 -- ShippingOptions
-INSERT INTO ShippingOptions (ShippingOptionName, Description) VALUES 
-('Standard Delivery', 'Delivers in 3 hours'),
-('Express Delivery', 'Immediate Delivery'),
-('Pickup in Store', 'Pick up the order from store'),
-('Free Shipping', 'Free delivery');
+INSERT INTO ShippingOptions (ShippingOptionName, Description, Cost, FreeShippingThreshold) VALUES
+('Standard Delivery', 'Delivers in 3 hours', 5.00, 15.00),
+('Express Delivery', 'Immediate Delivery', 10.00, 25.00),
+('Pickup in Store', 'Pick up the order from store', 0.00, 0.00);
 
 -- Users
 INSERT INTO Users (Title, FirstName, LastName, Email, Phone, ProfileImg, RoleId, IsActive) VALUES 

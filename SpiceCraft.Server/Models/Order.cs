@@ -15,7 +15,7 @@ public partial class Order
 
     public decimal TotalCost { get; set; }
 
-    public bool? IsFreeShipping { get; set; }
+    public bool IsFreeShipping { get; set; }
 
     public string? Preference { get; set; }
 

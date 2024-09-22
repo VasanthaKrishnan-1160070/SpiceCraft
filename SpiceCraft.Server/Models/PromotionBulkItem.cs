@@ -11,7 +11,7 @@ public partial class PromotionBulkItem
 
     public int RequiredQuantity { get; set; }
 
-    public decimal? DiscountRate { get; set; }
+    public decimal DiscountRate { get; set; }
 
     public virtual Item Item { get; set; } = null!;
 }

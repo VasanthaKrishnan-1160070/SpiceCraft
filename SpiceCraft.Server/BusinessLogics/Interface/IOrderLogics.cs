@@ -16,11 +16,16 @@ namespace SpiceCraft.Server.BusinessLogics.Interface
 
         // Get all orders for a user
         Task<ResultDetail<List<UserOrderDTO>>> GetUserOrdersAsync(int userId);
+        
+        Task<ResultDetail<UserOrderDTO>> GetFirstUnpaidUserOrdersAsync(int userId);
 
         // Change the order status
         Task<ResultDetail<bool>> ChangeOrderStatusAsync(int orderId, string newStatus);
 
         // Verify stock availability before placing an order
         Task<ResultDetail<bool>> VerifyStockBeforeOrderAsync(int userId);
+        Task<ResultDetail<bool>> CreateUserOrderAsync(OrderDTO order);
+
+        Task<ResultDetail<bool>> InsertOrderItemsFromShoppingCartAsync(int userId, int orderId);
     }
 }

@@ -3,7 +3,7 @@
   or to force it 
   dotnet ef dbcontext scaffold "Name=ConnectionStrings:DefaultConnection" Microsoft.EntityFrameworkCore.SqlServer --context-dir Context --output-dir Models --force
 
-  dotnet ef dbcontext scaffold "Server=localhost,1455;Database=SpiceCraft;User Id=sa;Password=Admin123;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer --context-dir Context --output-dir Models --force
+  dotnet ef dbcontext scaffold "Server=localhost,1455;Database=SpiceCraft;User Id=sa;Password=Admin@123;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer --context-dir Context --output-dir Models --force
 
 
 # Scaffold specific tables from the database

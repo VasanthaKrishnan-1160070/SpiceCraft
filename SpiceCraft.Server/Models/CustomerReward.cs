@@ -11,7 +11,7 @@ public partial class CustomerReward
 
     public int UserId { get; set; }
 
-    public bool? IsUsed { get; set; }
+    public bool IsUsed { get; set; }
 
     public virtual Reward Reward { get; set; } = null!;
 

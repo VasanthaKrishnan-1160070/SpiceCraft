@@ -26,8 +26,8 @@ namespace SpiceCraft.Server.Repository
                                 GiftCardId = cgc.GiftCardId,
                                 UserId = cgc.UserId,
                                 Code = gc.Code,
-                                Balance = $"${gc.Balance}",
-                                IsActive = gc.IsActive ?? false ? "Yes" : "No",
+                                Balance = gc.Balance,
+                                IsActive = gc.IsActive ? "Yes" : "No",
                                 PurchasedDate = gc.CreatedAt.HasValue ? gc.CreatedAt.Value.ToString("dd'/'MM'/'yyyy") : string.Empty
                             };
 
@@ -44,8 +44,8 @@ namespace SpiceCraft.Server.Repository
                             {
                                 GiftCardId = gc.GiftCardId,
                                 Code = gc.Code,
-                                Balance = gc.Balance.ToString(),
-                                IsActive = gc.IsActive ?? false ? "Yes" : "No",
+                                Balance = gc.Balance,
+                                IsActive = gc.IsActive ? "Yes" : "No",
                                 PurchasedDate = gc.CreatedAt.HasValue ? gc.CreatedAt.Value.ToString("dd'/'MM'/'yyyy") : string.Empty
                             }).FirstOrDefault();
 

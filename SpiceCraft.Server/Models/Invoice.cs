@@ -15,7 +15,7 @@ public partial class Invoice
 
     public decimal TotalAmount { get; set; }
 
-    public bool? Paid { get; set; }
+    public bool Paid { get; set; }
 
     public virtual Order Order { get; set; } = null!;
 }

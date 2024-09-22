@@ -9,7 +9,7 @@ public partial class PromotionItem
 
     public int ItemId { get; set; }
 
-    public decimal? DiscountRate { get; set; }
+    public decimal DiscountRate { get; set; }
 
     public virtual Item Item { get; set; } = null!;
 }

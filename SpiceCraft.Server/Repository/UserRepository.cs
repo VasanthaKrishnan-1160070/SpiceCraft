@@ -21,6 +21,25 @@ namespace SpiceCraft.Server.Repository
             return await _context.Users.Include(u => u.UsersCredential)
                                        .FirstOrDefaultAsync(u => u.UserId == userId);
         }
+        
+        public async Task<UserAddressDTO?> GetUserAddressByIdAsync(int userId)
+        {
+            var userDetail = await GetUserByIdAsync(userId);
+            var userAddress = userDetail.UserAddresses.FirstOrDefault();
+            if (userAddress != null)
+            {
+                return new UserAddressDTO
+                {
+                    UserId = userDetail.UserId,
+                    StreetAddress1 = userAddress.StreetAddress1,
+                    StreetAddress2 = userAddress.StreetAddress2,
+                    City = userAddress.City,
+                    StateOrProvince = userAddress.StateOrProvince,
+                    PostalCode = userAddress.PostalCode
+                };
+            }
+            return null;
+        }
 
         public async Task<UsersCredential> GetUserCredentialByUsernameAsync(string username)
         {

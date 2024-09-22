@@ -2,6 +2,7 @@
 {
     public class UserAddressDTO
     {
+        public int UserId { get; set; }
         public string StateOrProvince { get; set; }
         public string City { get; set; }
         public string PostalCode { get; set; }

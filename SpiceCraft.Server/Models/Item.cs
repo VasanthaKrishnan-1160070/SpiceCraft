@@ -11,15 +11,15 @@ public partial class Item
 
     public string ItemName { get; set; } = null!;
 
-    public bool? OwnProduct { get; set; }
+    public bool OwnProduct { get; set; }
 
-    public decimal? Discount { get; set; }
+    public decimal Discount { get; set; }
 
     public string? Description { get; set; }
 
     public decimal Price { get; set; }
 
-    public bool? IsRemoved { get; set; }
+    public bool IsRemoved { get; set; }
 
     public DateOnly? CreatedDate { get; set; }
 

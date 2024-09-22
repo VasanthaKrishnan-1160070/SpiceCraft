@@ -141,7 +141,7 @@ public class CartRepository : ICartRepository
                 TotalPrice = p.Price * ci.Quantity * (1 - ((pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0)) / 100))
             }).SumAsync(x => x.TotalPrice);
 
-        return result ?? 0;
+        return result;
     }
 
     // Retrieves total cart price for corporate clients
@@ -160,7 +160,7 @@ public class CartRepository : ICartRepository
                                             : p.Price * ci.Quantity
                             }).SumAsync(x => x.FinalPrice);
 
-        return result ?? 0;
+        return result;
     }
 
     // Retrieves a specific cart item by its ID
