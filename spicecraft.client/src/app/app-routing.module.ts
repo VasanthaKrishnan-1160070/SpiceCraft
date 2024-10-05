@@ -10,8 +10,6 @@ import {StaffRegistrationComponent} from "./feature/registeration/staff-registra
 import {DashboardComponent} from "./feature/dashboard/dashboard/dashboard.component";
 import {LogoutComponent} from "./feature/logout/logout.component";
 import {ProfileComponent} from "./feature/profile/profile.component";
-import {OrderComponent} from "./feature/order/order.component";
-import {PaymentComponent} from "./feature/payment/payment.component";
 import {EnquiryComponent} from "./feature/enquiry/enquiry.component";
 import {ReturnsComponent} from "./feature/returns/returns.component";
 import {GiftCardComponent} from "./feature/gift-card/gift-card.component";
@@ -37,6 +35,10 @@ import {B2bInventoryListComponent} from "./feature/admin/b2b-inventory/b2b-inven
 import {B2bPromotionComponent} from "./feature/admin/b2b-promotion/b2b-promotion/b2b-promotion.component";
 import {CustomerCheckoutComponent} from "./feature/checkout/customer-checkout/customer-checkout.component";
 import {BulkCustomerComponent} from "./feature/checkout/bulk-customer/bulk-customer.component";
+import {OrderListComponent} from "./feature/order/order-list/order-list.component";
+import {OrderDetailComponent} from "./feature/order/order-detail/order-detail.component";
+import {PaymentListComponent} from "./feature/payment/payment-list/payment-list.component";
+import {PaymentDetailComponent} from "./feature/payment/payment-detail/payment-detail.component";
 
 const routes: Routes = [
   { path: '', component: ClientHomeComponent},
@@ -48,8 +50,10 @@ const routes: Routes = [
   { path: 'profile', component: ProfileComponent },
   { path: 'item-list', component: ItemListComponent },
   { path: 'cart-list', component: CartListComponent },
-  { path: 'orders', component: OrderComponent },
-  { path: 'payment', component: PaymentComponent },
+  { path: 'order-list', component: OrderListComponent },
+  { path: 'order-detail/:orderId', component: OrderDetailComponent },
+  { path: 'payment-list', component: PaymentListComponent },
+  { path: 'payment-detail/:transactionId', component: PaymentDetailComponent },
   { path: 'enquiry-list', component: EnquiryListComponent },
   { path: 'enquiry-details/:id', component: EnquiryDetailComponent },
   { path: 'returns', component: ReturnsComponent },

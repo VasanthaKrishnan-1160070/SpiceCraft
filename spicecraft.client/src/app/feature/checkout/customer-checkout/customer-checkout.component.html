@@ -38,10 +38,9 @@
         <div class="col-8">
 <!--          <a class="btn btn-success mb-3 text-light" [routerLink]="['/cart-list']">Modify Cart</a>-->
           <dx-button type="success" text="Modify Cart" [routerLink]="['/cart-list']" ></dx-button>
-
           <!-- Free Shipping Info -->
-          <div *ngIf="isEligibleForFreeShipping" class="text-success fw-bold text-center mt-3">Eligible For Free Shipping</div>
-          <div *ngIf="amountNeededToReachFreeShipping > 0" class="text-primary fw-bold text-center mt-3">
+          <div *ngIf="isEligibleForFreeShipping && selectedShipping !== 3" class="text-success fw-bold text-center mt-3">Eligible For Free Shipping</div>
+          <div *ngIf="amountNeededToReachFreeShipping > 0  && selectedShipping !== 3" class="text-primary fw-bold text-center mt-3">
             Add ${{ amountNeededToReachFreeShipping }} more for Free Shipping!
           </div>
 

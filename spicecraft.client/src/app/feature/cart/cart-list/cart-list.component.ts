@@ -6,6 +6,7 @@ import {CartService} from "../../../core/service/cart.service";
 import {take, takeUntil} from "rxjs/operators";
 import {Subject} from "rxjs";
 import {Router} from "@angular/router";
+import {MessageService} from "../../../core/service/message.service";
 
 @Component({
   selector: 'sc-cart-list',
@@ -23,6 +24,7 @@ export class CartListComponent implements OnInit, OnDestroy {
   cartItems: CartItemModel[] = [];
   private router = inject(Router);
   private _cartService: CartService = inject(CartService);
+  private _messageService: MessageService = inject(MessageService);
   private _destroy$ = new Subject<void>();
   cartSummary: { finalPrice: string, savings: string } = { finalPrice: '0.00', savings: '0.00' };
 
@@ -61,7 +63,12 @@ export class CartListComponent implements OnInit, OnDestroy {
      )
       .subscribe(shoppingCart => {
         if (subAction === 'delete') {
-          this.cartItems = [];
+          this._messageService.showConfirmDialog('Are you sure you wanted to delete?')
+              .then( (result) => {
+                if (result){
+                  this.cartItems = [];
+                }
+              })
         }
           this.getCartItems();
        });

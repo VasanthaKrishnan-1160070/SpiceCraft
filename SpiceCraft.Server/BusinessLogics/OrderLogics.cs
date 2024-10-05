@@ -62,6 +62,17 @@ namespace SpiceCraft.Server.BusinessLogics
             return HelperFactory.Msg.Success(orderDetails);
         }
 
+        public async Task<ResultDetail<UserOrderDetailDTO>> GetUserOrderDetailsAsync(int orderId)
+        {
+            var userOrderDetails =  await _orderRepo.GetOrderDetailsAsync(orderId);
+            if (userOrderDetails == null || !userOrderDetails.OrderItems.Any())
+            {
+                return HelperFactory.Msg.Error<UserOrderDetailDTO>("No details found for the order.");
+            }
+            
+            return HelperFactory.Msg.Success(userOrderDetails);
+        }
+
         // Get all orders for a user
         public async Task<ResultDetail<List<UserOrderDTO>>> GetUserOrdersAsync(int userId)
         {

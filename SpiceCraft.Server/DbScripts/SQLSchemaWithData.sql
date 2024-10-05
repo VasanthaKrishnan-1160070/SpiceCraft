@@ -322,6 +322,16 @@ create table Notification (
     foreign key (UserId) references Users(UserId)
 );
 
+create table UserActivityLog (
+  UserActivityLogId int primary key identity(1,1),
+  UserId int not null, 
+  NavigationItem varchar(100) not null,
+  Routing varchar(100) not null,
+  TimeSpent datetime null,
+  ClickCount int default(1),
+  foreign key (UserId) references Users(UserId)
+)
+
 -- Insert Data into Tables
 -- Roles
 INSERT INTO Roles (RoleName) VALUES 
@@ -910,26 +920,26 @@ INSERT INTO ItemImages (ItemId, ImageCode, ImageName, ImageIndex, IsMain) VALUES
 
 -- UserAddresses
 INSERT INTO UserAddresses (UserId, AddressType, StreetAddress1, StreetAddress2, City, StateOrProvince, PostalCode) VALUES 
-(1, 'billing', '123 Main St', 'Apt 1', 'Springfield', 'IL', '62701'),
-(2, 'shipping', '456 Elm St', 'Apt 2', 'Springfield', 'IL', '62702'),
-(3, 'billing', '789 Oak St', 'Apt 3', 'Springfield', 'IL', '62703'),
-(4, 'shipping', '101 Maple St', 'Apt 4', 'Springfield', 'IL', '62704'),
-(5, 'billing', '102 Pine St', 'Apt 5', 'Springfield', 'IL', '62705'),
-(6, 'shipping', '103 Cedar St', 'Apt 6', 'Springfield', 'IL', '62706'),
-(7, 'billing', '104 Birch St', 'Apt 7', 'Springfield', 'IL', '62707'),
-(8, 'shipping', '105 Walnut St', 'Apt 8', 'Springfield', 'IL', '62708'),
+(1, 'billing', '123 Main St', 'Apt 1', 'Springfield', 'IL', '6201'),
+(2, 'shipping', '456 Elm St', 'Apt 2', 'Springfield', 'IL', '6202'),
+(3, 'billing', '789 Oak St', 'Apt 3', 'Springfield', 'IL', '6203'),
+(4, 'shipping', '101 Maple St', 'Apt 4', 'Springfield', 'IL', '6204'),
+(5, 'billing', '102 Pine St', 'Apt 5', 'Springfield', 'IL', '6205'),
+(6, 'shipping', '103 Cedar St', 'Apt 6', 'Springfield', 'IL', '6206'),
+(7, 'billing', '104 Birch St', 'Apt 7', 'Springfield', 'IL', '6207'),
+(8, 'shipping', '105 Walnut St', 'Apt 8', 'Springfield', 'IL', '6208'),
 (9, 'billing', '106 Hickory St', 'Apt 9', 'Springfield', 'IL', '62709'),
-(10, 'shipping', '107 Chestnut St', 'Apt 10', 'Springfield', 'IL', '62710'),
-(11, 'billing', '108 Sycamore St', 'Apt 11', 'Springfield', 'IL', '62711'),
-(12, 'shipping', '109 Redwood St', 'Apt 12', 'Springfield', 'IL', '62712'),
-(13, 'billing', '110 Spruce St', 'Apt 13', 'Springfield', 'IL', '62713'),
-(14, 'shipping', '111 Ash St', 'Apt 14', 'Springfield', 'IL', '62714'),
-(15, 'billing', '112 Poplar St', 'Apt 15', 'Springfield', 'IL', '62715'),
-(16, 'shipping', '113 Fir St', 'Apt 16', 'Springfield', 'IL', '62716'),
-(17, 'billing', '114 Larch St', 'Apt 17', 'Springfield', 'IL', '62717'),
-(18, 'shipping', '115 Aspen St', 'Apt 18', 'Springfield', 'IL', '62718'),
-(19, 'billing', '116 Palm St', 'Apt 19', 'Springfield', 'IL', '62719'),
-(20, 'shipping', '117 Cypress St', 'Apt 20', 'Springfield', 'IL', '62720');
+(10, 'shipping', '107 Chestnut St', 'Apt 10', 'Springfield', 'IL', '6210'),
+(11, 'billing', '108 Sycamore St', 'Apt 11', 'Springfield', 'IL', '6211'),
+(12, 'shipping', '109 Redwood St', 'Apt 12', 'Springfield', 'IL', '6212'),
+(13, 'billing', '110 Spruce St', 'Apt 13', 'Springfield', 'IL', '6213'),
+(14, 'shipping', '111 Ash St', 'Apt 14', 'Springfield', 'IL', '6214'),
+(15, 'billing', '112 Poplar St', 'Apt 15', 'Springfield', 'IL', '6215'),
+(16, 'shipping', '113 Fir St', 'Apt 16', 'Springfield', 'IL', '6216'),
+(17, 'billing', '114 Larch St', 'Apt 17', 'Springfield', 'IL', '6217'),
+(18, 'shipping', '115 Aspen St', 'Apt 18', 'Springfield', 'IL', '6218'),
+(19, 'billing', '116 Palm St', 'Apt 19', 'Springfield', 'IL', '6219'),
+(20, 'shipping', '117 Cypress St', 'Apt 20', 'Springfield', 'IL', '6220');
 
 -- Notification
 INSERT INTO Notification (NotificationType, EntityId, IsRead, Title, Message, UserId) VALUES 

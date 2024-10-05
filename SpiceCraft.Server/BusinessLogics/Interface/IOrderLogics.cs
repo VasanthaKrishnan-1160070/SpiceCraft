@@ -26,6 +26,8 @@ namespace SpiceCraft.Server.BusinessLogics.Interface
         Task<ResultDetail<bool>> VerifyStockBeforeOrderAsync(int userId);
         Task<ResultDetail<bool>> CreateUserOrderAsync(OrderDTO order);
 
+        Task<ResultDetail<UserOrderDetailDTO>> GetUserOrderDetailsAsync(int orderId);
+
         Task<ResultDetail<bool>> InsertOrderItemsFromShoppingCartAsync(int userId, int orderId);
     }
 }

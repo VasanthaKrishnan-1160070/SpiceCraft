@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {RouterLink} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {DxButtonModule, DxFormModule, DxPopupModule, DxSelectBoxModule, DxTextBoxModule} from "devextreme-angular";
 import {FormsModule} from "@angular/forms";
 import {CheckoutService} from "../../../core/service/checkout.service";
@@ -7,6 +7,8 @@ import {StartPostPaymentModel} from "../../../core/model/checkout/start-post-pay
 import {UserService} from "../../../core/service/user.service";
 import {ShippingOptionModel} from "../../../core/model/shipping/shipping-option-model";
 import {CommonModule} from "@angular/common";
+import notify from "devextreme/ui/notify";
+import {NotifyService} from "../../../core/service/notify.service";
 
 @Component({
   selector: 'sc-customer-checkout',
@@ -52,6 +54,8 @@ export class CustomerCheckoutComponent implements OnInit {
   constructor(
     private checkoutService: CheckoutService,
     private userService: UserService,
+    private notifyService: NotifyService,
+    private router: Router
     ) {}
 
   ngOnInit(): void {
@@ -79,6 +83,9 @@ export class CustomerCheckoutComponent implements OnInit {
   calculateTotal() {
     this.shippingCost = this.getSelectedShippingCost();
     this.isEligibleForFreeShipping = this.canDoFreeShipping();
+    if (this.isEligibleForFreeShipping) {
+      this.shippingCost = 0.00;
+    }
     this.amountNeededToReachFreeShipping = this.getPriceNeededToReachFreeShipping();
     this.total = +(this.subTotal + this.shippingCost).toFixed(2);
     this.totalDue = +(this.total - this.giftCardBalance)?.toFixed(2);
@@ -133,9 +140,13 @@ export class CustomerCheckoutComponent implements OnInit {
       if (response.isSuccess) {
         // Handle success, e.g., redirect to order confirmation page
         this.isCreditCardPopupVisible = false;
+        this.notifyService.showSuccess(response.message);
+        this.router.navigate(['/order-list']);
+
       } else {
         this.errorMessage = response.message;
         this.isCreditCardPopupVisible = false;
+        this.notifyService.showSuccess(response.message);
       }
     });
   }

@@ -1,0 +1,51 @@
+
+<div class="p-4">
+  <sc-title [title]="'Order Detail'"></sc-title>
+</div>
+
+<div class="container p-5">
+  <!-- Form for Order Info, Contact Info, and Address -->
+  <dx-form
+    [formData]="orderDetails"
+    [colCount]="2"
+    labelLocation="top"
+  >
+    <!-- Order Info -->
+    <dxi-item itemType="group" caption="Order Info">
+      <dxi-item dataField="orderStatus" [editorOptions]="{ disabled: true }" label="Order Status"></dxi-item>
+      <dxi-item dataField="totalCost" [editorOptions]="{ disabled: true }" label="Total Cost"></dxi-item>
+    </dxi-item>
+
+    <!-- Contact Info -->
+    <dxi-item itemType="group" caption="Contact Info">
+      <dxi-item dataField="contactInfo.name" [editorOptions]="{ disabled: true }" label="Name"></dxi-item>
+      <dxi-item dataField="contactInfo.email" [editorOptions]="{ disabled: true }" label="Email"></dxi-item>
+      <dxi-item dataField="contactInfo.phone" [editorOptions]="{ disabled: true }" label="Phone"></dxi-item>
+    </dxi-item>
+
+    <!-- Address -->
+    <dxi-item itemType="group" caption="Address" [colSpan]="2">
+      <dxi-item dataField="shippingAddress.streetAddress1" [editorOptions]="{ disabled: true }" label="Street Address 1"></dxi-item>
+      <dxi-item dataField="shippingAddress.streetAddress2" [editorOptions]="{ disabled: true }" label="Street Address 2"></dxi-item>
+      <dxi-item dataField="shippingAddress.city" [editorOptions]="{ disabled: true }" label="City"></dxi-item>
+      <dxi-item dataField="shippingAddress.stateOrProvince" [editorOptions]="{ disabled: true }" label="State"></dxi-item>
+      <dxi-item dataField="shippingAddress.postalCode" [editorOptions]="{ disabled: true }" label="Postal Code"></dxi-item>
+    </dxi-item>
+  </dx-form>
+
+  <!-- Grid for Ordered Items -->
+  <div class="mt-5">
+    <h4>Ordered Items</h4>
+
+    <dx-data-grid
+      [dataSource]="orderDetails.orderItems"
+      [columns]="[
+        { dataField: 'itemName', caption: 'Item Name' },
+        { dataField: 'quantity', caption: 'Quantity' },
+        { dataField: 'price', caption: 'Price' }
+      ]"
+      [showBorders]="true"
+    >
+    </dx-data-grid>
+  </div>
+</div>

@@ -48,7 +48,7 @@ namespace SpiceCraft.Server.Controllers
             var result = await _paymentLogic.GetPaymentInvoiceDetailsAsync(transactionId);
             if (result.IsSuccess)
             {
-                return Ok(result.Data);
+                return Ok(result);
             }
             return NotFound(result.Message);
         }

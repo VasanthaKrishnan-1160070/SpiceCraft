@@ -14,16 +14,16 @@ export class PaymentService {
 
   // Get payments for a specific user
   getPaymentsForUser(userId: number): Observable<ResultDetailModel<PaymentModel[]>> {
-    return this._api.get<ResultDetailModel<PaymentModel[]>>(`payment/user/${userId}`);
+    return this._api.get<ResultDetailModel<PaymentModel[]>>(`/payment/user/${userId}`);
   }
 
   // Get payments for internal users
   getPaymentsForInternalUsers(): Observable<ResultDetailModel<PaymentModel[]>> {
-    return this._api.get<ResultDetailModel<PaymentModel[]>>(`payment/internal`);
+    return this._api.get<ResultDetailModel<PaymentModel[]>>(`/payment/internal`);
   }
 
   // Get detailed invoice information for a specific transaction
   getPaymentInvoiceDetails(transactionId: number): Observable<ResultDetailModel<PaymentInvoiceModel>> {
-    return this._api.get<ResultDetailModel<PaymentInvoiceModel>>(`payment/invoice/${transactionId}`);
+    return this._api.get<ResultDetailModel<PaymentInvoiceModel>>(`/payment/invoice/${transactionId}`);
   }
 }

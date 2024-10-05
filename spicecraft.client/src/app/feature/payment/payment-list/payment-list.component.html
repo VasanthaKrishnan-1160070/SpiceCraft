@@ -1,9 +1,79 @@
-<p>This is List</p>
+<div class="p-4">
+  <sc-title [title]="'Payments'"></sc-title>
+</div>
 
-<sc-payment-detail>
-  <div>
-     <p>above div</p>
-    <ng-content></ng-content>
-  </div>
+<div class="container mt-2">
+  <!-- DevExtreme DataGrid for displaying the shopping cart items -->
+  <dx-data-grid
+    [dataSource]="paymentItems"
+    [showBorders]="true"
+    [showRowLines]="true"
+    [columnAutoWidth]="true"
+    [allowColumnReordering]="true"
+    [filterRow]="{ visible: true }"
+    [paging]="{ enabled: true, pageSize: 5 }"
+    [groupPanel]="{ visible: true }"
+    [grouping]="{ autoExpandAll: true }"
+    [sorting]="{ mode: 'multiple' }"
 
-</sc-payment-detail>
+  >
+    <dxo-search-panel
+      [visible]="true"
+      [width]="340"
+      placeholder="Search..."
+    ></dxo-search-panel>
+    <!-- Column Chooser -->
+    <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+
+    <dxo-paging
+      [enabled]="true"
+      [pageSize]="5"
+      [pageIndex]="1"
+    >
+    </dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [displayMode]="'full'"
+      [showInfo]="true"
+      [showPageSizeSelector]="true"
+      [allowedPageSizes]="[5, 10, 20, 50]"
+      infoText="Page #{0}. Total: {1} ({2} items)"
+      [showNavigationButtons]="true">
+    </dxo-pager>
+
+    <!-- Load Panel -->
+    <dxo-load-panel [enabled]="true"></dxo-load-panel>
+
+    <!-- Define columns -->
+    <dxi-column [width]="100" dataField="transactionId" caption="Order Id"></dxi-column>
+    <dxi-column  dataField="paymentDate" caption="Payment Date" [dataType]="'date'" format="dd/MM/yyyy" ></dxi-column>
+    <dxi-column  dataField="paymentStatus" caption="Payment Status"></dxi-column>
+    <dxi-column [width]="160" dataField="paymentAmount" caption="Payment Amount" [cellTemplate]="'priceTemplate'"></dxi-column>
+    <dxi-column [width]="100" dataField="orderId" caption="OrderId"></dxi-column>
+
+    <div *dxTemplate="let data of 'priceTemplate'">
+      <!-- Template for rendering price fields with currency formatting -->
+      <span>${{ data.value }}</span>
+    </div>
+
+    <!-- Action buttons for add/remove quantity and delete -->
+    <dxi-column [width]="300" caption="Actions" cellTemplate="actionsTemplate">
+      <!-- Template for action buttons -->
+      <div class="d-flex gap-2" *dxTemplate="let data of 'actionsTemplate'">
+        <dx-button
+          text="View Detail"
+          type="success"
+          [routerLink]="['/payment-detail', data.data.transactionId]"
+        >
+        </dx-button>
+        <dx-button
+          text="View Order"
+          type="success"
+          [routerLink]="['/order-detail', data.data.orderId]"
+         >
+        </dx-button>
+      </div>
+    </dxi-column>
+  </dx-data-grid>
+</div>

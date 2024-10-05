@@ -12,7 +12,7 @@ namespace SpiceCraft.Server.Repository.Interface
         Task<bool> UpdateOrderStatusAsync(int orderId, string orderStatus);
         Task<List<UserOrderDTO>> GetUserOrdersAsync(int userId);
         Task<ProductInventoryDTO> GetInventoryForProductAsync(int productId);
-
+        Task<UserOrderDetailDTO> GetOrderDetailsAsync(int orderId);
         Task<bool> CreateUserOrderAsync(OrderDTO order);
     }
 }

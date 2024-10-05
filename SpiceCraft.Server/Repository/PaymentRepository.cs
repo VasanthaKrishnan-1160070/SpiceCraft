@@ -29,7 +29,7 @@ namespace SpiceCraft.Server.Repository
                     PaymentAmount = pt.Amount,
                     OrderId = pt.OrderId,
                     PaymentStatus = pt.PaymentStatus,
-                    PaymentDate = pt.PaymentDate
+                    PaymentDate = pt.PaymentDate,
                 }).ToListAsync();
         
             return payments;
@@ -68,7 +68,7 @@ namespace SpiceCraft.Server.Repository
                     PaymentDate = pt.PaymentDate.ToString("dd/MM/yyyy"),
                     PaymentMethod = pt.PaymentMethod,
                     PaymentStatus = pt.PaymentStatus,
-                    // ShippingOptionName = so.ShippingOptionName,
+                    ShippingOptionName = so.ShippingOptionName,
                     // CountryName = c.Name,
                     IsFreeShipping = o.IsFreeShipping,
                     ShippingCost =
@@ -111,13 +111,12 @@ namespace SpiceCraft.Server.Repository
                     Email = u.Email,
                     Phone = u.Phone
                 }).FirstOrDefaultAsync();
+            
+            orderPayments.OrderDetails = orderDetails;
+            orderPayments.UserAddress = userAddress;
+            orderPayments.ContactInfo = contactInfo;
         
-            return new PaymentInvoiceDTO
-            {
-                OrderDetails = orderDetails,
-                UserAddress = userAddress,
-                ContactInfo = contactInfo
-            };
+            return orderPayments;
         }
 
         public async Task<bool> CreateUserPaymentAsync(PaymentDTO paymentDto)

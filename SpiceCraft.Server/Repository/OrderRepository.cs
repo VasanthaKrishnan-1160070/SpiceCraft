@@ -2,6 +2,7 @@
 using SpiceCraft.Server.Context;
 using SpiceCraft.Server.DTO.Inventory;
 using SpiceCraft.Server.DTO.Order;
+using SpiceCraft.Server.DTO.User;
 using SpiceCraft.Server.Models;
 using SpiceCraft.Server.Repository.Interface;
 
@@ -223,6 +224,72 @@ namespace SpiceCraft.Server.Repository
 
             return userOrders;
         }
+
+        public async Task<UserOrderDetailDTO> GetOrderDetailsAsync(int orderId)
+        {
+            // First, retrieve the order details.
+            var userOrderDetail = await (from o in _context.Orders
+                join shc in _context.ShippingOptions on o.ShippingOptionId equals shc.ShippingOptionId into shcGroup
+                from shc in shcGroup.DefaultIfEmpty()
+                where o.OrderId == orderId
+                select new UserOrderDetailDTO()
+                {
+                    OrderStatus = o.OrderStatus,
+                    TotalCost = o.TotalCost,
+                    UserId = o.UserId,
+                    ShippingOptionId = Convert.ToInt32(o.ShippingOptionId),
+                    OrderId = o.OrderId
+                }).FirstOrDefaultAsync();
+
+            if (userOrderDetail == null)
+            {
+                return null;
+            }
+
+            // Retrieve order item details.
+            var orderItems = await (from od in _context.OrderDetails
+                join p in _context.Items on od.ItemId equals p.ItemId
+                where od.OrderId == orderId
+                select new OrderDetailDTO
+                {
+                    ItemName = p.ItemName,
+                    Price = od.PurchasePrice,
+                    Quantity = od.Quantity,
+                    OrderId = od.OrderId,
+                    PurchasePrice = od.PurchasePrice,
+                    ItemId = od.ItemId
+                }).ToListAsync();
+
+            // Retrieve user address.
+            var userAddress = await (from ua in _context.UserAddresses
+                where ua.UserId == userOrderDetail.UserId
+                select new UserAddressDTO
+                {
+                    StreetAddress1 = ua.StreetAddress1,
+                    StreetAddress2 = ua.StreetAddress2,
+                    City = ua.City,
+                    PostalCode = ua.PostalCode,
+                    StateOrProvince = ua.StateOrProvince
+                }).FirstOrDefaultAsync();
+
+            // Retrieve customer contact info.
+            var contactInfo = await (from u in _context.Users
+                where u.UserId == userOrderDetail.UserId
+                select new ContactInfoDTO
+                {
+                    Name = u.Title + " " + u.FirstName + " " + u.LastName,
+                    Email = u.Email,
+                    Phone = u.Phone
+                }).FirstOrDefaultAsync();
+
+            // Return the combined order details, user address, and contact info.
+            userOrderDetail.OrderItems = orderItems;
+            userOrderDetail.ShippingAddress = userAddress;
+            userOrderDetail.ContactInfo = contactInfo;
+            return userOrderDetail;
+
+        }
+
 
         public async Task<UserOrderDTO> GetFirstUnpaidUserOrdersAsync(int userId)
         {

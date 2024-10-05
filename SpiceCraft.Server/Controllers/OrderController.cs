@@ -45,10 +45,10 @@ public class OrderController : ControllerBase
     [HttpGet("order-details/{orderId}")]
     public async Task<IActionResult> GetOrderDetails(int orderId)
     {
-        var result = await _orderLogics.GetOrderDetailsAsync(orderId);
+        var result = await _orderLogics.GetUserOrderDetailsAsync(orderId);
         if (result.IsSuccess)
         {
-            return Ok(result.Data);
+            return Ok(result);
         }
         return NotFound(result.Message);
     }
@@ -60,7 +60,7 @@ public class OrderController : ControllerBase
         var result = await _orderLogics.GetUserOrdersAsync(userId);
         if (result.IsSuccess)
         {
-            return Ok(result.Data);
+            return Ok(result);
         }
         return NotFound(result.Message);
     }
