@@ -35,6 +35,8 @@ import {EnquiryDetailComponent} from "./feature/enquiry/enquiry-detail/enquiry-d
 import {CartListComponent} from "./feature/cart/cart-list/cart-list.component";
 import {B2bInventoryListComponent} from "./feature/admin/b2b-inventory/b2b-inventory-list/b2b-inventory-list.component";
 import {B2bPromotionComponent} from "./feature/admin/b2b-promotion/b2b-promotion/b2b-promotion.component";
+import {CustomerCheckoutComponent} from "./feature/checkout/customer-checkout/customer-checkout.component";
+import {BulkCustomerComponent} from "./feature/checkout/bulk-customer/bulk-customer.component";
 
 const routes: Routes = [
   { path: '', component: ClientHomeComponent},
@@ -52,6 +54,8 @@ const routes: Routes = [
   { path: 'enquiry-details/:id', component: EnquiryDetailComponent },
   { path: 'returns', component: ReturnsComponent },
   { path: 'gift-card', component: GiftCardComponent },
+  { path: 'customer-checkout', component: CustomerCheckoutComponent },
+  { path: 'bulk-customer-checkout', component: BulkCustomerComponent },
   { path: 'logout', component: LogoutComponent },
 
   // b2b routes

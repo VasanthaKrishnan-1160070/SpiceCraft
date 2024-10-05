@@ -19,7 +19,8 @@ namespace SpiceCraft.Server.Repository
         public async Task<User> GetUserByIdAsync(int userId)
         {
             return await _context.Users.Include(u => u.UsersCredential)
-                                       .FirstOrDefaultAsync(u => u.UserId == userId);
+                .Include(u => u.UserAddresses)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
         }
         
         public async Task<UserAddressDTO?> GetUserAddressByIdAsync(int userId)

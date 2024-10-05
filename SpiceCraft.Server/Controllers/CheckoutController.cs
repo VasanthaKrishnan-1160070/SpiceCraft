@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SpiceCraft.Server.BusinessLogics.Interface;
+using SpiceCraft.Server.DTO.Checkout;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,37 +10,63 @@ namespace SpiceCraft.Server.Controllers
     [ApiController]
     public class CheckoutController : ControllerBase
     {
-        // GET: api/<CheckoutController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly ICheckoutLogics _checkoutLogics;
+
+        public CheckoutController(ICheckoutLogics checkoutLogics)
         {
-            return new string[] { "value1", "value2" };
+            _checkoutLogics = checkoutLogics;
         }
 
-        // GET api/<CheckoutController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // GET: api/checkout/{userId}
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetCheckoutInfo(int userId)
         {
-            return "value";
+            var result = await _checkoutLogics.GetCheckoutInfoAsync(userId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
 
-        // POST api/<CheckoutController>
-        [HttpPost]
-        public string Post([FromBody] string value)
+        // GET: api/checkout/totalamount/{userId}
+        [HttpGet("totalamount/{userId}")]
+        public async Task<IActionResult> GetTotalAmount(int userId, [FromQuery] int? shippingOptionId)
         {
-            return "working";
+            var result = await _checkoutLogics.GetTotalAmountToPayAsync(userId, shippingOptionId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
 
-        // PUT api/<CheckoutController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // POST: api/checkout/applygiftcard
+        [HttpPost("applygiftcard")]
+        public async Task<IActionResult> ApplyGiftCard([FromBody] ApplyGiftCardDTO request)
         {
+            var result = await _checkoutLogics.ApplyGiftCardAsync(request.Code, request.UserId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
 
-        // DELETE api/<CheckoutController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // POST: api/checkout/startpostpayment
+        [HttpPost("startpostpayment")]
+        public async Task<IActionResult> StartPostPayment([FromBody] StartPostPaymentDTO request)
         {
+            var result = await _checkoutLogics.StartPostPaymentProcessAsync(request.UserId, request.ShippingOptionId, request.PaymentMethod, request.GiftCardCode);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
     }
 }

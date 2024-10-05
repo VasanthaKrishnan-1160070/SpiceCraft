@@ -237,7 +237,7 @@ namespace SpiceCraft.Server.Repository
                 // from sh in shippingOptGroup.DefaultIfEmpty()
                 // join ct in _context.Countries on shc.CountryId equals ct.CountryId into countryGroup
                 // from ct in countryGroup.DefaultIfEmpty()
-                where o.UserId == userId && o.OrderStatus == "Pending"
+                where o.UserId == userId && (o.OrderStatus == "Pending" || o.OrderStatus == "Prepared")
                 orderby o.OrderDate descending
                 select new UserOrderDTO
                 {

@@ -45,6 +45,7 @@ export class AddToCartComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject<void>();
 
   public ngOnInit() {
+    this.isPopupVisible = false;
     this._cartService.showAddToCartDialog$.pipe(
      takeUntil(this.destroy$)
     )
@@ -66,10 +67,11 @@ export class AddToCartComponent implements OnInit, OnDestroy {
     { key: 'L', value: 'Large' }
   ];
 
-  productColors = [
-    { key: 'R', value: 'Red' },
-    { key: 'G', value: 'Green' },
-    { key: 'B', value: 'Blue' }
+  spiceLevel = [
+    { key: 'Mild', value: 'Mild' },
+    { key: 'Medium', value: 'Medium' },
+    { key: 'Hot', value: 'Hot' },
+    { key: 'Extra Hot', value: 'Extra Hot' }
   ];
 
   // Opens the Popup
@@ -84,7 +86,7 @@ export class AddToCartComponent implements OnInit, OnDestroy {
 
   closePopup() {
     this.isPopupVisible = false;
-    // this._cartService.showAddToCartDialog$.next(this.isPopupVisible);
+    this._cartService.showAddToCartDialog$.next(this.isPopupVisible);
   }
 
   // Handles form submission

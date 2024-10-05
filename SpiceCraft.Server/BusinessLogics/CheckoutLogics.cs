@@ -98,7 +98,7 @@ namespace SpiceCraft.Server.BusinessLogics
             var checkoutDetail = new CheckoutDetailDTO();
             var finalPrice = await _shoppingCartService.GetTotalCartPrice(userId);
             var userAddress = await _userService.GetUserAddressByIdAsync(userId);
-            
+            var shippingOptions = await _shippingService.GetShippingOptionsAsync();
 
             if (finalPrice != null && userAddress != null)
             {
@@ -111,7 +111,7 @@ namespace SpiceCraft.Server.BusinessLogics
                     UserAddress = userAddress,
                     SubTotal = subTotal,
                     ToPay = subTotal,
-                   // ShippingOptions = shippingOptions,
+                    ShippingOptions = shippingOptions.ToList(),
                     QualifiedForFreeShipping = qualifiedForFreeShipping
                 };
                 return HelperFactory.Msg.Success(checkoutDetail);
@@ -289,6 +289,16 @@ namespace SpiceCraft.Server.BusinessLogics
             // {
             //     await UpdateCreditLimitAsync(userId, orderResult.Data.TotalCost);
             // }
+
+            if (orderItemsResult.IsSuccess && userOrder?.Data?.OrderId > 0)
+            {
+                await _orderBusinessLogic.ChangeOrderStatusAsync(userOrder.Data.OrderId, "Ready To Ship");
+                orderItemsResult.Message = "Order placed successfully";
+            }
+            else
+            {
+                orderItemsResult.Message = "Couldn't place the order please contact customer support";
+            }
 
             return orderItemsResult;
         }

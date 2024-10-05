@@ -1,0 +1,136 @@
+<div class="container">
+  <div class="mt-4 bg-light p-4 rounded-2 border border-3 border-steel-blue">
+  <div class="row">
+    <div class="col-6">
+      <p class="text-center">Shipping Address</p>
+      <dx-form
+        [formData]="userAddress"
+        [colCount]="1"
+        [readOnly]="true"
+        labelLocation="top"
+        [(ngModel)]="userAddress">
+        <dxi-item itemType="group" caption="Address">
+          <dxi-item dataField="streetAddress1" [label]="{ text: 'Street Address 1' }">
+            <dxi-validation-rule type="required" message="Street Address 1 is required"></dxi-validation-rule>
+          </dxi-item>
+
+          <dxi-item dataField="streetAddress2" [label]="{ text: 'Street Address 2' }"></dxi-item>
+
+          <dxi-item dataField="city" [label]="{ text: 'City' }">
+            <dxi-validation-rule type="required" message="City is required"></dxi-validation-rule>
+          </dxi-item>
+
+          <dxi-item dataField="state" [label]="{ text: 'State' }">
+            <dxi-validation-rule type="required" message="State is required"></dxi-validation-rule>
+          </dxi-item>
+
+          <dxi-item dataField="postalCode" [editorOptions]="{mode: 'number'}" [label]="{ text: 'Postal Code' }">
+            <dxi-validation-rule type="required" message="Postal Code is required"></dxi-validation-rule>
+            <dxi-validation-rule type="pattern" [pattern]="'^[0-9]{4}$'" message="Postal Code must be 4 digits"></dxi-validation-rule>
+          </dxi-item>
+        </dxi-item>
+      </dx-form>
+    </div>
+
+    <div class="col-6 p-3 checkout-box">
+      <p class="text-center pb-4">Payment Option</p>
+      <div class="row justify-content-center">
+        <div class="col-8">
+<!--          <a class="btn btn-success mb-3 text-light" [routerLink]="['/cart-list']">Modify Cart</a>-->
+          <dx-button type="success" text="Modify Cart" [routerLink]="['/cart-list']" ></dx-button>
+
+          <!-- Free Shipping Info -->
+          <div *ngIf="isEligibleForFreeShipping" class="text-success fw-bold text-center mt-3">Eligible For Free Shipping</div>
+          <div *ngIf="amountNeededToReachFreeShipping > 0" class="text-primary fw-bold text-center mt-3">
+            Add ${{ amountNeededToReachFreeShipping }} more for Free Shipping!
+          </div>
+
+          <!-- Shipping Option Dropdown -->
+          <div class="mb-3 mt-2">
+            <dx-select-box
+              [items]="shippingOptions"
+              displayExpr="shippingOptionName"
+              valueExpr="shippingOptionId"
+              [(value)]="selectedShipping"
+              (onValueChanged)="onShippingOptionChange()">
+            </dx-select-box>
+          </div>
+
+          <!-- Gift Card Code -->
+          <div class="d-flex mb-3">
+            <dx-text-box [(value)]="giftCardCode" placeholder="Gift Card Code (optional)">
+              <dxi-validation-rule type="stringLength" [min]="0"></dxi-validation-rule>
+            </dx-text-box>
+            <dx-button text="Apply" (onClick)="applyGiftCard()"></dx-button>
+          </div>
+
+          <!-- Order Summary -->
+          <div class="d-flex justify-content-between">
+            <p>Sub Total:</p>
+            <p>${{ subTotal }}</p>
+          </div>
+          <div class="d-flex justify-content-between">
+            <p>Shipping Cost:</p>
+            <p>${{ shippingCost }}</p>
+          </div>
+          <div class="d-flex justify-content-between">
+            <p>Total:</p>
+            <p>${{ total }}</p>
+          </div>
+          <div class="d-flex justify-content-between" *ngIf="giftCardBalance > 0">
+            <p>Gift Card Balance:</p>
+            <p>-${{ giftCardBalance }}</p>
+          </div>
+          <div class="d-flex justify-content-between">
+            <p>Gst Amount:</p>
+            <p>${{ gstAmount }}</p>
+          </div>
+          <div class="d-flex justify-content-between border-top border-info pt-2">
+            <p>You Pay:</p>
+            <p>${{ totalDue }}</p>
+          </div>
+
+          <dx-button type="success" text="Pay Now" (onClick)="isCreditCardPopupVisible = !isCreditCardPopupVisible"></dx-button>
+
+          <!-- Payment and Place Order -->
+          <dx-popup [(visible)]="isCreditCardPopupVisible" [(hideOnOutsideClick)]="isCreditCardPopupVisible" title="Credit Card Payment" [width]="400" >
+            <dx-form [formData]="creditCardForm">
+              <dxi-item dataField="amountToPay" [editorOptions]="{'readOnly': true}" [label]="{ text: 'Amount to Pay' }">
+                <dxi-validation-rule type="required" message="Amount is required"></dxi-validation-rule>
+              </dxi-item>
+
+              <dxi-item dataField="cardHolderName" [label]="{ text: 'Card Holder Name' }">
+                <dxi-validation-rule type="required" message="Card Holder Name is required"></dxi-validation-rule>
+              </dxi-item>
+
+              <dxi-item dataField="cardNumber" [editorOptions]="{mode: 'text'}" [label]="{ text: 'Card Number' }">
+                <dxi-validation-rule type="required" message="Card Number is required"></dxi-validation-rule>
+                <dxi-validation-rule type="pattern" [pattern]="'^[0-9]{16}$'" message="Card Number must be 16 digits"></dxi-validation-rule>
+              </dxi-item>
+
+              <dxi-item dataField="expiryDate" [editorOptions]="{mode: 'text'}" [label]="{ text: 'Expiry Date (MM/YY)' }">
+                <dxi-validation-rule type="required" message="Expiry Date is required"></dxi-validation-rule>
+              </dxi-item>
+
+              <dxi-item dataField="cvv" [editorOptions]="{mode: 'number'}" [label]="{ text: 'CVV' }">
+                <dxi-validation-rule type="required" message="CVV is required"></dxi-validation-rule>
+                <dxi-validation-rule type="pattern" [pattern]="'^[0-9]{3}$'" message="CVV must be 3 digits"></dxi-validation-rule>
+              </dxi-item>
+              <dxi-item>
+                <dx-button type="success" text="Place Order" (onClick)="placeOrder('credit card')"></dx-button>
+              </dxi-item>
+            </dx-form>
+          </dx-popup>
+
+          <ng-template #noPaymentRequired>
+            <dx-button [type]="'success'" text="Place Order" (onClick)="placeOrder('gift card')"></dx-button>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Dialog -->
+<!--  <app-error-dialog *ngIf="errorMessage" [message]="errorMessage"></app-error-dialog>-->
+  </div>
+</div>
