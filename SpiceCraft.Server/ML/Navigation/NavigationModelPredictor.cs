@@ -1,5 +1,6 @@
 ﻿using Microsoft.ML;
-using SpiceCraft.Server.Models.ML.Navigation;
+using Microsoft.ML.Data;
+using SpiceCraft.Server.ML.Models.Navigation;
 
 namespace SpiceCraft.Server.ML.Navigation;
 
@@ -23,4 +24,10 @@ public class NavigationModelPredictor
         var prediction = predictionEngine.Predict(userActivity);
         return prediction.Score; // Score represents the likelihood of clicking
     }
+}
+
+public class NavigationPrediction
+{
+    [ColumnName("Score")]
+    public float Score { get; set; } // The predicted score (click probability)
 }

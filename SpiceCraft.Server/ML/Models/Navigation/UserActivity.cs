@@ -1,8 +1,8 @@
-﻿namespace SpiceCraft.Server.Models.ML.Navigation;
+﻿namespace SpiceCraft.Server.ML.Models.Navigation;
 
 public class UserActivity
 {
-    public string UserId { get; set; }
+    public int UserId { get; set; }
     public string NavigationItem { get; set; }
     public float ClickCount { get; set; }   // Number of times the user clicked this item
     public float TimeSpent { get; set; }    // Time spent on the page in seconds

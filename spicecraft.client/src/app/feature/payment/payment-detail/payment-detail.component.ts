@@ -8,7 +8,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {ContactInfoModel} from "../../../core/model/user/contact-info.model";
 import {UserAddressModel} from "../../../core/model/user/user-address.model";
 import {OrderDetailModel} from "../../../core/model/order/order-detail-model";
-import {CurrencyPipe} from "@angular/common";
+import {CommonModule, CurrencyPipe} from "@angular/common";
 
 @Component({
   selector: 'sc-payment-detail',
@@ -17,7 +17,8 @@ import {CurrencyPipe} from "@angular/common";
     DxDataGridModule,
     DxFormModule,
     TitleComponent,
-    CurrencyPipe
+    CurrencyPipe,
+    CommonModule
   ],
   templateUrl: './payment-detail.component.html',
   styleUrl: './payment-detail.component.css'

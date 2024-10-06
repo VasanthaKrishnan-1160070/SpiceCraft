@@ -7,7 +7,7 @@
 
     <div class="d-flex flex-column justify-content-start">
       @for(item of  navigation(); track item.name) {
-        <div class="d-flex p-3 ps-3 ms-4">
+        <div (click)="onNavigationItemClick(item.name)" class="d-flex p-3 ps-3 ms-4">
           <div style="width: 38px; height: 28px;">
             <i class="{{item.icon}} fs-4 side-nav-icons  align-self-center"></i>
           </div>

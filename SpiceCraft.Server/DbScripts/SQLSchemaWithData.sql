@@ -327,7 +327,8 @@ create table UserActivityLog (
   UserId int not null, 
   NavigationItem varchar(100) not null,
   Routing varchar(100) not null,
-  TimeSpent datetime null,
+  TimeSpent float null,
+  SessionId varchar(200) null,
   ClickCount int default(1),
   foreign key (UserId) references Users(UserId)
 )

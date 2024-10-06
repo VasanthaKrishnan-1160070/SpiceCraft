@@ -27,6 +27,8 @@ public partial class User
 
     public DateTime? UpdatedAt { get; set; }
 
+    public virtual CorporateClient? CorporateClient { get; set; }
+
     public virtual ICollection<CustomerGiftCard> CustomerGiftCards { get; set; } = new List<CustomerGiftCard>();
 
     public virtual ICollection<CustomerReward> CustomerRewards { get; set; } = new List<CustomerReward>();
@@ -44,6 +46,8 @@ public partial class User
     public virtual Role Role { get; set; } = null!;
 
     public virtual ShoppingCart? ShoppingCart { get; set; }
+
+    public virtual ICollection<UserActivityLog> UserActivityLogs { get; set; } = new List<UserActivityLog>();
 
     public virtual ICollection<UserAddress> UserAddresses { get; set; } = new List<UserAddress>();
 

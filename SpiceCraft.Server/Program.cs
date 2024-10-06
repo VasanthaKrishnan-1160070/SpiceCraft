@@ -8,6 +8,7 @@ using SpiceCraft.Server.IndentityModels;
 using SpiceCraft.Server.Middleware;
 using SpiceCraft.Server.SeedData;
 using System.Text;
+using SpiceCraft.Server.ML.Navigation;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -103,6 +104,7 @@ app.UseMiddleware<CustomExceptionMiddleware>();
 // Seed data
 // Calling the seeding extension method
 await app.SeedDataAsync();
+NavigationModelTrainer.TrainAndEvaluateModel();
 
 
 // Configure the HTTP request pipeline.
