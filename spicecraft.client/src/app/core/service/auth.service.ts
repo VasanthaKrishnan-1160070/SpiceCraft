@@ -59,6 +59,12 @@ export class AuthService {
     return role === 'Admin';
   }
 
+  // check is admin
+  isUserAdminOrManager(): boolean {
+    const role = this.getCurrentUserRole();
+    return role === 'Admin' || role === 'Manager';
+  }
+
   isInternalUser(): boolean {
     const role = this.getCurrentUserRole();
     return role === 'Admin' || role === 'Staff' || role === 'Manager';

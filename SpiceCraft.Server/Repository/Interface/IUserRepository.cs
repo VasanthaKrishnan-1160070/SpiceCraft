@@ -7,8 +7,10 @@ namespace SpiceCraft.Server.Repository.Interface
     public interface IUserRepository
     {
         public Task<User> GetUserByIdAsync(int userId);
-        public Task<UsersCredential> GetUserCredentialByUsernameAsync(string username);
-        public Task<User> GetUserByEmailAsync(string email);
+
+        public Task<UserDTO> GetUserDetailById(int userId);
+        public Task<UsersCredential> GetUserCredentialByUsernameAsync(string username,  int? userId = null);
+        public Task<User> GetUserByEmailAsync(string email, int? userId = null);
         public Task<User> GetUserByUserNameAsync(string username);
         public Task<UserAddressDTO?> GetUserAddressByIdAsync(int userId);
         public Task<IEnumerable<UserDTO>> GetUserByRoleAsync(int roleId);

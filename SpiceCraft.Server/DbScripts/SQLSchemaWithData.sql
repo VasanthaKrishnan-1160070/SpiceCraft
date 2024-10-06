@@ -39,6 +39,7 @@ create table Users (
     Email varchar(100) unique  not null,
     Phone varchar(12),
     ProfileImg varchar(200),
+	DateofBirth date,
     RoleId int not null,
     IsActive bit default 1 not null,
     CreatedAt datetime default getdate(),
@@ -349,27 +350,28 @@ INSERT INTO ShippingOptions (ShippingOptionName, Description, Cost, FreeShipping
 ('Pickup in Store', 'Pick up the order from store', 0.00, 0.00);
 
 -- Users
-INSERT INTO Users (Title, FirstName, LastName, Email, Phone, ProfileImg, RoleId, IsActive) VALUES 
-('Mr.', 'John', 'Doe', 'john.doe@example.com', '1234567890', 'img1.jpg', 1, 1),
-('Ms.', 'Jane', 'Smith', 'jane.smith@example.com', '0987654321', 'img2.jpg', 2, 1),
-('Dr.', 'Alan', 'Walker', 'alan.walker@example.com', '1112223333', 'img3.jpg', 3, 1),
-('Mr.', 'Mark', 'Johnson', 'mark.johnson@example.com', '4445556666', 'img4.jpg', 4, 1),
-('Ms.', 'Sarah', 'Connor', 'sarah.connor@example.com', '7778889999', 'img5.jpg', 4, 1),
-('Dr.', 'Emma', 'Davis', 'emma.davis@example.com', '2223334444', 'img6.jpg', 2, 1),
-('Mr.', 'Luke', 'Skywalker', 'luke.skywalker@example.com', '5556667777', 'img7.jpg', 3, 1),
-('Ms.', 'Leia', 'Organa', 'leia.organa@example.com', '8889990000', 'img8.jpg', 4, 1),
-('Mr.', 'Han', 'Solo', 'han.solo@example.com', '1110002222', 'img9.jpg', 4, 1),
-('Ms.', 'Rey', 'Palpatine', 'rey.palpatine@example.com', '3334445555', 'img10.jpg', 1, 1),
-('Mr.', 'Kylo', 'Ren', 'kylo.ren@example.com', '6667778888', 'img11.jpg', 3, 1),
-('Ms.', 'Padme', 'Amidala', 'padme.amidala@example.com', '9990001111', 'img12.jpg', 2, 1),
-('Dr.', 'Yoda', 'Unknown', 'yoda.unknown@example.com', '2221113333', 'img13.jpg', 2, 1),
-('Mr.', 'Obi-Wan', 'Kenobi', 'obiwan.kenobi@example.com', '4445556666', 'img14.jpg', 4, 1),
-('Ms.', 'Ahsoka', 'Tano', 'ahsoka.tano@example.com', '7778889999', 'img15.jpg', 4, 1),
-('Mr.', 'Anakin', 'Skywalker', 'anakin.skywalker@example.com', '1234567890', 'img16.jpg', 3, 1),
-('Ms.', 'Mace', 'Windu', 'mace.windu@example.com', '0987654321', 'img17.jpg', 1, 1),
-('Dr.', 'Qui-Gon', 'Jinn', 'quigon.jinn@example.com', '1112223333', 'img18.jpg', 4, 1),
-('Mr.', 'Jar Jar', 'Binks', 'jarjar.binks@example.com', '4445556666', 'img19.jpg', 4, 1),
-('Ms.', 'Darth', 'Maul', 'darth.maul@example.com', '7778889999', 'img20.jpg', 3, 1);
+INSERT INTO Users (Title, FirstName, LastName, Email, Phone, ProfileImg, RoleId, IsActive, DateOfBirth) VALUES 
+('Mr.', 'John', 'Doe', 'john.doe@example.com', '1234567890', 'img1.jpg', 1, 1, '1980-05-15'),
+('Ms.', 'Jane', 'Smith', 'jane.smith@example.com', '0987654321', 'img2.jpg', 2, 1, '1985-09-23'),
+('Dr.', 'Alan', 'Walker', 'alan.walker@example.com', '1112223333', 'img3.jpg', 3, 1, '1978-07-30'),
+('Mr.', 'Mark', 'Johnson', 'mark.johnson@example.com', '4445556666', 'img4.jpg', 4, 1, '1982-11-11'),
+('Ms.', 'Sarah', 'Connor', 'sarah.connor@example.com', '7778889999', 'img5.jpg', 4, 1, '1987-02-20'),
+('Dr.', 'Emma', 'Davis', 'emma.davis@example.com', '2223334444', 'img6.jpg', 2, 1, '1975-04-18'),
+('Mr.', 'Luke', 'Skywalker', 'luke.skywalker@example.com', '5556667777', 'img7.jpg', 3, 1, '1983-06-10'),
+('Ms.', 'Leia', 'Organa', 'leia.organa@example.com', '8889990000', 'img8.jpg', 4, 1, '1983-06-10'),
+('Mr.', 'Han', 'Solo', 'han.solo@example.com', '1110002222', 'img9.jpg', 4, 1, '1975-07-13'),
+('Ms.', 'Rey', 'Palpatine', 'rey.palpatine@example.com', '3334445555', 'img10.jpg', 1, 1, '1993-12-12'),
+('Mr.', 'Kylo', 'Ren', 'kylo.ren@example.com', '6667778888', 'img11.jpg', 3, 1, '1988-01-01'),
+('Ms.', 'Padme', 'Amidala', 'padme.amidala@example.com', '9990001111', 'img12.jpg', 2, 1, '1981-03-17'),
+('Dr.', 'Yoda', 'Unknown', 'yoda.unknown@example.com', '2221113333', 'img13.jpg', 2, 1, '1900-01-01'),
+('Mr.', 'Obi-Wan', 'Kenobi', 'obiwan.kenobi@example.com', '4445556666', 'img14.jpg', 4, 1, '1964-03-25'),
+('Ms.', 'Ahsoka', 'Tano', 'ahsoka.tano@example.com', '7778889999', 'img15.jpg', 4, 1, '1984-10-14'),
+('Mr.', 'Anakin', 'Skywalker', 'anakin.skywalker@example.com', '1234567890', 'img16.jpg', 3, 1, '1981-05-22'),
+('Ms.', 'Mace', 'Windu', 'mace.windu@example.com', '0987654321', 'img17.jpg', 1, 1, '1972-11-06'),
+('Dr.', 'Qui-Gon', 'Jinn', 'quigon.jinn@example.com', '1112223333', 'img18.jpg', 4, 1, '1960-08-19'),
+('Mr.', 'Jar Jar', 'Binks', 'jarjar.binks@example.com', '4445556666', 'img19.jpg', 4, 1, '1973-05-04'),
+('Ms.', 'Darth', 'Maul', 'darth.maul@example.com', '7778889999', 'img20.jpg', 3, 1, '1977-09-16');
+
 
 -- UsersCredential
 --INSERT INTO UsersCredential (UserName, Password, UserId) VALUES 

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SpiceCraft.Server.BusinessLogics.Interface;
 using SpiceCraft.Server.DTO.User;
 using SpiceCraft.Server.Helpers;
+using SpiceCraft.Server.Helpers.Request;
 using SpiceCraft.Server.IndentityModels;
 using SpiceCraft.Server.Models;
 using SpiceCraft.Server.Repository.Interface;
@@ -14,10 +16,12 @@ namespace SpiceCraft.Server.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IUserLogics _userLogics;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, IUserLogics userLogics)
         {
             _userRepository = userRepository;
+            _userLogics = userLogics;
         }
 
         [HttpGet]
@@ -27,9 +31,9 @@ namespace SpiceCraft.Server.Controllers
         }
 
         [HttpGet("check-username/{userName}")]
-        public async Task<IActionResult> CheckUserName(string userName)
+        public async Task<IActionResult> CheckUserName(string userName, int? userId = null)
         {
-            var existingUser = await _userRepository.GetUserCredentialByUsernameAsync(userName);
+            var existingUser = await _userRepository.GetUserCredentialByUsernameAsync(userName, userId);
             if (existingUser != null)
             {
                 return Ok(new { valid = false });
@@ -37,11 +41,18 @@ namespace SpiceCraft.Server.Controllers
 
             return Ok(new { valid = true });
         }
+        
+        [HttpGet("{userId:int}")]
+        public async Task<IActionResult> GetUserDetailById(int userId)
+        {
+            var result = await _userLogics.GetUserDetailById(userId);
+            return Ok(result);
+        }
 
         [HttpGet("check-email/{email}")]
-        public async Task<IActionResult> CheckEmail(string email)
+        public async Task<IActionResult> CheckEmail(string email, int? userId = null)
         {
-            var existingUser = await _userRepository.GetUserByEmailAsync(email);
+            var existingUser = await _userRepository.GetUserByEmailAsync(email, userId);
             if (existingUser != null)
             {
                 return Ok(new { valid = false });
@@ -95,6 +106,18 @@ namespace SpiceCraft.Server.Controllers
             await _userRepository.AddUserAsync(user, credential, address);
 
             return Ok(new { success = true, message = "User registered successfully" });
+        }
+
+        [HttpPost("create-or-update")]
+        public async Task<IActionResult> CreateOrUpdateUser([FromBody] CreateUserRequest userRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            
+            var result = await _userLogics.CreateUpdateUserAsync(userRequest);
+            return Ok(result);
         }
     }
 }

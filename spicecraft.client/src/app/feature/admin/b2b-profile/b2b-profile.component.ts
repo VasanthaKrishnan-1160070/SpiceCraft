@@ -7,21 +7,23 @@ import {NgIf} from "@angular/common";
 import {UserService} from "../../../core/service/user.service";
 import {Router} from "@angular/router";
 import {RegisterModel} from "../../../core/interface/register-user.interface";
+import {MyProfileComponent} from "../../profile/my-profile/my-profile.component";
 
 @Component({
   selector: 'sc-b2b-profile',
   templateUrl: './b2b-profile.component.html',
   styleUrl: './b2b-profile.component.css',
   standalone: true,
-    imports: [
-        TitleComponent,
-        DxFormModule,
-        DxiItemModule,
-        DxiValidationRuleModule,
-        FormsModule,
-        NgIf,
-        ReactiveFormsModule
-    ]
+  imports: [
+    TitleComponent,
+    DxFormModule,
+    DxiItemModule,
+    DxiValidationRuleModule,
+    FormsModule,
+    NgIf,
+    ReactiveFormsModule,
+    MyProfileComponent
+  ]
 })
 export class B2bProfileComponent {
   @ViewChild(DxFormComponent, { static: false }) form!: DxFormComponent;

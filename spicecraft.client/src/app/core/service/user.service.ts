@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {Observable} from "rxjs";
 import {WebAPIService} from "./webAPI.service";
-import {HttpResponse} from "@angular/common/http";
+import {HttpParams, HttpResponse} from "@angular/common/http";
 import {map} from "rxjs/operators";
 import {RegisterModel} from "../interface/register-user.interface";
 import {ActionSuccessModel} from "../interface/action-success.interface";
@@ -11,6 +11,7 @@ import {LoggedInUserModel} from "../model/user/logged-in-user.model";
 import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 import {CreateUpdateCartItemRequest} from "../model/cart/create-update-cart-item-request.model";
 import {AuthService} from "./auth.service";
+import {ResultDetailModel} from "../model/result-detail.model";
 
 
 
@@ -50,13 +51,21 @@ export class UserService {
     return loggedInUser.userId;
   }
 
-  checkUserName(userName: string) {
-    return this._api.get<{valid: boolean}>(`/user/check-username/${userName}`)
-          .pipe(map(response => response.valid));
+  checkUserName(userName: string, userId?: number) {
+    const url = userId
+      ? `/user/check-username/${userName}?userId=${userId}`
+      : `/user/check-username/${userName}`;
+
+    return this._api.get<{ valid: boolean }>(url)
+      .pipe(map(response => response.valid));
   }
 
-  checkEmail(email: string) {
-    return this._api.get<{valid: boolean}>(`/user/check-email/${email}`)
+  checkEmail(email: string, userId?: number) {
+    const url = userId
+      ? `/user/check-email/${email}?userId=${userId}`
+      : `/user/check-email/${email}`;
+
+    return this._api.get<{ valid: boolean }>(url)
       .pipe(map(response => response.valid));
   }
 
@@ -78,5 +87,13 @@ export class UserService {
 
   getDealers() {
     return this._api.get<UserModel[]>(`/user/user-role/${UserRoleEnum.Manager}`);
+  }
+
+  createOrUpdate(userDetail: UserModel){
+    return this._api.post<ResultDetailModel<boolean>>('/user/create-or-update', userDetail)
+  }
+
+  getUserDetailsById(userId: number) {
+    return this._api.get<ResultDetailModel<UserModel>>(`/user/${userId}`)
   }
 }

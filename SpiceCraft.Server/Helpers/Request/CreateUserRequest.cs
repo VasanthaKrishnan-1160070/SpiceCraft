@@ -4,6 +4,6 @@ namespace SpiceCraft.Server.Helpers.Request
 {
     public class CreateUserRequest : UserDTO
     {
-        public string Password { get; set; }
+        public string? Password { get; set; }
     }
 }

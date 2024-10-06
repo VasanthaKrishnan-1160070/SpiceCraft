@@ -10,6 +10,8 @@ namespace SpiceCraft.Server.DTO.User
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public int RoleId { get; set; }
+        
+        public string? DateOfBirth { get; set; } = string.Empty;
 
         public bool IsActive { get; set; } = false;
         public string Phone { get; set; } = string.Empty;

@@ -39,6 +39,7 @@ import {OrderListComponent} from "./feature/order/order-list/order-list.componen
 import {OrderDetailComponent} from "./feature/order/order-detail/order-detail.component";
 import {PaymentListComponent} from "./feature/payment/payment-list/payment-list.component";
 import {PaymentDetailComponent} from "./feature/payment/payment-detail/payment-detail.component";
+import {MyProfileComponent} from "./feature/profile/my-profile/my-profile.component";
 
 const routes: Routes = [
   { path: '', component: ClientHomeComponent},
@@ -47,7 +48,7 @@ const routes: Routes = [
   { path: 'customer-registration', component: CustomerRegistrationComponent },
   { path: 'staff-registration', component: StaffRegistrationComponent },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'profile', component: ProfileComponent },
+  { path: 'profile', component: MyProfileComponent },
   { path: 'item-list', component: ItemListComponent },
   { path: 'cart-list', component: CartListComponent },
   { path: 'order-list', component: OrderListComponent },

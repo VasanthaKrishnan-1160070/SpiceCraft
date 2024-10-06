@@ -83,9 +83,9 @@ public partial class SpiceCraftContext : DbContext
     {
         modelBuilder.Entity<CartItem>(entity =>
         {
-            entity.HasKey(e => e.CartItemId).HasName("PK__CartItem__488B0B0A4DB1586E");
+            entity.HasKey(e => e.CartItemId).HasName("PK__CartItem__488B0B0A4AD9CD24");
 
-            entity.HasIndex(e => new { e.CartId, e.ItemId }, "UQ__CartItem__F69B3F8E39FF32C0").IsUnique();
+            entity.HasIndex(e => new { e.CartId, e.ItemId }, "UQ__CartItem__F69B3F8E17564479").IsUnique();
 
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
@@ -105,11 +105,11 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<CorporateClient>(entity =>
         {
-            entity.HasKey(e => e.CorporateId).HasName("PK__Corporat__87E4038626818C16");
+            entity.HasKey(e => e.CorporateId).HasName("PK__Corporat__87E403866F76FB3B");
 
-            entity.HasIndex(e => e.UserId, "UQ__Corporat__1788CC4DE22E08C0").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__Corporat__1788CC4D6AD4793D").IsUnique();
 
-            entity.HasIndex(e => e.CompanyName, "UQ__Corporat__9BCE05DC935B8E92").IsUnique();
+            entity.HasIndex(e => e.CompanyName, "UQ__Corporat__9BCE05DC18A9BF9C").IsUnique();
 
             entity.Property(e => e.Approved).HasDefaultValue(false);
             entity.Property(e => e.CompanyDescription).IsUnicode(false);
@@ -143,7 +143,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<CustomerGiftCard>(entity =>
         {
-            entity.HasKey(e => e.CustomerGiftCardId).HasName("PK__Customer__F382824D54B62638");
+            entity.HasKey(e => e.CustomerGiftCardId).HasName("PK__Customer__F382824DC3E2C3DC");
 
             entity.ToTable("CustomerGiftCard");
 
@@ -160,7 +160,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<CustomerReward>(entity =>
         {
-            entity.HasKey(e => e.CustomerRewardsId).HasName("PK__Customer__2E79ECCE26508D64");
+            entity.HasKey(e => e.CustomerRewardsId).HasName("PK__Customer__2E79ECCEF6FFFBF8");
 
             entity.HasOne(d => d.Reward).WithMany(p => p.CustomerRewards)
                 .HasForeignKey(d => d.RewardId)
@@ -175,7 +175,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<Enquiry>(entity =>
         {
-            entity.HasKey(e => e.EnquiryId).HasName("PK__Enquiry__0A019B7D6CB4DA80");
+            entity.HasKey(e => e.EnquiryId).HasName("PK__Enquiry__0A019B7D573748F0");
 
             entity.ToTable("Enquiry");
 
@@ -194,7 +194,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<EnquiryType>(entity =>
         {
-            entity.HasKey(e => e.EnquiryTypeId).HasName("PK__EnquiryT__BE8CFEFC48FAF66B");
+            entity.HasKey(e => e.EnquiryTypeId).HasName("PK__EnquiryT__BE8CFEFCC6D98947");
 
             entity.ToTable("EnquiryType");
 
@@ -205,9 +205,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<GiftCard>(entity =>
         {
-            entity.HasKey(e => e.GiftCardId).HasName("PK__GiftCard__9FBB0CC1F47DDD51");
+            entity.HasKey(e => e.GiftCardId).HasName("PK__GiftCard__9FBB0CC11B66DF93");
 
-            entity.HasIndex(e => e.Code, "UQ__GiftCard__A25C5AA71DFC5EA3").IsUnique();
+            entity.HasIndex(e => e.Code, "UQ__GiftCard__A25C5AA74F2CB5C0").IsUnique();
 
             entity.Property(e => e.Balance).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Code)
@@ -224,11 +224,11 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<Inventory>(entity =>
         {
-            entity.HasKey(e => e.InventoryId).HasName("PK__Inventor__F5FDE6B36280D82B");
+            entity.HasKey(e => e.InventoryId).HasName("PK__Inventor__F5FDE6B3E75D7C9D");
 
             entity.ToTable("Inventory");
 
-            entity.HasIndex(e => e.ItemId, "UQ__Inventor__727E838A7E8B1340").IsUnique();
+            entity.HasIndex(e => e.ItemId, "UQ__Inventor__727E838A28C24BDB").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -245,9 +245,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<Invoice>(entity =>
         {
-            entity.HasKey(e => e.InvoiceId).HasName("PK__Invoices__D796AAB5A53CC7C7");
+            entity.HasKey(e => e.InvoiceId).HasName("PK__Invoices__D796AAB53052FF99");
 
-            entity.HasIndex(e => e.OrderId, "UQ__Invoices__C3905BCE2B83C849").IsUnique();
+            entity.HasIndex(e => e.OrderId, "UQ__Invoices__C3905BCE56345C55").IsUnique();
 
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(10, 2)");
 
@@ -259,9 +259,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<Item>(entity =>
         {
-            entity.HasKey(e => e.ItemId).HasName("PK__Items__727E838BD7969C79");
+            entity.HasKey(e => e.ItemId).HasName("PK__Items__727E838B2B3E7184");
 
-            entity.HasIndex(e => new { e.CategoryId, e.ItemName }, "UQ__Items__6DED0D35774F2AD4").IsUnique();
+            entity.HasIndex(e => new { e.CategoryId, e.ItemName }, "UQ__Items__6DED0D35271418F9").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -286,9 +286,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<ItemCategory>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__ItemCate__19093A0B567E6C61");
+            entity.HasKey(e => e.CategoryId).HasName("PK__ItemCate__19093A0B375A6C13");
 
-            entity.HasIndex(e => e.CategoryName, "UQ__ItemCate__8517B2E09C694909").IsUnique();
+            entity.HasIndex(e => e.CategoryName, "UQ__ItemCate__8517B2E0C9C72837").IsUnique();
 
             entity.Property(e => e.CategoryName)
                 .HasMaxLength(300)
@@ -301,9 +301,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<ItemImage>(entity =>
         {
-            entity.HasKey(e => e.ImageId).HasName("PK__ItemImag__7516F70C5565F855");
+            entity.HasKey(e => e.ImageId).HasName("PK__ItemImag__7516F70CCFB339BF");
 
-            entity.HasIndex(e => e.ImageCode, "UQ__ItemImag__A7875E72D16170B6").IsUnique();
+            entity.HasIndex(e => e.ImageCode, "UQ__ItemImag__A7875E72F3507C94").IsUnique();
 
             entity.Property(e => e.ImageCode)
                 .HasMaxLength(300)
@@ -321,7 +321,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<Message>(entity =>
         {
-            entity.HasKey(e => e.MessageId).HasName("PK__Messages__C87C0C9CA169A749");
+            entity.HasKey(e => e.MessageId).HasName("PK__Messages__C87C0C9CCE14BD20");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -352,7 +352,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E12457072DE");
+            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E127D29D093");
 
             entity.ToTable("Notification");
 
@@ -382,9 +382,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCFE288E40E");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCFF503D13A");
 
-            entity.HasIndex(e => new { e.OrderDate, e.UserId }, "UQ__Orders__A7F88E8F6BAC29E4").IsUnique();
+            entity.HasIndex(e => new { e.OrderDate, e.UserId }, "UQ__Orders__A7F88E8FD7E6AB27").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -413,9 +413,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<OrderDetail>(entity =>
         {
-            entity.HasKey(e => e.OrderDetailsId).HasName("PK__OrderDet__9DD74DBD6005E903");
+            entity.HasKey(e => e.OrderDetailsId).HasName("PK__OrderDet__9DD74DBD5189DBB9");
 
-            entity.HasIndex(e => new { e.OrderId, e.ItemId }, "UQ__OrderDet__64B7B3F6DF3BE4D5").IsUnique();
+            entity.HasIndex(e => new { e.OrderId, e.ItemId }, "UQ__OrderDet__64B7B3F607927B06").IsUnique();
 
             entity.Property(e => e.ActualPrice).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Description)
@@ -446,7 +446,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.TransactionId).HasName("PK__Payments__55433A6BF1969F8A");
+            entity.HasKey(e => e.TransactionId).HasName("PK__Payments__55433A6B1FB431AE");
 
             entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.CreatedAt)
@@ -477,7 +477,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<PaymentSchedule>(entity =>
         {
-            entity.HasKey(e => e.ScheduleId).HasName("PK__PaymentS__9C8A5B49955CA37D");
+            entity.HasKey(e => e.ScheduleId).HasName("PK__PaymentS__9C8A5B490637CB18");
 
             entity.Property(e => e.ScheduleType)
                 .HasMaxLength(10)
@@ -490,9 +490,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<PromotionBulkItem>(entity =>
         {
-            entity.HasKey(e => e.PromotionBulkItemId).HasName("PK__Promotio__430AF235C0E38302");
+            entity.HasKey(e => e.PromotionBulkItemId).HasName("PK__Promotio__430AF2350FEB143F");
 
-            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838A7D35DE4C").IsUnique();
+            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838ADC899205").IsUnique();
 
             entity.Property(e => e.DiscountRate).HasColumnType("decimal(5, 2)");
 
@@ -504,9 +504,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<PromotionCategory>(entity =>
         {
-            entity.HasKey(e => e.PromotionCategoryId).HasName("PK__Promotio__0D44A8A9F9F1264C");
+            entity.HasKey(e => e.PromotionCategoryId).HasName("PK__Promotio__0D44A8A90BDD9922");
 
-            entity.HasIndex(e => e.CategoryId, "UQ__Promotio__19093A0A238A860C").IsUnique();
+            entity.HasIndex(e => e.CategoryId, "UQ__Promotio__19093A0A4188BFC7").IsUnique();
 
             entity.Property(e => e.DiscountRate).HasColumnType("decimal(5, 2)");
 
@@ -518,9 +518,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<PromotionComboItem>(entity =>
         {
-            entity.HasKey(e => e.PromotionComboItemsId).HasName("PK__Promotio__DD97A31E35F6F361");
+            entity.HasKey(e => e.PromotionComboItemsId).HasName("PK__Promotio__DD97A31E01792C6F");
 
-            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838AD1DAD601").IsUnique();
+            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838A03B7B483").IsUnique();
 
             entity.Property(e => e.BuyQuantity).HasDefaultValue(2);
             entity.Property(e => e.ComboName)
@@ -536,9 +536,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<PromotionItem>(entity =>
         {
-            entity.HasKey(e => e.PromotionItemId).HasName("PK__Promotio__2B1778CC84060885");
+            entity.HasKey(e => e.PromotionItemId).HasName("PK__Promotio__2B1778CC00532DB4");
 
-            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838A2DF35BD8").IsUnique();
+            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838A732FCD8E").IsUnique();
 
             entity.Property(e => e.DiscountRate).HasColumnType("decimal(5, 2)");
 
@@ -550,16 +550,16 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<Reward>(entity =>
         {
-            entity.HasKey(e => e.RewardId).HasName("PK__Rewards__825015B97FABDE6A");
+            entity.HasKey(e => e.RewardId).HasName("PK__Rewards__825015B998B3844B");
 
             entity.Property(e => e.RewardDescription).HasColumnType("text");
         });
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.RoleId).HasName("PK__Roles__8AFACE1A641D94BD");
+            entity.HasKey(e => e.RoleId).HasName("PK__Roles__8AFACE1A272622CE");
 
-            entity.HasIndex(e => e.RoleName, "UQ__Roles__8A2B616062EF683F").IsUnique();
+            entity.HasIndex(e => e.RoleName, "UQ__Roles__8A2B61608652B476").IsUnique();
 
             entity.Property(e => e.RoleName)
                 .HasMaxLength(50)
@@ -568,9 +568,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<ShippingOption>(entity =>
         {
-            entity.HasKey(e => e.ShippingOptionId).HasName("PK__Shipping__642EC60D0AA4B418");
+            entity.HasKey(e => e.ShippingOptionId).HasName("PK__Shipping__642EC60D5D735BB7");
 
-            entity.HasIndex(e => e.ShippingOptionName, "UQ__Shipping__6AB401BA0F546AF0").IsUnique();
+            entity.HasIndex(e => e.ShippingOptionName, "UQ__Shipping__6AB401BA859EB518").IsUnique();
 
             entity.Property(e => e.Cost)
                 .HasDefaultValue(5.00m)
@@ -586,9 +586,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<ShoppingCart>(entity =>
         {
-            entity.HasKey(e => e.CartId).HasName("PK__Shopping__51BCD7B76B83F0A1");
+            entity.HasKey(e => e.CartId).HasName("PK__Shopping__51BCD7B73A34CEA5");
 
-            entity.HasIndex(e => e.UserId, "UQ__Shopping__1788CC4DD0AC87A1").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__Shopping__1788CC4D5F91B2A7").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -605,9 +605,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4CB1BE3B1E");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C606F0D0F");
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534B94C2EF1").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D105349B3B3410").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -643,7 +643,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<UserActivityLog>(entity =>
         {
-            entity.HasKey(e => e.UserActivityLogId).HasName("PK__UserActi__488B2453DCDBCE97");
+            entity.HasKey(e => e.UserActivityLogId).HasName("PK__UserActi__488B2453DB7C03C6");
 
             entity.ToTable("UserActivityLog");
 
@@ -666,7 +666,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<UserAddress>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__UserAddr__091C2AFB7F8FED62");
+            entity.HasKey(e => e.AddressId).HasName("PK__UserAddr__091C2AFB7CDC2484");
 
             entity.Property(e => e.AddressType)
                 .HasMaxLength(20)
@@ -696,13 +696,13 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<UsersCredential>(entity =>
         {
-            entity.HasKey(e => e.UserCredentialId).HasName("PK__UsersCre__17C49DA7BCA793D7");
+            entity.HasKey(e => e.UserCredentialId).HasName("PK__UsersCre__17C49DA73C88DDE0");
 
             entity.ToTable("UsersCredential");
 
-            entity.HasIndex(e => e.UserId, "UQ__UsersCre__1788CC4DF41C58C8").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__UsersCre__1788CC4D3ABC1A27").IsUnique();
 
-            entity.HasIndex(e => e.UserName, "UQ__UsersCre__C9F284560689BF8B").IsUnique();
+            entity.HasIndex(e => e.UserName, "UQ__UsersCre__C9F28456BCB43338").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")

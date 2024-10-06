@@ -1,7 +1,7 @@
 import {UserAddressModel} from "./user-address.model";
 
 export interface UserModel {
-  userId: number;
+  userId?: number;
   userName: string  // Default to empty string
   firstName: string;
   lastName: string ;
@@ -11,5 +11,6 @@ export interface UserModel {
   phone: string;
   profileImg: string;
   title: string;
+  dateOfBirth?: Date | undefined;
   userAddress: UserAddressModel;
 }

@@ -19,6 +19,8 @@ public partial class User
 
     public string? ProfileImg { get; set; }
 
+    public DateOnly? DateofBirth { get; set; }
+
     public int RoleId { get; set; }
 
     public bool IsActive { get; set; }

@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {TitleComponent} from "../../../../shared/components/title/title.component";
-import {DxDataGridModule} from "devextreme-angular";
+import {DxButtonModule, DxDataGridModule} from "devextreme-angular";
 import {UserService} from "../../../../core/service/user.service";
 import {Observable, Subject} from "rxjs";
 import {takeUntil} from "rxjs/operators";
@@ -16,7 +16,8 @@ import {AsyncPipe, JsonPipe, NgIf} from "@angular/common";
     DxDataGridModule,
     AsyncPipe,
     NgIf,
-    JsonPipe
+    JsonPipe,
+    DxButtonModule
   ],
   standalone: true
 })

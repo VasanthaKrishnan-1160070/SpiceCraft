@@ -22,6 +22,35 @@ namespace SpiceCraft.Server.Repository
                 .Include(u => u.UserAddresses)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
         }
+
+        public async Task<UserDTO> GetUserDetailById(int userId)
+        {
+            return await _context.Users.Include(u => u.UsersCredential)
+                .Include(u => u.UserAddresses)
+                .Where(w => w.UserId == userId)
+                .Select(s => new UserDTO()
+                {
+                    UserId = s.UserId,
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    Email = s.Email,
+                    Phone = s.Phone,
+                    ProfileImg = s.ProfileImg,
+                    RoleId = s.RoleId,
+                    IsActive = s.IsActive,
+                    UserName = s.UsersCredential.UserName,
+                    DateOfBirth = s.DateofBirth != null ? s.DateofBirth.Value.ToString("dd/MM/yyyy") : string.Empty,
+                    UserAddress = s.UserAddresses.Select(ua => new UserAddressDTO()
+                    {
+                        UserId = ua.UserId,
+                        StreetAddress1 = ua.StreetAddress1,
+                        StreetAddress2 = ua.StreetAddress2,
+                        City = ua.City,
+                        StateOrProvince = ua.StateOrProvince,
+                        PostalCode = ua.PostalCode
+                    }).FirstOrDefault()
+                }).FirstOrDefaultAsync();
+        }
         
         public async Task<UserAddressDTO?> GetUserAddressByIdAsync(int userId)
         {
@@ -42,18 +71,18 @@ namespace SpiceCraft.Server.Repository
             return null;
         }
 
-        public async Task<UsersCredential> GetUserCredentialByUsernameAsync(string username)
+        public async Task<UsersCredential> GetUserCredentialByUsernameAsync(string username, int? userId = null)
         {
             return await _context.UsersCredentials.Include(uc => uc.User)
-                                                 .FirstOrDefaultAsync(uc => uc.UserName == username);
+                                                 .FirstOrDefaultAsync(uc => uc.UserName.ToLower() == username.ToLower() && (userId == null || uc.UserId!= userId));
         }
 
-        public async Task<User> GetUserByEmailAsync(string email)
+        public async Task<User> GetUserByEmailAsync(string email, int? userId=null)
         {
             return await _context.Users
                            .Include(u => u.UsersCredential)
                            .Include(u => u.UserAddresses)
-                           .FirstOrDefaultAsync(u => u.Email == email);
+                           .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() && (userId == null || u.UserId!= userId));
         }
 
         public async Task<User> GetUserByUserNameAsync(string username)
@@ -134,6 +163,7 @@ namespace SpiceCraft.Server.Repository
         {
                 var existingUser = await _context.Users
                                                  .Include(u => u.UsersCredential)
+                                                 .Include(u => u.UserAddresses)
                                                  .FirstOrDefaultAsync(u => u.Email == userRequest.Email);
 
                 if (existingUser == null)
@@ -147,12 +177,14 @@ namespace SpiceCraft.Server.Repository
                 existingUser.Phone = userRequest.Phone;
                 existingUser.ProfileImg = userRequest.ProfileImg;
                 existingUser.IsActive = userRequest.IsActive;
-                existingUser.Title = userRequest.Title;
+                // existingUser.Title = userRequest.Title;
+                existingUser.UpdatedAt = DateTime.UtcNow;
+                
 
                 // Update or create credentials
                 if (existingUser.UsersCredential != null)
                 {
-                    existingUser.UsersCredential.Password = userRequest.Password; // Ensure to hash the password
+                    existingUser.UsersCredential.UserName = userRequest.UserName; // Ensure to hash the password
                 }
                 else
                 {
@@ -164,6 +196,30 @@ namespace SpiceCraft.Server.Repository
                     };
 
                     _context.UsersCredentials.Add(newCredential);
+                }
+                
+                // Update or create address
+                if (existingUser.UserAddresses.Count == 0)
+                {
+                    existingUser.UserAddresses.Add(new UserAddress
+                    {
+                        UserId = existingUser.UserId,
+                        StreetAddress1 = userRequest.UserAddress.StreetAddress1,
+                        StreetAddress2 = userRequest.UserAddress.StreetAddress2,
+                        City = userRequest.UserAddress.City,
+                        StateOrProvince = userRequest.UserAddress.StateOrProvince,
+                        PostalCode = userRequest.UserAddress.PostalCode,
+                        AddressType = userRequest.UserAddress.AddressType
+                    });
+                }
+                else
+                {
+                    var address = existingUser.UserAddresses.FirstOrDefault();
+                    address.StreetAddress1 = userRequest.UserAddress.StreetAddress1;
+                    address.StreetAddress2 = userRequest.UserAddress.StreetAddress2;
+                    address.City = userRequest.UserAddress.City;
+                    address.StateOrProvince = userRequest.UserAddress.StateOrProvince;
+                    address.PostalCode = userRequest.UserAddress.PostalCode;
                 }
 
                 // Save changes and check if it was successful

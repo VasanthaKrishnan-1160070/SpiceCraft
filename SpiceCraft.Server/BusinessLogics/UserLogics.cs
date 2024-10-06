@@ -21,9 +21,19 @@ namespace SpiceCraft.Server.BusinessLogics
             return HelperFactory.Msg.Success(result);
         }
 
-        public async Task<ResultDetail<UsersCredential>> GetUserCredentialByUsernameAsync(string username)
+        public async Task<ResultDetail<UserDTO>> GetUserDetailById(int userId)
         {
-            var result = await userRepository.GetUserCredentialByUsernameAsync(username);
+            var result = await userRepository.GetUserDetailById(userId);
+            if (result == null)
+            {
+                return HelperFactory.Msg.Error(result, "No User Detail Found");
+            }
+            return HelperFactory.Msg.Success(result);
+        }
+
+        public async Task<ResultDetail<UsersCredential>> GetUserCredentialByUsernameAsync(string username, int? userId)
+        {
+            var result = await userRepository.GetUserCredentialByUsernameAsync(username, userId);
             if (result == null)
             {
                 return HelperFactory.Msg.Error(result, "No User Credential Found");
@@ -31,9 +41,9 @@ namespace SpiceCraft.Server.BusinessLogics
             return HelperFactory.Msg.Success(result);
         }
 
-        public async Task<ResultDetail<User>> GetUserByEmailAsync(string email)
+        public async Task<ResultDetail<User>> GetUserByEmailAsync(string email, int? userId)
         {
-            var result = await userRepository.GetUserByEmailAsync(email);
+            var result = await userRepository.GetUserByEmailAsync(email, userId);
             if (result == null)
             {
                 return HelperFactory.Msg.Error(result, "No User Found by Email");
