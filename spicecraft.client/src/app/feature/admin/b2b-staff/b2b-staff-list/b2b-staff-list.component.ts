@@ -6,6 +6,7 @@ import {Observable, Subject} from "rxjs";
 import {takeUntil} from "rxjs/operators";
 import {UserModel} from "../../../../core/model/user/user.model";
 import {AsyncPipe, JsonPipe, NgIf} from "@angular/common";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'sc-b2b-staff-list',
@@ -17,7 +18,8 @@ import {AsyncPipe, JsonPipe, NgIf} from "@angular/common";
     AsyncPipe,
     NgIf,
     JsonPipe,
-    DxButtonModule
+    DxButtonModule,
+    RouterLink
   ],
   standalone: true
 })

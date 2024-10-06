@@ -1,60 +1,57 @@
-import {Component, inject, Input, OnInit, ViewChild} from '@angular/core';
-import {TitleComponent} from "../../shared/components/title/title.component";
+import {Component, inject, Input, ViewChild} from '@angular/core';
 import {DxFormComponent, DxFormModule} from "devextreme-angular";
 import {DxiItemModule, DxiValidationRuleModule} from "devextreme-angular/ui/nested";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {CommonModule, Location, NgIf} from "@angular/common";
-import {UserService} from "../../core/service/user.service";
+import {UserService} from "../../../core/service/user.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {RegisterModel} from "../../core/interface/register-user.interface";
-import {UserModel} from "../../core/model/user/user.model";
-import {takeUntil} from "rxjs/operators";
+import {NotifyService} from "../../../core/service/notify.service";
 import {Subject} from "rxjs";
-import {NotifyService} from "../../core/service/notify.service";
+import {UserModel} from "../../../core/model/user/user.model";
+import {takeUntil} from "rxjs/operators";
+import {TitleComponent} from "../../../shared/components/title/title.component";
+import { Location } from '@angular/common';
 
 @Component({
-  selector: 'sc-profile',
+  selector: 'sc-add-profile',
   standalone: true,
-    imports: [
-        TitleComponent,
-        DxFormModule,
-        DxiItemModule,
-        DxiValidationRuleModule,
-        FormsModule,
-        NgIf,
-        ReactiveFormsModule,
-        CommonModule
-    ],
-  templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css'
+  imports: [
+    DxFormModule,
+    DxiItemModule,
+    DxiValidationRuleModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TitleComponent
+  ],
+  templateUrl: './add-profile.component.html',
+  styleUrl: './add-profile.component.css'
 })
-export class ProfileComponent implements OnInit {
-  @Input() userId!: number;
-  @Input() canEdit: boolean = true;
-  @Input() isOwnProfile: boolean = true;
+export class AddProfileComponent {
+  public title: string = 'Create Profile';
   @ViewChild(DxFormComponent, { static: false }) form!: DxFormComponent;
   isRegisterSuccess?: boolean;
   _userService = inject(UserService);
-  _locationService = inject(Location);
   router = inject(Router);
+  _locationService = inject(Location);
+  private _roleId!: number;
   private _notifyService = inject(NotifyService);
   private _destroy$: Subject<void> = new Subject<void>();
+  private _router: Router = inject(Router);
+  private _activatedRoute = inject(ActivatedRoute);
   activatedRoute = inject(ActivatedRoute);
   minDobDate = new Date(1900, 0, 1);
   maxDobDate = new Date();
   public userModel!: UserModel | null | undefined;
 
   ngOnInit() {
-    this._userService.getUserDetailsById(this.userId).pipe(
-      takeUntil(this._destroy$)
-    ).subscribe(
-      s => this.userModel = s.data
-    );
+    this._activatedRoute.paramMap.subscribe(params => {
+      this._roleId = +(params.get('roleId') || 0);
+      this.title = params.get('title') || 'Create Profile';
+    });
   }
 
   usernameAsyncValidation = (params: any) => {
     return new Promise((resolve, reject) => {
-      this._userService.checkUserName(params.value, this.userId).subscribe(isValid => {
+      this._userService.checkUserName(params.value).subscribe(isValid => {
         isValid ? resolve(isValid) : reject(isValid);
       }, () => {
         // Handle any errors by resolving with an invalid state
@@ -65,7 +62,7 @@ export class ProfileComponent implements OnInit {
 
   emailAsyncValidation = (params: any) => {
     return new Promise((resolve, reject) => {
-      this._userService.checkEmail(params.value, this.userId).subscribe(isValid => {
+      this._userService.checkEmail(params.value).subscribe(isValid => {
         isValid ? resolve(isValid) : reject(isValid);
       }, () => {
         // Handle any errors by resolving with an invalid state
@@ -79,22 +76,18 @@ export class ProfileComponent implements OnInit {
     const isFormValid = this.form.instance.validate().isValid;
 
     if (isFormValid) {
-      if (!this.userModel?.title) {
-        (this.userModel as UserModel).title = 'Mr.';
-      }
-
+      (this.userModel as UserModel).title = 'Mr.';
+      (this.userModel as UserModel).roleId = this._roleId;
       this._userService.createOrUpdate(this.userModel as UserModel)
         .subscribe(status => {
           if (status.isSuccess) {
             this.isRegisterSuccess = true;
-            this._notifyService.showSuccess('Profile Updated Successfully');
-            if (!this.isOwnProfile){
-              this._locationService.back();
-            }
+            this._notifyService.showSuccess('Profile Created Successfully');
+            this._locationService.back();
           }
           else {
             this.isRegisterSuccess = false;
-            this._notifyService.showSuccess('Could not Update the profile');
+            this._notifyService.showSuccess('Could not Create the profile');
           }
         })
     }

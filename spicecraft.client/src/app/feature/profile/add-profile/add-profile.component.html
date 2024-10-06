@@ -1,15 +1,17 @@
+<div class="p-4">
+  <sc-title [title]="title"></sc-title>
+</div>
 
 <div class="p-5">
   <div class="row col-12">
 
-<!--    <p *ngIf="isRegisterSuccess === true" class="text-center fw-semibold fs-3 text-success">Registration Successful</p>-->
-<!--    <p *ngIf="isRegisterSuccess === false" class="text-center fw-semibold fs-3 text-danger">Registration Failed, Something went wrong. Please try again after sometime</p>-->
+    <!--    <p *ngIf="isRegisterSuccess === true" class="text-center fw-semibold fs-3 text-success">Registration Successful</p>-->
+    <!--    <p *ngIf="isRegisterSuccess === false" class="text-center fw-semibold fs-3 text-danger">Registration Failed, Something went wrong. Please try again after sometime</p>-->
 
     <div class="offset-1 col-11">
       <form (ngSubmit)="onSave($event)" >
         <dx-form
           [(formData)]="userModel"
-          [disabled]="!canEdit"
           [colCount]="2">
 
           <dxi-item itemType="group" caption="General Information">
@@ -76,19 +78,19 @@
                                    message="User Name already exists"></dxi-validation-rule>
             </dxi-item>
 
-<!--            <dxi-item dataField="password" [editorOptions]="{mode: 'password'}" [label]="{ text: 'Password' }">-->
-<!--              <dxi-validation-rule type="required" message="Password is required"></dxi-validation-rule>-->
-<!--              <dxi-validation-rule type="pattern"-->
-<!--                                   [pattern]="'^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[a-zA-Z0-9]).{8,}$'"-->
-<!--                                   message="Password must be at least 8 characters long, should contain one uppercase letter, and one special character"></dxi-validation-rule>-->
-<!--            </dxi-item>-->
+            <!--            <dxi-item dataField="password" [editorOptions]="{mode: 'password'}" [label]="{ text: 'Password' }">-->
+            <!--              <dxi-validation-rule type="required" message="Password is required"></dxi-validation-rule>-->
+            <!--              <dxi-validation-rule type="pattern"-->
+            <!--                                   [pattern]="'^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[a-zA-Z0-9]).{8,}$'"-->
+            <!--                                   message="Password must be at least 8 characters long, should contain one uppercase letter, and one special character"></dxi-validation-rule>-->
+            <!--            </dxi-item>-->
 
-<!--            <dxi-item dataField="confirmPassword" [editorOptions]="{mode: 'password'}" [label]="{ text: 'Confirm Password' }">-->
-<!--              <dxi-validation-rule type="required" message="Confirm Password is required"></dxi-validation-rule>-->
-<!--              <dxi-validation-rule type="compare"-->
-<!--                                   [comparisonTarget]="confirmPasswordComparison"-->
-<!--                                   message="Passwords do not match"></dxi-validation-rule>-->
-<!--            </dxi-item>-->
+            <!--            <dxi-item dataField="confirmPassword" [editorOptions]="{mode: 'password'}" [label]="{ text: 'Confirm Password' }">-->
+            <!--              <dxi-validation-rule type="required" message="Confirm Password is required"></dxi-validation-rule>-->
+            <!--              <dxi-validation-rule type="compare"-->
+            <!--                                   [comparisonTarget]="confirmPasswordComparison"-->
+            <!--                                   message="Passwords do not match"></dxi-validation-rule>-->
+            <!--            </dxi-item>-->
           </dxi-item>
 
           <dxi-item itemType="button" [buttonOptions]="{type: 'success', text: 'Submit', useSubmitBehavior: true, stylingMode: 'contained' }" >

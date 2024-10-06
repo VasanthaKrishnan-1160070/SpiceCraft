@@ -33,7 +33,7 @@ create table ShippingOptions (
 
 create table Users (
     UserId int primary key identity(1,1),
-    Title varchar(5) check (Title in ('Mr.', 'Ms.', 'Dr.', 'Mr.')),
+    Title varchar(5) check (Title in ('Mr.', 'Ms.', 'Dr.', 'Mr.')) default('Mr.'),
     FirstName varchar(100) not null,
     LastName varchar(100) not null,
     Email varchar(100) unique  not null,
@@ -114,7 +114,7 @@ create table Orders (
     TotalCost decimal(10,2) not null,
     IsFreeShipping bit default 0 not null,
 	Preference varchar(100),
-    OrderStatus varchar(50) check (OrderStatus in ('Prepared', 'Ready To Ship', 'Shipped', 'Ready For Pickup', 'Cancelled', 'Returned')) not null,
+    OrderStatus varchar(50) check (OrderStatus in ('Prepared', 'Ready To Ship', 'Shipped', 'Ready For Pickup', 'Cancelled', 'Returned')) not null default('Prepared'),
     CreatedAt datetime default getdate(),
     UpdatedAt datetime default getdate(),
     foreign key (UserId) references Users(UserId),
@@ -396,63 +396,122 @@ INSERT INTO Users (Title, FirstName, LastName, Email, Phone, ProfileImg, RoleId,
 --('jarjar_binks', 'password123', 19),
 --('darth_maul', 'password123', 20);
 
--- ItemCategories
--- ItemCategories
+-- Insert primary categories
 INSERT INTO ItemCategories (CategoryName, ParentCategoryId) VALUES 
-('Indian Appetizers', NULL),
-('Indian Main Course', NULL),
-('Indian Desserts', NULL),
-('Indian Drinks', NULL),
-('Mediterranean Appetizers', NULL),
-('Mediterranean Main Course', NULL),
-('Mediterranean Desserts', NULL),
-('Mediterranean Drinks', NULL),
-('Mexican Appetizers', NULL),
-('Mexican Main Course', NULL),
-('Mexican Desserts', NULL),
-('Mexican Drinks', NULL),
-('Vegetarian Dishes', NULL),
-('Non-Vegetarian Dishes', NULL),
-('Vegan Dishes', NULL),
-('Gluten-Free Dishes', NULL),
-('Spicy Dishes', NULL),
-('Indian Bread', 1),
-('Mediterranean Bread', 5),
-('Mexican Sides', 9);
+('Appetizers', NULL),
+('Main Course', NULL),
+('Desserts', NULL),
+('Drinks', NULL),
+('Dishes', NULL),
+('Bread', NULL),
+('Other', NULL);
+
+-- Insert subcategories for Appetizers, Main Course, Desserts, Drinks
+INSERT INTO ItemCategories (CategoryName, ParentCategoryId) VALUES 
+('Indian Appetizers', 1),  -- 1 is the ParentCategoryId for Appetizers
+('Mediterranean Appetizers', 1), 
+('Mexican Appetizers', 1),
+
+('Indian Main Course', 2), -- 2 is the ParentCategoryId for Main Course
+('Mediterranean Main Course', 2),
+('Mexican Main Course', 2),
+
+('Indian Desserts', 3),    -- 3 is the ParentCategoryId for Desserts
+('Mediterranean Desserts', 3),
+('Mexican Desserts', 3),
+
+('Indian Drinks', 4),      -- 4 is the ParentCategoryId for Drinks
+('Mediterranean Drinks', 4),
+('Mexican Drinks', 4),
+
+-- Other categories like Vegetarian, Vegan, etc., are not under primary categories, so they remain with NULL ParentCategoryId
+('Vegetarian Dishes', 5),
+('Non-Vegetarian Dishes', 5),
+('Vegan Dishes', 5),
+('Gluten-Free Dishes', 5),
+('Spicy Dishes', 5),
+
+-- Insert bread and sides as subcategories under their respective regions
+('Indian Bread', 6),       -- Indian Bread goes under Indian Main Course (ParentCategoryId = 2)
+('Mediterranean Bread', 6),-- Mediterranean Bread goes under Mediterranean Main Course
+('Mexican Sides', 7);     -- Mexican Sides goes under Mexican Main Course
 
 
 -- Items (30 rows)
+-- Insert Items into subcategories
+-- Insert Items into subcategories (with auto-increment IDs starting from 8)
 INSERT INTO Items (CategoryId, ItemName, OwnProduct, Discount, Description, Price) VALUES 
-(1, 'Butter Chicken', 1, 10.00, 'Delicious Indian dish made with butter and spices', 15.99),
-(1, 'Chicken Tikka Masala', 1, 15.00, 'Popular Indian dish with a spicy tomato-based sauce', 17.99),
-(1, 'Biryani', 1, 5.00, 'Aromatic Indian rice dish with spices and meat', 13.99),
-(1, 'Naan Bread', 1, 0, 'Indian flatbread perfect for dipping', 3.99),
-(1, 'Samosas', 1, 0, 'Crispy Indian pastry filled with spiced potatoes and peas', 4.99),
-(2, 'Falafel', 1, 0, 'Deep-fried ball made from ground chickpeas, a Mediterranean staple', 6.99),
-(2, 'Shawarma', 1, 10.00, 'Middle Eastern dish of thinly sliced roasted meat', 12.99),
-(2, 'Hummus', 1, 5.00, 'Creamy blend of chickpeas, tahini, and spices', 7.99),
-(2, 'Tabbouleh', 1, 0, 'Mediterranean salad made with parsley, tomatoes, and bulgur', 8.99),
-(2, 'Baba Ganoush', 1, 0, 'Smoky roasted eggplant dip', 8.99),
-(3, 'Tacos', 1, 0, 'Mexican dish with various fillings wrapped in a soft tortilla', 10.99),
-(3, 'Burritos', 1, 5.00, 'Mexican dish with a flour tortilla wrapped around fillings', 11.99),
-(3, 'Quesadillas', 1, 0, 'Grilled tortilla filled with cheese and other ingredients', 9.99),
-(3, 'Guacamole', 1, 0, 'Avocado dip with lime, onion, and cilantro', 5.99),
-(3, 'Churros', 1, 10.00, 'Deep-fried dough pastry sprinkled with sugar', 4.99),
-(1, 'Rogan Josh', 1, 15.00, 'Indian lamb dish cooked with yogurt and spices', 18.99),
-(2, 'Baklava', 1, 5.00, 'Rich, sweet pastry made of layers of filo filled with chopped nuts', 9.99),
-(3, 'Enchiladas', 1, 0, 'Rolled tortilla with a savory filling and chili sauce', 14.99),
-(1, 'Palak Paneer', 1, 10.00, 'Indian vegetarian dish made with spinach and paneer', 13.99),
-(1, 'Vindaloo', 1, 20.00, 'Indian curry dish known for its intense heat', 16.99),
-(2, 'Moussaka', 1, 10.00, 'Mediterranean dish with layers of eggplant and meat', 15.99),
-(3, 'Tostadas', 1, 5.00, 'Crispy fried tortilla topped with various ingredients', 12.99),
-(2, 'Gyro', 1, 0, 'Greek dish made with meat, tomato, onion, and tzatziki sauce', 11.99),
-(3, 'Nachos', 1, 0, 'Tortilla chips topped with cheese and other ingredients', 8.99),
-(1, 'Pani Puri', 1, 0, 'Indian street food, hollow puri filled with flavored water', 5.99),
-(2, 'Spanakopita', 1, 0, 'Greek pastry filled with spinach and feta cheese', 7.99),
-(3, 'Tamales', 1, 5.00, 'Mexican dish made of masa filled with meat or beans and steamed', 9.99),
-(1, 'Chole Bhature', 1, 10.00, 'Indian dish made of spicy chickpeas served with fried bread', 11.99),
-(2, 'Dolma', 1, 15.00, 'Stuffed grape leaves, a Mediterranean delicacy', 8.99),
-(3, 'Empanadas', 1, 5.00, 'Mexican pastry filled with sweet or savory ingredients', 6.99);
+-- Indian Appetizers (CategoryId = 8)
+(8, 'Samosas', 1, 0, 'Crispy Indian pastry filled with spiced potatoes and peas', 4.99),
+(8, 'Pani Puri', 1, 0, 'Indian street food, hollow puri filled with flavored water', 5.99),
+
+-- Mediterranean Appetizers (CategoryId = 9)
+(9, 'Falafel', 1, 0, 'Deep-fried ball made from ground chickpeas, a Mediterranean staple', 6.99),
+(9, 'Hummus', 1, 5.00, 'Creamy blend of chickpeas, tahini, and spices', 7.99),
+(9, 'Tabbouleh', 1, 0, 'Mediterranean salad made with parsley, tomatoes, and bulgur', 8.99),
+(9, 'Baba Ganoush', 1, 0, 'Smoky roasted eggplant dip', 8.99),
+
+-- Mexican Appetizers (CategoryId = 10)
+(10, 'Guacamole', 1, 0, 'Avocado dip with lime, onion, and cilantro', 5.99),
+(10, 'Nachos', 1, 0, 'Tortilla chips topped with cheese and other ingredients', 8.99),
+
+-- Indian Main Course (CategoryId = 11)
+(11, 'Butter Chicken', 1, 10.00, 'Delicious Indian dish made with butter and spices', 15.99),
+(11, 'Chicken Tikka Masala', 1, 15.00, 'Popular Indian dish with a spicy tomato-based sauce', 17.99),
+(11, 'Biryani', 1, 5.00, 'Aromatic Indian rice dish with spices and meat', 13.99),
+(11, 'Rogan Josh', 1, 15.00, 'Indian lamb dish cooked with yogurt and spices', 18.99),
+(11, 'Palak Paneer', 1, 10.00, 'Indian vegetarian dish made with spinach and paneer', 13.99),
+(11, 'Vindaloo', 1, 20.00, 'Indian curry dish known for its intense heat', 16.99),
+(11, 'Chole Bhature', 1, 10.00, 'Indian dish made of spicy chickpeas served with fried bread', 11.99),
+
+-- Mediterranean Main Course (CategoryId = 12)
+(12, 'Shawarma', 1, 10.00, 'Middle Eastern dish of thinly sliced roasted meat', 12.99),
+(12, 'Moussaka', 1, 10.00, 'Mediterranean dish with layers of eggplant and meat', 15.99),
+(12, 'Gyro', 1, 0, 'Greek dish made with meat, tomato, onion, and tzatziki sauce', 11.99),
+
+-- Mexican Main Course (CategoryId = 13)
+(13, 'Burritos', 1, 5.00, 'Mexican dish with a flour tortilla wrapped around fillings', 11.99),
+(13, 'Tacos', 1, 0, 'Mexican dish with various fillings wrapped in a soft tortilla', 10.99),
+(13, 'Quesadillas', 1, 0, 'Grilled tortilla filled with cheese and other ingredients', 9.99),
+(13, 'Enchiladas', 1, 0, 'Rolled tortilla with a savory filling and chili sauce', 14.99),
+(13, 'Tostadas', 1, 5.00, 'Crispy fried tortilla topped with various ingredients', 12.99),
+
+-- Indian Desserts (CategoryId = 14)
+(14, 'Gulab Jamun', 1, 5.00, 'Sweet Indian dessert made of deep-fried dough balls soaked in syrup', 6.99),
+
+-- Mediterranean Desserts (CategoryId = 15)
+(15, 'Baklava', 1, 5.00, 'Rich, sweet pastry made of layers of filo filled with chopped nuts', 9.99),
+
+-- Mexican Desserts (CategoryId = 16)
+(16, 'Churros', 1, 10.00, 'Deep-fried dough pastry sprinkled with sugar', 4.99),
+
+-- Indian Drinks (CategoryId = 17)
+(17, 'Mango Lassi', 1, 0, 'Refreshing mango-flavored yogurt drink', 4.99),
+
+-- Mediterranean Drinks (CategoryId = 18)
+(18, 'Turkish Coffee', 1, 0, 'Strong, unfiltered coffee', 3.99),
+
+-- Mexican Drinks (CategoryId = 19)
+(19, 'Horchata', 1, 0, 'Traditional Mexican drink made from rice and cinnamon', 3.99),
+
+-- Indian Bread (CategoryId = 20)
+(20, 'Naan Bread', 1, 0, 'Indian flatbread perfect for dipping', 3.99),
+
+-- Mediterranean Bread (CategoryId = 21)
+(21, 'Pita Bread', 1, 0, 'Mediterranean flatbread', 2.99),
+
+-- Mexican Sides (CategoryId = 22)
+(22, 'Mexican Rice', 1, 0, 'Spiced rice with tomatoes and onions', 3.99),
+
+-- Other Mediterranean Items (CategoryId = 23)
+(23, 'Spanakopita', 1, 0, 'Greek pastry filled with spinach and feta cheese', 7.99),
+(23, 'Dolma', 1, 15.00, 'Stuffed grape leaves, a Mediterranean delicacy', 8.99),
+
+-- Other Mexican Items (CategoryId = 24)
+(24, 'Tamales', 1, 5.00, 'Mexican dish made of masa filled with meat or beans and steamed', 9.99),
+(24, 'Empanadas', 1, 5.00, 'Mexican pastry filled with sweet or savory ingredients', 6.99);
+
+
 
 -- Orders
 DECLARE @CurrentDate DATE = GETDATE();

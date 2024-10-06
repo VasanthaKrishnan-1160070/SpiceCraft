@@ -40,6 +40,9 @@ import {OrderDetailComponent} from "./feature/order/order-detail/order-detail.co
 import {PaymentListComponent} from "./feature/payment/payment-list/payment-list.component";
 import {PaymentDetailComponent} from "./feature/payment/payment-detail/payment-detail.component";
 import {MyProfileComponent} from "./feature/profile/my-profile/my-profile.component";
+import {AddProfileComponent} from "./feature/profile/add-profile/add-profile.component";
+import {UserProfileComponent} from "./feature/profile/user-profile/user-profile.component";
+import {ItemDetailComponent} from "./feature/item/item-detail/item-detail.component";
 
 const routes: Routes = [
   { path: '', component: ClientHomeComponent},
@@ -50,6 +53,7 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'profile', component: MyProfileComponent },
   { path: 'item-list', component: ItemListComponent },
+  { path: 'item-detail/:itemId', component: ItemDetailComponent },
   { path: 'cart-list', component: CartListComponent },
   { path: 'order-list', component: OrderListComponent },
   { path: 'order-detail/:orderId', component: OrderDetailComponent },
@@ -78,6 +82,11 @@ const routes: Routes = [
   { path: 'b2b-inventory', component: B2bInventoryListComponent },
   { path: 'b2b-promotion-list', component: B2bPromotionComponent},
   { path: 'b2b-reset-password', component: B2bResetPasswordComponent },
+  { path: 'create-staff/:roleId/:title', component: AddProfileComponent},
+  { path: 'create-customer/:roleId/:title', component: AddProfileComponent},
+  { path: 'create-manager/:roleId/:title', component: AddProfileComponent},
+  { path: 'create-dealer/:roleId/:title', component: AddProfileComponent},
+  { path: 'view-user/:userId/:title', component: UserProfileComponent}
 ];
 
 @NgModule({

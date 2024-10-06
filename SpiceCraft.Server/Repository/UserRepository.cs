@@ -35,11 +35,12 @@ namespace SpiceCraft.Server.Repository
                     LastName = s.LastName,
                     Email = s.Email,
                     Phone = s.Phone,
+                    Title = s.Title,
                     ProfileImg = s.ProfileImg,
                     RoleId = s.RoleId,
                     IsActive = s.IsActive,
                     UserName = s.UsersCredential.UserName,
-                    DateOfBirth = s.DateofBirth != null ? s.DateofBirth.Value.ToString("dd/MM/yyyy") : string.Empty,
+                    DateOfBirth = s.DateofBirth != null ? s.DateofBirth.Value.ToString("yyyy-MM-dd") : string.Empty,
                     UserAddress = s.UserAddresses.Select(ua => new UserAddressDTO()
                     {
                         UserId = ua.UserId,
@@ -164,7 +165,10 @@ namespace SpiceCraft.Server.Repository
                 var existingUser = await _context.Users
                                                  .Include(u => u.UsersCredential)
                                                  .Include(u => u.UserAddresses)
-                                                 .FirstOrDefaultAsync(u => u.Email == userRequest.Email);
+                                                 .FirstOrDefaultAsync(u => u.UserId == userRequest.UserId ||
+                                                                           u.Email == userRequest.Email ||
+                                                                           u.UsersCredential.UserName == userRequest.UserName
+                                                                           );
 
                 if (existingUser == null)
                 {
@@ -177,6 +181,8 @@ namespace SpiceCraft.Server.Repository
                 existingUser.Phone = userRequest.Phone;
                 existingUser.ProfileImg = userRequest.ProfileImg;
                 existingUser.IsActive = userRequest.IsActive;
+                existingUser.Email = userRequest.Email;
+                existingUser.DateofBirth = ExtractDate(userRequest.DateOfBirth);
                 // existingUser.Title = userRequest.Title;
                 existingUser.UpdatedAt = DateTime.UtcNow;
                 
@@ -233,6 +239,20 @@ namespace SpiceCraft.Server.Repository
             _context.UsersCredentials.Add(credential);
             _context.UserAddresses.Add(address);
             await _context.SaveChangesAsync();
+        }
+
+        private DateOnly? ExtractDate(string dateOfBirth)
+        {
+            DateOnly? parsedDate = null;
+            if (!string.IsNullOrEmpty(dateOfBirth))
+            {
+                if (DateTime.TryParse(dateOfBirth, out var dateTime))
+                {
+                    parsedDate = DateOnly.FromDateTime(dateTime); // Extract only the date part
+                }
+            }
+            
+            return parsedDate;
         }
     }
 }

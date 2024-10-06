@@ -5,7 +5,7 @@
 <div class="ms-5 me-5">
 
   <div class="d-flex justify-content-end mb-3">
-    <dx-button [text]="'Add Staff'" type="success" ></dx-button>
+    <dx-button [text]="'Add Staff'" [routerLink]="['/create-staff', 3, 'Create Staff']"  type="success" ></dx-button>
   </div>
 
   <dx-data-grid
@@ -50,13 +50,13 @@
     <dxi-column dataField="isActive" caption="Active" [dataType]="'boolean'"></dxi-column>
     <dxi-column dataField="phone" caption="Phone"></dxi-column>
 
-    <dxi-column caption="Edit" [width]="70" [cellTemplate]="'editButtonTemplate'" >
-      <div *dxTemplate="let data of 'editButtonTemplate'">
-        <dx-button [text]="'Edit'" type="success" ></dx-button>
+    <dxi-column caption="View Detail" [width]="130" [cellTemplate]="'viewDetailButtonTemplate'" >
+      <div *dxTemplate="let data of 'viewDetailButtonTemplate'">
+        <dx-button [text]="'View Detail'" [routerLink]="['/view-user', data.data.userId, 'Staff Profile']" type="success" ></dx-button>
       </div>
     </dxi-column>
 
-    <dxi-column caption="Delete" [width]="150" [cellTemplate]="'deleteButtonTemplate'" >
+    <dxi-column caption="Deactivate" [width]="150" [cellTemplate]="'deleteButtonTemplate'" >
       <div *dxTemplate="let data of 'deleteButtonTemplate'">
         <dx-button [text]="'Deactivate'" type="danger" ></dx-button>
       </div>

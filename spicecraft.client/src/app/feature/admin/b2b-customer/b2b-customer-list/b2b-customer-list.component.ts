@@ -4,7 +4,7 @@ import {Observable, Subject} from "rxjs";
 import {UserModel} from "../../../../core/model/user/user.model";
 import {takeUntil} from "rxjs/operators";
 import {AsyncPipe, JsonPipe, NgIf} from "@angular/common";
-import {DxDataGridModule, DxTemplateModule} from "devextreme-angular";
+import {DxButtonModule, DxDataGridModule, DxTemplateModule} from "devextreme-angular";
 import {
   DxiColumnModule,
   DxoColumnChooserModule,
@@ -12,6 +12,7 @@ import {
   DxoMasterDetailModule
 } from "devextreme-angular/ui/nested";
 import {TitleComponent} from "../../../../shared/components/title/title.component";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'sc-b2b-customer-list',
@@ -26,7 +27,9 @@ import {TitleComponent} from "../../../../shared/components/title/title.componen
     DxoMasterDetailModule,
     JsonPipe,
     NgIf,
-    TitleComponent
+    TitleComponent,
+    DxButtonModule,
+    RouterLink
   ],
   templateUrl: './b2b-customer-list.component.html',
   styleUrl: './b2b-customer-list.component.css'

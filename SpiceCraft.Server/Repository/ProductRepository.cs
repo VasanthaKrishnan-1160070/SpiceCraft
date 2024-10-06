@@ -311,7 +311,7 @@ namespace SpiceCraft.Server.Repository
                                       IsRemoved = pd.IsRemoved,
                                       CategoryName = pc.CategoryName,
                                       ParentCategoryId = _context.ItemCategories
-                                      .Where(c => c.CategoryId == pc.ParentCategoryId)
+                                      .Where(c => c.CategoryId == pc.CategoryId)
                                       .Select(c => c.ParentCategoryId)
                                       .FirstOrDefault(),
                                       SubCategoryId = pc.CategoryId,

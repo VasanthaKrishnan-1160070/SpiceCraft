@@ -7,6 +7,7 @@ import {WebAPIService} from "./webAPI.service";
 import {MenuItemModel} from "../model/item/menu-item.model";
 import {ItemFilterModel} from "../model/item/item-filter.model";
 import {LoggedInUserModel} from "../model/user/logged-in-user.model";
+import {ItemDetailModel} from "../model/item/item-detail.model";
 
 @Injectable({
   providedIn: 'root'
@@ -20,5 +21,9 @@ export class ItemService {
 
   addOrRemoveItemFromListing(itemId: number, isAdd = true) {
     return this._api.get<ResultDetailModel<boolean>>(`/item/listing/${itemId}?isAdd=${isAdd}`);
+  }
+
+  getItemDetailById(itemId: number) {
+    return this._api.get<ResultDetailModel<ItemDetailModel>>(`/item/${itemId}`);
   }
 }

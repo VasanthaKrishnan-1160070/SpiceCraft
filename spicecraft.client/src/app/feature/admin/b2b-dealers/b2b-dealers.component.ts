@@ -5,13 +5,14 @@ import {Observable, Subject} from "rxjs";
 import {UserModel} from "../../../core/model/user/user.model";
 import {takeUntil} from "rxjs/operators";
 import {AsyncPipe, JsonPipe, NgIf} from "@angular/common";
-import {DxDataGridModule, DxTemplateModule} from "devextreme-angular";
+import {DxButtonModule, DxDataGridModule, DxTemplateModule} from "devextreme-angular";
 import {
   DxiColumnModule,
   DxoColumnChooserModule,
   DxoLoadPanelModule,
   DxoMasterDetailModule, DxoPagerModule, DxoPagingModule
 } from "devextreme-angular/ui/nested";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'sc-b2b-dealers',
@@ -28,7 +29,9 @@ import {
     DxoPagerModule,
     DxoPagingModule,
     JsonPipe,
-    NgIf
+    NgIf,
+    DxButtonModule,
+    RouterLink
   ],
   templateUrl: './b2b-dealers.component.html',
   styleUrl: './b2b-dealers.component.css'
