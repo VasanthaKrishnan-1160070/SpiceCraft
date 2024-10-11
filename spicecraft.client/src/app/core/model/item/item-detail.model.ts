@@ -7,4 +7,5 @@ export interface ItemDetailModel {
   categories: CategoryModel[];                          // Array of CategoryDTO
   subCategories: CategoryModel[];                       // Array of CategoryDTO for subcategories
   productImages: ItemImageModel[];                      // Array of ItemImageDTO
+  mainImageName: string | null;
 }

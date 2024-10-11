@@ -119,5 +119,18 @@ namespace SpiceCraft.Server.Controllers
             var result = await _userLogics.CreateUpdateUserAsync(userRequest);
             return Ok(result);
         }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            return Ok(); // TODO: Implement password change logic
+        }
+        
+        [HttpPost("toggle-user-active/{userId:int}")]
+        public async Task<IActionResult> ToggleUserActive(int userId)
+        {
+            await _userLogics.ToggleUserActiveAsync(userId);
+            return Ok(new { success = true, message = "User deleted successfully" });
+        }
     }
 }

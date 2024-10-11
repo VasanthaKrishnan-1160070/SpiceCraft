@@ -64,25 +64,32 @@ namespace SpiceCraft.Server.BusinessLogics
             return productDetails;
         }
 
-        public ResultDetail<bool> CreateUpdateProductDetails(ProductSummaryDTO productDetails, string mainImageCode, List<IFormFile> uploadedImages)
+        public ResultDetail<bool> CreateUpdateProductDetails(CreateUpdateItemRequest createUpdateItem, List<IFormFile> uploadedImages)
         {
-            CreateUpdateProduct(productDetails);
-            if (productDetails.ItemId != 0)
+            var details = CreateUpdateProduct(createUpdateItem.ItemSummary);
+            if (details.ItemId != 0)
             {
+                
                 // Now we create the product inventory
                 // inventoryRepository.InsertProductToInventory(Convert.ToInt32(productDetails["product_id"]));
 
                 // Now we save the images
-                SaveProductImages(productDetails.ItemId, mainImageCode, uploadedImages);
+                SaveProductImages(details.ItemId, createUpdateItem.MainImageName, uploadedImages, createUpdateItem?.RemovedImages?.ToList());
+                return HelperFactory.Msg.Success(true);
             }
-            return HelperFactory.Msg.Success(true);
+            return HelperFactory.Msg.Error<bool>("Failed to save product images.");
         }
 
-        public void SaveProductImages(int itemId, string mainImageCode, List<IFormFile> uploadedImages)
+        public void SaveProductImages(int itemId, string mainImageCode, List<IFormFile> uploadedImages , List<string>? removedImages)
         {
             int nextImageIndex = productRepository.GetProductImageNextIndex(itemId);
-
-            string staticImgFolderPath = Path.Combine(AppContext.BaseDirectory, "wwwroot", "product_images");
+            
+            var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Items");
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+           
             List<ProductImageDto> imgDetails = new();
 
             foreach (var img in uploadedImages)
@@ -102,16 +109,39 @@ namespace SpiceCraft.Server.BusinessLogics
                         ItemId = itemId
                     });
 
-                    Directory.CreateDirectory(staticImgFolderPath);
-                    // Assuming `img` is a path, use File.Copy to save
-                    File.Copy(img.FileName, Path.Combine(staticImgFolderPath, imgCode));
+                var filePath = Path.Combine(uploadFolder, imgCode);
+                    
+                 // Save the file to the server
+                 using (var stream = new FileStream(filePath, FileMode.Create))
+                 {
+                     img.CopyTo(stream);
+                 }
 
                     nextImageIndex++;
                 }
             }
 
+            if (removedImages?.Count > 0)
+            {
+                // Remove deleted images from file system and database
+                foreach (var imageCode in removedImages)
+                {
+                    var filePath = Path.Combine(uploadFolder, imageCode);
+
+                    // Delete the file from the server
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
+
+                    // Delete the image record from the database
+                    productRepository.DeleteItemImage(itemId, imageCode);
+                }
+            }
+
             productRepository.CreateUpdateItemImages(imgDetails);
-            // productRepository.UpdateMainImage(itemId, mainImageCode);
+            
+            productRepository.UpdateMainImage(itemId, mainImageCode);
         }
 
         public ResultDetail<bool> RemoveProductFromListing(int itemId)
@@ -134,6 +164,52 @@ namespace SpiceCraft.Server.BusinessLogics
             }
             return HelperFactory.Msg.Error<bool>("Could not add product to the listing");
         }
+
+        // public async Task<ResultDetail<int?>> UploadItemImages(IFormFileCollection files, string mainImageName, int itemId)
+        // {
+        //     if (files == null || files.Count == 0)
+        //     {
+        //         return HelperFactory.Msg.Error<int?>("Files could not be uploaded");
+        //     }
+        //
+        //     var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+        //     if (!Directory.Exists(uploadFolder))
+        //     {
+        //         Directory.CreateDirectory(uploadFolder);
+        //     }
+        //
+        //     var uploadedFileNames = new List<string>(); // List to store file names
+        //
+        //     foreach (var file in files)
+        //     {
+        //         var uniqueFileName = Path.GetFileNameWithoutExtension(file.FileName) 
+        //                              + "_" + Path.GetRandomFileName() 
+        //                              + Path.GetExtension(file.FileName); // Generate unique name for the file
+        //         var filePath = Path.Combine(uploadFolder, uniqueFileName);
+        //
+        //         // Save the file to the server
+        //         using (var stream = new FileStream(filePath, FileMode.Create))
+        //         {
+        //             await file.CopyToAsync(stream);
+        //         }
+        //
+        //         // Add file name to the list (to save in the database later)
+        //         uploadedFileNames.Add(uniqueFileName);
+        //     }
+        //
+        //     // saving to the database
+        //     var itemImagesDTO = new ItemImagesDTO()
+        //     {
+        //         ItemId = itemId, // Replace with actual ItemId
+        //         ImageNames = uploadedFileNames,
+        //         MainImageName = mainImageName
+        //     };
+        //     
+        //     await productRepository.SaveImageDetails(itemImagesDTO);
+        //     
+        //     // Return the file count
+        //     return HelperFactory.Msg.Success(uploadedFileNames?.Count());
+        // }
     }
 
 }

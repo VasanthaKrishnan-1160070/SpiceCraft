@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using SpiceCraft.Server.BusinessLogics.Interface;
+using SpiceCraft.Server.DTO.Order;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -40,6 +41,17 @@ public class OrderController : ControllerBase
         }
         return BadRequest(result.Message);
     }
+    
+    [HttpPut("update-order/{orderId}")]
+    public async Task<IActionResult> UpdateOrder(int orderId, [FromBody] UserOrderDetailDTO orderDetail)
+    {
+        var result = await _orderLogics.UpdateOrderAsync(orderId, orderDetail);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result.Message);
+    }
 
     // Endpoint to get order details
     [HttpGet("order-details/{orderId}")]
@@ -58,6 +70,17 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> GetUserOrders(int userId)
     {
         var result = await _orderLogics.GetUserOrdersAsync(userId);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return NotFound(result.Message);
+    }
+
+    [HttpGet("all-orders")]
+    public async Task<IActionResult> GetAllOrders()
+    {
+        var result = await _orderLogics.GetOrdersAsync();
         if (result.IsSuccess)
         {
             return Ok(result);

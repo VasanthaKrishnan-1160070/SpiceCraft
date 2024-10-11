@@ -14,6 +14,8 @@ namespace SpiceCraft.Server.BusinessLogics.Interface
         // Get detailed information about an order
         Task<ResultDetail<List<OrderDetailDTO>>> GetOrderDetailsAsync(int orderId);
 
+        Task<ResultDetail<List<UserOrderDTO>>> GetOrdersAsync();
+
         // Get all orders for a user
         Task<ResultDetail<List<UserOrderDTO>>> GetUserOrdersAsync(int userId);
         
@@ -29,5 +31,7 @@ namespace SpiceCraft.Server.BusinessLogics.Interface
         Task<ResultDetail<UserOrderDetailDTO>> GetUserOrderDetailsAsync(int orderId);
 
         Task<ResultDetail<bool>> InsertOrderItemsFromShoppingCartAsync(int userId, int orderId);
+
+        Task<ResultDetail<bool>> UpdateOrderAsync(int orderId, UserOrderDetailDTO updatedOrderDetails);
     }
 }

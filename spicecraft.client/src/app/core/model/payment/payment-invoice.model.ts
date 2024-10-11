@@ -5,6 +5,7 @@ import {ContactInfoModel} from "../user/contact-info.model";
 export interface PaymentInvoiceModel {
   userId: number;
   orderId: number;
+  transactionId: number;
   amount: number;
   paymentDate: string;  // Date formatted as 'dd/MM/yyyy'
   paymentMethod: string;

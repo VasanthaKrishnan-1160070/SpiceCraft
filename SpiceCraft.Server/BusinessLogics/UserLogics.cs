@@ -103,5 +103,27 @@ namespace SpiceCraft.Server.BusinessLogics
             return HelperFactory.Msg.Success(result);
         }
 
+        public async Task<ResultDetail<bool>> ChangePasswordAsync(ChangePasswordRequest request)
+        {
+            string defaultPassword = configuration.GetValue<string>("Defaults:UserPassword") ?? string.Empty;
+            request.NewPassword = PasswordHelper.HashPassword(request?.NewPassword ?? request?.OldPassword ?? defaultPassword);
+            request.OldPassword = PasswordHelper.HashPassword(request?.OldPassword?? defaultPassword);
+            var result = await userRepository.ChangePasswordAsync(request);
+            if (!result)
+            {
+                return HelperFactory.Msg.Error(result, "Password Change Failed");
+            }
+            return HelperFactory.Msg.Success(result);
+        }
+        
+        public async Task<ResultDetail<bool>> ToggleUserActiveAsync(int userId)
+        {
+            var result = await userRepository.ToggleUserActiveAsync(userId);
+            if (!result)
+            {
+                return HelperFactory.Msg.Error(result, "Couldn't disable the user");
+            }
+            return HelperFactory.Msg.Success(result);
+        }
     }
 }

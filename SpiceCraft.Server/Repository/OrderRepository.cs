@@ -175,6 +175,28 @@ namespace SpiceCraft.Server.Repository
             return orderDetails;
         }
 
+        // Get all orders for all users
+        public async Task<List<UserOrderDTO>> GetAllOrdersAsync()
+        {
+            var allOrders = await (from o in _context.Orders
+                join pyt in _context.Payments on o.OrderId equals pyt.OrderId into paymentGroup
+                from pyt in paymentGroup.DefaultIfEmpty()
+                orderby o.OrderDate descending
+                select new UserOrderDTO
+                {
+                    UserId = o.UserId,
+                    OrderId = o.OrderId,
+                    OrderDate = o.OrderDate.ToString("dd/MM/yyyy"),
+                    PaymentStatus = pyt != null ? pyt.PaymentStatus : "Pending",
+                    OrderStatus = o.OrderStatus,
+                    TotalCost = o.TotalCost,
+                    ShippingInfo = _context.ShippingOptions
+                               .FirstOrDefault(si => si.ShippingOptionId == o.ShippingOptionId).ShippingOptionName.ToString(),
+                    CustomerName = _context.Users.FirstOrDefault(u => u.UserId == o.UserId).FirstName.ToString(),
+                }).ToListAsync();
+            return allOrders;
+        }
+
         // Update Order Status
         public async Task<bool> UpdateOrderStatusAsync(int orderId, string orderStatus)
         {
@@ -236,8 +258,11 @@ namespace SpiceCraft.Server.Repository
                 {
                     OrderStatus = o.OrderStatus,
                     TotalCost = o.TotalCost,
+                    OrderDate = o.OrderDate.ToString("dd/MM/yyyy"),
                     UserId = o.UserId,
                     ShippingOptionId = Convert.ToInt32(o.ShippingOptionId),
+                    ShippingCost = shc.Cost,
+                    GST = (o.TotalCost * (decimal)0.15),
                     OrderId = o.OrderId
                 }).FirstOrDefaultAsync();
 
@@ -342,6 +367,97 @@ namespace SpiceCraft.Server.Repository
 
             return inventory;
         }
+
+        public async Task<bool> UpdateOrderAsync(int orderId, UserOrderDetailDTO updatedOrderDetails)
+        {
+            // Begin transaction to ensure atomic updates
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // 1. Update Order Info
+                    var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+                    if (order == null)
+                    {
+                        return false; // Order not found
+                    }
+
+                    order.OrderStatus = updatedOrderDetails.OrderStatus;
+                    order.TotalCost = updatedOrderDetails.TotalCost;
+                    order.ShippingOptionId = updatedOrderDetails.ShippingOptionId;
+
+                    _context.Orders.Update(order);
+
+                    // 2. Update User Address
+                    var userAddress =
+                        await _context.UserAddresses.FirstOrDefaultAsync(ua => ua.UserId == updatedOrderDetails.UserId);
+                    if (userAddress != null)
+                    {
+                        userAddress.StreetAddress1 = updatedOrderDetails.ShippingAddress.StreetAddress1;
+                        userAddress.StreetAddress2 = updatedOrderDetails.ShippingAddress.StreetAddress2;
+                        userAddress.City = updatedOrderDetails.ShippingAddress.City;
+                        userAddress.StateOrProvince = updatedOrderDetails.ShippingAddress.StateOrProvince;
+                        userAddress.PostalCode = updatedOrderDetails.ShippingAddress.PostalCode;
+
+                        _context.UserAddresses.Update(userAddress);
+                    }
+
+                    // 3. Update Contact Info
+                    var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == updatedOrderDetails.UserId);
+                    if (user != null)
+                    {
+                        user.Email = updatedOrderDetails.ContactInfo.Email;
+                        user.Phone = updatedOrderDetails.ContactInfo.Phone;
+                        // You can also update FirstName, LastName if needed, but they are derived in the DTO.
+                        _context.Users.Update(user);
+                    }
+
+                    // 4. Update Order Items
+                    var existingOrderDetails =
+                        await _context.OrderDetails.Where(od => od.OrderId == orderId).ToListAsync();
+
+                    foreach (var item in updatedOrderDetails.OrderItems)
+                    {
+                        var orderDetail = existingOrderDetails.FirstOrDefault(od => od.ItemId == item.ItemId);
+                        if (orderDetail != null)
+                        {
+                            // Update existing item
+                            orderDetail.Quantity = item.Quantity;
+                            orderDetail.PurchasePrice = item.PurchasePrice;
+                            _context.OrderDetails.Update(orderDetail);
+                        }
+                        else
+                        {
+                            // Add new item if not exists
+                            var newOrderDetail = new OrderDetail
+                            {
+                                OrderId = orderId,
+                                ItemId = item.ItemId,
+                                Quantity = item.Quantity,
+                                PurchasePrice = item.PurchasePrice
+                            };
+                            await _context.OrderDetails.AddAsync(newOrderDetail);
+                        }
+                    }
+
+                    // Save all changes
+                    await _context.SaveChangesAsync();
+
+                    // Commit transaction
+                    await transaction.CommitAsync();
+
+                    return true; // Update successful
+                }
+                catch (Exception ex)
+                {
+                    // Rollback transaction in case of error
+                    await transaction.RollbackAsync();
+                    Console.WriteLine("Error updating order: " + ex.Message);
+                    return false;
+                }
+            }
+        }
+
 
         public async Task<bool> CreateUserOrderAsync(OrderDTO order)
         {

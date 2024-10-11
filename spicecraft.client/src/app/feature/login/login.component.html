@@ -1,6 +1,8 @@
 <div class="p-5 w-100 d-flex flex-column justify-content-center flex-fill align-items-stretch content-height">
-  <p *ngIf="loginSuccess === true" class="text-center fw-semibold fs-3 text-success">Login Successful</p>
-  <p *ngIf="loginSuccess === false" class="text-center fw-semibold fs-3 text-danger">Login Failed, Please enter valid user name and password</p>
+  <p *ngIf="loginSuccess === true && userActive" class="text-center fw-semibold fs-3 text-success">{{loginMessage}}</p>
+  <p *ngIf="loginSuccess === false" class="text-center fw-semibold fs-3 text-danger">{{loginMessage}}</p>
+  <p *ngIf="!userActive" class="text-center fw-semibold fs-3 text-warning">{{loginMessage}}</p>
+
   <div class="row col-12">
     <div class="offset-4 col-4">
       <div class="card shadow-sm">

@@ -233,6 +233,39 @@ namespace SpiceCraft.Server.Repository
                 return rowsAffected > 0;            
         }
 
+        public async Task<bool> ToggleUserActiveAsync(int userId)
+        {
+            // activate or deactive the user with the given id
+            var user = await _context.Users.FindAsync(userId);
+            if (user!= null)
+            {
+                user.IsActive = !user.IsActive;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> ChangePasswordAsync(ChangePasswordRequest request)
+        {
+            // update the user's password with the given id and old password'
+            var user = await _context.Users
+                                       .Include(c => c.UsersCredential)
+                                       .FirstOrDefaultAsync(u => u.UsersCredential.UserId == request.UserId);
+
+            if (user!= null && user.UsersCredential.Password == request.OldPassword)
+            {
+                user.UsersCredential.Password = request.NewPassword;
+                _context.UsersCredentials.Update(user.UsersCredential);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+
+        }
+
         public async Task AddUserAsync(User user, UsersCredential credential, UserAddress address)
         {
             _context.Users.Add(user);

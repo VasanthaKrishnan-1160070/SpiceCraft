@@ -8,11 +8,14 @@ namespace SpiceCraft.Server.Repository.Interface
         Task<int> InsertOrderItemsFromShoppingCartAsync(int userId, int orderId);
         Task<int> InsertOrderItemsForCorporateClientAsync(int userId, int orderId);
         Task<List<OrderDetailDTO>> GetOrderInfoAsync(int orderId);
+        Task<List<UserOrderDTO>> GetAllOrdersAsync();
         Task<UserOrderDTO> GetFirstUnpaidUserOrdersAsync(int userId);
         Task<bool> UpdateOrderStatusAsync(int orderId, string orderStatus);
         Task<List<UserOrderDTO>> GetUserOrdersAsync(int userId);
         Task<ProductInventoryDTO> GetInventoryForProductAsync(int productId);
-        Task<UserOrderDetailDTO> GetOrderDetailsAsync(int orderId);
         Task<bool> CreateUserOrderAsync(OrderDTO order);
+        Task<UserOrderDetailDTO> GetOrderDetailsAsync(int orderId);
+
+        Task<bool> UpdateOrderAsync(int orderId, UserOrderDetailDTO updatedOrderDetails);
     }
 }

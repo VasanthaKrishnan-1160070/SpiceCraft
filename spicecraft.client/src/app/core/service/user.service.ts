@@ -28,7 +28,8 @@ export class UserService {
     lastName: '',
     email: '',
     roleName: '',
-    userName: ''
+    userName: '',
+    isActive: true
   }
 
   constructor() { }
@@ -95,5 +96,13 @@ export class UserService {
 
   getUserDetailsById(userId: number) {
     return this._api.get<ResultDetailModel<UserModel>>(`/user/${userId}`)
+  }
+
+  changePassword(userId: number, newPassword: string, oldPassword: string)  {
+    return this._api.post(`/user/change-password/}`, {userId, newPassword, oldPassword});
+  }
+
+  toggleUserActive(userId: number){
+    return this._api.post(`/user/toggle-user-active/${userId}`, {});
   }
 }

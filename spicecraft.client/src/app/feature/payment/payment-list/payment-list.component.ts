@@ -15,6 +15,7 @@ import {
   DxoLoadPanelModule, DxoPagerModule, DxoPagingModule, DxoSearchPanelModule
 } from "devextreme-angular/ui/nested";
 import {TitleComponent} from "../../../shared/components/title/title.component";
+import {AuthService} from "../../../core/service/auth.service";
 
 @Component({
   selector: 'sc-payment-list',
@@ -44,23 +45,40 @@ private _paymentService: PaymentService = inject(PaymentService);
 private _userService: UserService = inject(UserService);
 private _messageService: MessageService = inject(MessageService);
 private _destroy$ = new Subject<void>();
+private _authService = inject(AuthService);
+
 
 public paymentItems!: PaymentModel[];
+public isInternalUser = false;
 
 
   ngOnInit(): void {
+    this.isInternalUser = this._authService.isInternalUser();
     this.getPaymentItems();
   }
 
   getPaymentItems() {
-    this._paymentService.getPaymentsForUser(this._userService.getCurrentUserId()).pipe(
-      take(1),
-      takeUntil(this._destroy$)
-    )
-      .subscribe(paymentItems => {
-        this.paymentItems = paymentItems?.data || [];
-        console.log(this.paymentItems);
-      });
+
+    if (this.isInternalUser) {
+      this._paymentService.getPaymentsForInternalUsers().pipe(
+        take(1),
+        takeUntil(this._destroy$)
+      )
+        .subscribe(paymentItems => {
+          this.paymentItems = paymentItems?.data || [];
+          console.log(this.paymentItems);
+        });
+    }
+    else {
+      this._paymentService.getPaymentsForUser(this._userService.getCurrentUserId()).pipe(
+        take(1),
+        takeUntil(this._destroy$)
+      )
+        .subscribe(paymentItems => {
+          this.paymentItems = paymentItems?.data || [];
+          console.log(this.paymentItems);
+        });
+    }
   }
 
 // Update quantity or delete item from cart

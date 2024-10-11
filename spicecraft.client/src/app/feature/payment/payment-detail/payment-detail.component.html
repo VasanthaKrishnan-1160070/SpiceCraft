@@ -3,24 +3,33 @@
   <sc-title [title]="'Payment Detail'"></sc-title>
 </div>
 
-<div class="container p-4 pt-0">
-<div class="mt-4 bg-light p-3 rounded-2 border border-3 border-steel-blue">
+<div class="d-flex justify-content-end me-3">
+  <dx-button
+    text="Download Invoice"
+    type="success"
+    (onClick)="downloadInvoice()"
+    class="ml-auto">
+  </dx-button>
+</div>
+
+<div id="payment-details" class="p-4 pt-0">
+<div class="mt-4 bg-light p-3 rounded-2">
   <div class="row justify-content-center">
     <div class="col-12 mb-3 d-flex justify-content-center">
       <div class="col-12 row">
-        <div class="checkout-box col-4 offset-2">
+        <div class="checkout-box ms-5 col-3">
           <h5 class="text-center mb-4">Order Info</h5>
-          <dx-form [formData]="paymentInfo" labelLocation="top">
+          <dx-form [formData]="paymentInfo" [readOnly]="!isInternalUser" labelLocation="top">
             <!-- Shipping Type -->
-            <dxi-item dataField="shippingOptionName" label="Shipping Type" [editorOptions]="{ disabled: true }">
+            <dxi-item dataField="shippingOptionName" label="Shipping Type" >
               <dxi-validation-rule type="required" message="Shipping Type is required"></dxi-validation-rule>
             </dxi-item>
             <!-- Sub Total -->
-            <dxi-item dataField="subTotal" label="Sub Total" [editorOptions]="{ disabled: true }" ></dxi-item>
+            <dxi-item dataField="subTotal" label="Sub Total"  ></dxi-item>
             <!-- Shipping Cost -->
-            <dxi-item dataField="shippingCost" label="Shipping Cost" [editorOptions]="{ disabled: true }"></dxi-item>
+            <dxi-item dataField="shippingCost" label="Shipping Cost" ></dxi-item>
             <!-- Total -->
-            <dxi-item dataField="amount" label="Total" [editorOptions]="{ disabled: true }"></dxi-item>
+            <dxi-item dataField="amount" label="Total" ></dxi-item>
             <!-- Payment Status -->
             <dxi-item>
               <div class="d-flex justify-content-between border-top border-info pt-2">
@@ -36,30 +45,31 @@
         </div>
 
         <!-- Contact Info -->
-        <div class="col-4 pt-3 checkout-box  offset-1">
+        <div class="col-3 pt-3 checkout-box  offset-1">
           <h5 class="text-center mb-4">Contact Info</h5>
-          <dx-form [formData]="contactInfo" labelLocation="top">
+          <dx-form [formData]="contactInfo" [readOnly]="!isInternalUser" labelLocation="top">
             <!-- Name -->
-            <dxi-item dataField="name" label="Name" [editorOptions]="{ disabled: true }"></dxi-item>
+            <dxi-item dataField="name" label="Name" ></dxi-item>
             <!-- Email -->
-            <dxi-item dataField="email" label="Email" [editorOptions]="{ disabled: true }"></dxi-item>
+            <dxi-item dataField="email" label="Email" ></dxi-item>
             <!-- Phone -->
-            <dxi-item dataField="phone" label="Phone" [editorOptions]="{ disabled: true }"></dxi-item>
+            <dxi-item dataField="phone" label="Phone" ></dxi-item>
+          </dx-form>
+        </div>
+
+        <!-- Shipping Address -->
+        <div *ngIf="orderPayments.shipping_option_name !== 'Pick Up'" class="checkout-box offset-1 col-3">
+          <h5 class="text-center mb-4">Shipping Address</h5>
+          <dx-form [formData]="userAddress" labelLocation="top">
+            <dxi-item dataField="streetAddress1" label="Street Address 1" ></dxi-item>
+            <dxi-item dataField="streetAddress2" label="Street Address 2" ></dxi-item>
+            <dxi-item dataField="city" label="City" ></dxi-item>
+            <dxi-item dataField="state" label="State" ></dxi-item>
+            <dxi-item dataField="postalCode" label="Postal Code" ></dxi-item>
           </dx-form>
         </div>
       </div>
 
-      <!-- Shipping Address -->
-      <div *ngIf="orderPayments.shipping_option_name !== 'Pick Up'" class="checkout-box offset-1 col-3">
-        <h5 class="text-center mb-4">Shipping Address</h5>
-        <dx-form [formData]="userAddress" labelLocation="top">
-          <dxi-item dataField="streetAddress1" label="Street Address 1" [editorOptions]="{ disabled: true }"></dxi-item>
-          <dxi-item dataField="streetAddress2" label="Street Address 2" [editorOptions]="{ disabled: true }"></dxi-item>
-          <dxi-item dataField="city" label="City" [editorOptions]="{ disabled: true }"></dxi-item>
-          <dxi-item dataField="state" label="State" [editorOptions]="{ disabled: true }"></dxi-item>
-          <dxi-item dataField="postalCode" label="Postal Code" [editorOptions]="{ disabled: true }"></dxi-item>
-        </dx-form>
-      </div>
     </div>
   </div>
 

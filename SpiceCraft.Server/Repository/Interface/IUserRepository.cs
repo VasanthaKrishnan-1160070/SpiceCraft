@@ -17,5 +17,7 @@ namespace SpiceCraft.Server.Repository.Interface
         public Task<bool> CreateUserAsync(CreateUserRequest userRequest);
         public Task<bool> CreateUpdateUserAsync(CreateUserRequest userRequest);
         public Task AddUserAsync(User user, UsersCredential credential, UserAddress address);
+        public Task<bool> ChangePasswordAsync(ChangePasswordRequest request);
+        public Task<bool> ToggleUserActiveAsync(int userId);
     }
 }

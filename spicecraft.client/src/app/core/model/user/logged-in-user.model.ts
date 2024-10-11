@@ -5,4 +5,5 @@ export interface LoggedInUserModel {
   email: string;
   userName: string;
   roleName: string;
+  isActive: boolean;
 }

@@ -29,6 +29,18 @@ namespace SpiceCraft.Server.Controllers
             return NotFound(result.Message);
         }
 
+        [HttpGet("all-payments")]
+        public async Task<IActionResult> GetAllPayments()
+        {
+            var result = await _paymentLogic.GetPaymentsForInternalUsersAsync();
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return NotFound(result.Message);
+        }
+
+
         // Get payments for internal users
         [HttpGet("internal")]
         public async Task<IActionResult> GetPaymentsForInternalUsers()

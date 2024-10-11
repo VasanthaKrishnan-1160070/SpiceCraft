@@ -21,6 +21,8 @@ export class LoginComponent implements  OnDestroy {
   authService = inject(AuthService);
   router = inject(Router);
   loginSuccess?: boolean;
+  userActive = true;
+  loginMessage = '';
   $destroy: Subject<void> = new Subject<void>();
   loginCredential = {
     userName: '',
@@ -35,9 +37,24 @@ export class LoginComponent implements  OnDestroy {
     )
     .subscribe(
       status => {
-        this.loginSuccess = status;
-        if (this.loginSuccess) {
-          this.router.navigate(['dashboard']);
+        if (status) {
+          const isUserActive = this.authService.isUserActive();
+
+          if (isUserActive) {
+            this.loginSuccess = status;
+            this.loginMessage = `Login Successful`;
+            this.userActive = isUserActive;
+            this.router.navigate(['dashboard']);
+          }
+          else {
+            this.loginSuccess = status;
+            this.userActive = isUserActive;
+            this.loginMessage = `Login Successful, but your account is inactive. Please contact us.`;
+          }
+        }
+        else {
+          this.loginSuccess = false;
+          this.loginMessage = `Login Failed, Please enter valid user name and password`;
         }
       }
     )

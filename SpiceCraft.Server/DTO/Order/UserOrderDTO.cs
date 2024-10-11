@@ -9,4 +9,6 @@ public class UserOrderDTO
     public string OrderStatus { get; set; }
     public string ShippingInfo { get; set; }
     public decimal TotalCost { get; set; }
+    
+    public string CustomerName { get; set; }
 }

@@ -26,13 +26,18 @@ export class OrderService {
   }
 
   // Get order details
-  getOrderDetails(orderId: number): Observable<ResultDetailModel<UserOrderDetailModel[]>> {
-    return this._api.get<ResultDetailModel<UserOrderDetailModel[]>>(`/order/order-details/${orderId}`);
+  getOrderDetails(orderId: number): Observable<ResultDetailModel<UserOrderDetailModel>> {
+    return this._api.get<ResultDetailModel<UserOrderDetailModel>>(`/order/order-details/${orderId}`);
   }
 
   // Get all orders for a user
   getUserOrders(userId: number): Observable<ResultDetailModel<UserOrderModel[]>> {
     return this._api.get<ResultDetailModel<UserOrderModel[]>>(`/order/user-orders/${userId}`);
+  }
+
+  // Get all orders
+  getAllOrders(): Observable<ResultDetailModel<UserOrderModel[]>> {
+    return this._api.get<ResultDetailModel<UserOrderModel[]>>(`/order/all-orders`);
   }
 
   // Change order status
@@ -43,5 +48,20 @@ export class OrderService {
   // Verify stock before placing an order
   verifyStockBeforeOrder(userId: number): Observable<ResultDetailModel<boolean>> {
     return this._api.get<ResultDetailModel<boolean>>(`/order/verify-stock/${userId}`);
+  }
+
+  updateOrder(orderId: number, orderDetail: UserOrderDetailModel){
+    return this._api.put(`/order/update-order/${orderId}`, orderDetail);
+  }
+
+  getAllOrderStatus() {
+    return [
+      { name: 'Prepared', value: 'Prepared' },
+      { name: 'Ready To Ship', value: 'Ready To Ship' },
+      { name: 'Shipped', value: 'Shipped' },
+      { name: 'Ready For Pickup', value: 'Ready For Pickup' },
+      { name: 'Cancelled', value: 'Cancelled' },
+      { name: 'Returned', value: 'Returned' }
+    ];
   }
 }

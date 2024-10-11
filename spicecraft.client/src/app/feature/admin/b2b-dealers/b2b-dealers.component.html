@@ -55,7 +55,7 @@
 
     <dxi-column caption="Deactivate" [width]="150" [cellTemplate]="'deleteButtonTemplate'" >
       <div *dxTemplate="let data of 'deleteButtonTemplate'">
-        <dx-button [text]="'Deactivate'" type="danger" ></dx-button>
+        <dx-button [text]="data.data.isActive ? 'Deactivate' : 'Activate'" (onClick)="toggelUserActive(data.data.userId)" [type]=" data.data.isActive ? 'danger' : 'success'" ></dx-button>
       </div>
     </dxi-column>
   </dx-data-grid>

@@ -65,6 +65,7 @@ namespace SpiceCraft.Server.Repository
                     UserId = pt.UserId,
                     OrderId = pt.OrderId,
                     Amount = pt.Amount,
+                    TransactionId = pt.TransactionId,
                     PaymentDate = pt.PaymentDate.ToString("dd/MM/yyyy"),
                     PaymentMethod = pt.PaymentMethod,
                     PaymentStatus = pt.PaymentStatus,

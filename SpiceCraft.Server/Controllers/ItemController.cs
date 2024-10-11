@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SpiceCraft.Server.BusinessLogics.Interface;
 using SpiceCraft.Server.Context;
 using SpiceCraft.Server.DTO.Product;
@@ -33,15 +34,17 @@ public class ItemController(SpiceCraftContext context, IProductLogics productLog
         return productLogics.RemoveProductFromListing(itemId);
     }
 
-    [HttpPost]
-    public ActionResult<ResultDetail<bool>> CreateUpdateProduct([FromBody] ProductSummaryDTO productDetail, [FromQuery] string mainImageCode)
+    [HttpPost("create-update-product")]
+    public ActionResult<ResultDetail<bool>> CreateUpdateProduct([FromForm] string createUpdateItem, IFormFileCollection files)
     {
+        // Deserialize the JSON string into the ItemSummaryModel
+        var itemModel = JsonConvert.DeserializeObject<CreateUpdateItemRequest>(createUpdateItem);
         var uploadedImages = new List<IFormFile>();
         var hasAnyFiles = Request?.Form?.Files?.Any() ?? false;
         if (hasAnyFiles)
         {
             uploadedImages = Request.Form?.Files?.ToList();
         }
-        return productLogics.CreateUpdateProductDetails(productDetail, mainImageCode, new List<IFormFile>());
+        return productLogics.CreateUpdateProductDetails(itemModel, uploadedImages);
     }
 }

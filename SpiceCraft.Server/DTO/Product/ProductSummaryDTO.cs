@@ -5,6 +5,8 @@
         public int ItemId { get; set; }
         public string ItemName { get; set; }
         public string Description { get; set; }
+        
+        public string MainImageCode { get; set; }
         public DateTime? CreatedAt { get; set; }
         public decimal Price { get; set; }
         public bool OwnProduct { get; set; }
@@ -15,5 +17,6 @@
         public decimal DiscountRate { get; set; }
         public int? CurrentStock { get; set; } // Nullable if inventory is not found
         public bool? IsMain { get; set; } // Nullable if the product has no main image
+        
     }
 }

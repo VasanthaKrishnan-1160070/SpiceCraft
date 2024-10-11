@@ -1,91 +1,149 @@
+<div class="p-4">
+  <sc-title [title]="'Menu Item Detail'"></sc-title>
+</div>
+
 <div class="row offset-1 col-10 mt-4 bg-light p-4 rounded-2 border border-3 border-info">
   <div class="d-flex justify-content-end mb-3">
-    <button class="btn btn-danger" (click)="onCancel()">Cancel</button>
+    <button class="btn btn-danger" (click)="onCancel()">{{isUserInternal ? 'Cancel' : 'Back'}}</button>
   </div>
 
-  <div class="d-flex">
-       <div *ngIf="!isUserInternal">
-         <div class="col-6">
-           <div class="mt-3 mb-4 d-flex align-items-end flex-wrap">
-             @for (img of itemImages; track img) {
-               <div>
-                 <img class="img-thumbnail m-2 rounded  pest-img"
-                      src="{{ img.imageCode }}"/>
-                 <p class="text-center">{{ img.imageName }}</p>
-               </div>
-             }
-             @empty {
-               <div>
-<!--                 <img class="img-thumbnail m-2 rounded  pest-img"-->
-<!--                      src="{{ img.image_code }}"/>-->
-               </div>
-             }
-           </div>
-         </div>
+  <div class="col-12 row">
+    <!-- DevExtreme Gallery for Displaying Item Images -->
+    <div class="col-4" *ngIf="!isUserInternal">
+      <div>
+        <div>
+          <dx-gallery
+            [dataSource]="galleryImages"
+            [loop]="true"
+            [slideshowDelay]="2000"
+            [animationDuration]="1000"
+            [showIndicator]="true"
+           >
+<!--            <div *dxTemplate="let image of 'imageTemplate'">-->
+<!--              <img class="img-thumbnail rounded" [src]="image.imageCode | imageUrl:'item'" alt="{{ image.imageName }}" style="width: 100%; height: 100%;" />-->
 
-       </div>
-       <div>
+<!--            </div>-->
+          </dx-gallery>
+        </div>
+      </div>
+    </div>
+
+   <div [ngClass]="{'col-6': !isUserInternal, 'col-12': isUserInternal}">
          <form (ngSubmit)="onSave($event)" enctype="multipart/form-data">
            <dx-form [(formData)]="itemSummary" [colCount]="1">
 
              <!-- Item Name -->
-             <dxi-item dataField="itemName" [label]="{ text: 'Item Name' }">
+             <dxi-item [disabled]="isCustomer" dataField="itemName" [label]="{ text: 'Item Name' }">
                <dxi-validation-rule type="required" message="Item Name is required"></dxi-validation-rule>
              </dxi-item>
 
              <!-- Item Price -->
-             <dxi-item dataField="price" [label]="{ text: 'Item Price' }">
+             <dxi-item [disabled]="isCustomer" dataField="price" [label]="{ text: 'Item Price' }">
                <dxi-validation-rule type="required" message="Item Price is required"></dxi-validation-rule>
+               <!-- Numeric Validation (validates that the input is a number) -->
+               <dxi-validation-rule type="numeric" message="Item Price must be a number"></dxi-validation-rule>
+
+               <!-- Optional Range Validation (e.g., ensuring the price is positive) -->
+               <dxi-validation-rule type="range" [min]="1" [max]="3000" message="Item Price must be greater than or equal to 1 and less then 3000"></dxi-validation-rule>
              </dxi-item>
 
              <!-- Category -->
-             <dxi-item dataField="parentCategoryId" editorType="dxSelectBox" [editorOptions]="{ dataSource: categories, displayExpr: 'categoryName', onValueChanged: onParentCategoryChanged, valueExpr: 'categoryId' }" [label]="{ text: 'Category' }">
+             <dxi-item [disabled]="isCustomer" dataField="parentCategoryId" editorType="dxSelectBox" [editorOptions]="{ dataSource: categories, displayExpr: 'categoryName', onValueChanged: onParentCategoryChanged, valueExpr: 'categoryId' }" [label]="{ text: 'Category' }">
                <dxi-validation-rule type="required" message="Category is required"></dxi-validation-rule>
              </dxi-item>
 
              <!-- Subcategory -->
-             <dxi-item dataField="subCategoryId" editorType="dxSelectBox" [editorOptions]="{ dataSource: subCategories, displayExpr: 'categoryName', valueExpr: 'categoryId' }" [label]="{ text: 'Subcategory' }">
+             <dxi-item [disabled]="isCustomer" dataField="subCategoryId" editorType="dxSelectBox" [editorOptions]="{ dataSource: subCategories, displayExpr: 'categoryName', valueExpr: 'categoryId' }" [label]="{ text: 'Subcategory' }">
                <dxi-validation-rule type="required" message="Subcategory is required"></dxi-validation-rule>
              </dxi-item>
 
-             <!-- Hidden Fields -->
-<!--             <dxi-item dataField="itemId" editorType="dxTextBox" [editorOptions]="{ visible: false }"></dxi-item>-->
-<!--             <dxi-item dataField="ownItem" editorType="dxTextBox" [editorOptions]="{ visible: false }"></dxi-item>-->
-
              <!-- Item Description -->
-             <dxi-item dataField="description" editorType="dxTextArea" [editorOptions]="{height: 300, width: 700}" [label]="{ text: 'Item Description' }">
+             <dxi-item [disabled]="isCustomer" dataField="description" editorType="dxTextArea" [editorOptions]="{height: 300, width: 700}" [label]="{ text: 'Item Description' }">
                <dxi-validation-rule type="required" message="Item Description is required"></dxi-validation-rule>
              </dxi-item>
 
            </dx-form>
 
            <!-- Image Upload for Internal Users -->
-           <div *ngIf="isUserInternal">
-             <label for="itemImages" class="form-label">Choose multiple or single Item Image: </label>
-             <input type="file" accept="image/*" id="itemImages" (change)="onImageUpload($event)" multiple>
-             <div class="invalid-feedback">Image is required</div>
-             <div class="valid-feedback">Looks good!</div>
-           </div>
+<!--           <div *ngIf="isUserInternal" class="mb-3">-->
+<!--             <label for="itemImages" class="form-label">Choose multiple or single Item Image: </label>-->
+<!--             <input type="file" accept="image/*" id="itemImages" (change)="onImageUpload($event)" multiple>-->
+<!--             <div class="invalid-feedback">Image is required</div>-->
+<!--             <div class="valid-feedback">Looks good!</div>-->
+<!--           </div>-->
+
+           <div *ngIf="isUserInternal" class="mb-3 mt-3">
+             <label class="dx-field-label" >Upload Images:</label>
+             <dx-file-uploader
+               *ngIf="isUserInternal"
+               id="itemImages"
+               label="Choose multiple or single Item Image:"
+               [(value)]="selectedFiles"
+               [multiple]="true"
+               [showFileList]="false"
+               accept="image/*"
+               (onValueChanged)="onImageUpload($event)"
+             >
+             </dx-file-uploader>
+
+             <!-- Optional feedback messages -->
+             <div *ngIf="isImageRequired" class="invalid-feedback">Image is required</div>
+             <div *ngIf="isImageValid" class="valid-feedback">Looks good!</div>
+
+
+             <!-- Image Previews with Main Image Selection (same size for all images) -->
+             <div class="ml-3 d-flex gap-3">
+               <div *ngFor="let imgPreview of imagePreviews; let i = index">
+                 <!-- Set a fixed width and height using Bootstrap classes -->
+                 <img [src]="imgPreview.url" alt="Uploaded Image" class="img-thumbnail img-fluid" style="width: 150px; height: 150px; object-fit: cover;" />
+
+                 <!-- Image Name Display -->
+                 <p class="text-center mt-2">
+                   {{ imgPreview.name }}
+                   <i (click)="removePreviewImage(i)" class="fa-solid fa-xmark cursor-pointer text-danger"></i>
+                 </p>
+               </div>
+             </div>
 
 
 
            <!-- Existing Images Display -->
-<!--           <div *ngIf="itemImages?.length > 0">-->
-<!--             <label class="form-label">Existing product Images: </label>-->
-<!--             <div class="d-flex flex-wrap">-->
-<!--               <div *ngFor="let img of itemImages">-->
-<!--                 <img class="img-thumbnail m-2 rounded pest-img" [src]="imgUrl(img.imageCode)" />-->
-<!--                 <p class="text-center">{{ img.imageName }}</p>-->
-<!--               </div>-->
-<!--             </div>-->
-<!--           </div>-->
+           @if (itemImages && itemImages.length > 0) {
+             <div class="mb-3 mt-3">
+               <label class="dx-field-label">Existing product Images: </label>
+             <div class="d-flex flex-wrap ml-4 mt-4">
+             <div *ngFor="let img of itemImages">
+               <img class="img-thumbnail m-2 rounded pest-img" [src]="img.imageCode | imageUrl" />
+               <p class="text-center">
+                 {{ img.imageName }}
+                 <i (click)="removeImage(img.imageCode, img.imageName)" class="fa-solid fa-xmark cursor-pointer text-danger"></i>
+               </p>
+             </div>
+             </div>
+             </div>
+           }
+
+             <!-- DevExtreme SelectBox for Main Image Selection -->
+             <div class="mt-3 mb-3">
+               <dx-select-box
+                 [dataSource]="allImages"
+                 displayExpr="name"
+                 valueExpr="name"
+                 [(value)]="selectedMainImage"
+                 placeholder="Select Main Image"
+                 [width]="300">
+                 <dx-validator #mainImageValidator>
+                   <dxi-validation-rule type="required" message="Main image selection is required"></dxi-validation-rule>
+                 </dx-validator>
+               </dx-select-box>
+             </div>
 
            <!-- Submit Button for Internal Users -->
            <div *ngIf="isUserInternal">
-             <button type="submit" class="btn btn-info">Save</button>
+             <dx-button type="success" (onClick)="onSave($event)" text="Save" ></dx-button>
            </div>
-         </form>
        </div>
+         </form>
   </div>
 
 </div>

@@ -27,6 +27,7 @@ export class AuthService {
           loggedInUser.lastName = response?.lastName;
           loggedInUser.firstName = response?.firstName;
           loggedInUser.roleName = response?.roleName;
+          loggedInUser.isActive = response?.isActive;
           this._userService.loggedInUser = loggedInUser;
           localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
         }
@@ -37,6 +38,11 @@ export class AuthService {
         return of(false); // Return false in case of error
       })
     );
+  }
+
+  isUserActive() {
+    const loggedInUser = this.getLoggedInUser();
+    return loggedInUser && loggedInUser.isActive;
   }
 
   getLoggedInUser() {

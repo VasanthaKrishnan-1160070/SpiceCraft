@@ -25,6 +25,10 @@ namespace SpiceCraft.Server.Repository.Interface
         public ProductDetailDTO GetProductDetail(int? productId);
 
         public bool AddOrRemoveProductFromListing(int ItemId, bool isRemove = false);
+
+        Task<int?> SaveImageDetails(ItemImagesDTO imageDetails);
+
+        void DeleteItemImage(int itemId, string imageCode);
     }
 
 

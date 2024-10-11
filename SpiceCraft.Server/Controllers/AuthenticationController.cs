@@ -36,7 +36,7 @@ namespace SpiceCraft.Server.Controllers
             if (user != null && PasswordHelper.VerifyPassword(model.Password, user?.UsersCredential?.Password))
             {
                 var token = _jwtService.GenerateToken(user, user.UsersCredential, user.Role.RoleName);
-                var resp = new {token, user.Role.RoleName, user.FirstName, user.UserId, user.LastName, user.Email};
+                var resp = new {token, user.Role.RoleName, user.FirstName, user.UserId, user.LastName, user.Email, user.IsActive};
                 return Ok(resp);
             }
 

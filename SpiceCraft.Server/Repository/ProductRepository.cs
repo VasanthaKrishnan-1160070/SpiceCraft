@@ -146,23 +146,38 @@ namespace SpiceCraft.Server.Repository
 
         public ProductSummaryDTO CreateUpdateProduct(ProductSummaryDTO product)
         {
-            Item item = new Item()
-            {
-                CategoryId = product.SubCategoryId,
-                Description = product.Description,
-                Discount = product.DiscountRate,
-                ItemName = product.ItemName,
-                Price = product.Price,
-                OwnProduct = product.OwnProduct
-            };
+            // Check if the product already exists by ItemId
+            Item item = _context.Items.FirstOrDefault(i => i.ItemId == product.ItemId);
 
-            if (product?.ItemId != null && product?.ItemId != 0)
+            if (item == null)  // If the item doesn't exist, create a new one
             {
-                _context.Update(item);
+                item = new Item()
+                {
+                    CategoryId = product.SubCategoryId,
+                    Description = product.Description,
+                    Discount = product.DiscountRate,
+                    ItemName = product.ItemName,
+                    Price = product.Price,
+                    OwnProduct = product.OwnProduct
+                };
+
+                _context.Items.Add(item);  // Add new item
             }
-            _context.Items.Add(item);
+            else  // If the item exists, update its fields
+            {
+                item.CategoryId = product.SubCategoryId;
+                item.Description = product.Description;
+                item.Discount = product.DiscountRate;
+                item.ItemName = product.ItemName;
+                item.Price = product.Price;
+                item.OwnProduct = product.OwnProduct;
 
-            _context.SaveChanges();
+                _context.Items.Update(item);  // Update the existing item
+            }
+
+            _context.SaveChanges();  // Save changes to the database
+
+            product.ItemId = item.ItemId;  // Return the updated product ID
             return product;
         }
 
@@ -183,8 +198,25 @@ namespace SpiceCraft.Server.Repository
             }
             _context.ItemImages.AddRange(itemImages);
             int status = _context.SaveChanges();
+            
+            // now make sure there is only one main image for each product
+            var mainImageItem = productImages?.FirstOrDefault(f => f.IsMain);
+            if (mainImageItem != null)
+            {
+                UpdateMainImage(mainImageItem.ItemId, mainImageItem.ImageCode);   
+            }
 
             return status > 0;
+        }
+
+        public void DeleteItemImage(int itemId, string imageCode)
+        {
+            var itemImage = _context.ItemImages.FirstOrDefault(img => img.ItemId == itemId && img.ImageCode == imageCode);
+            if (itemImage != null)
+            {
+                _context.ItemImages.Remove(itemImage);
+                _context.SaveChanges();
+            }
         }
 
         public IEnumerable<CategoryDTO> GetSubCategories(int? parentCategoryId)
@@ -213,11 +245,11 @@ namespace SpiceCraft.Server.Repository
             return maxIndex + 1;
         }
 
-        public void UpdateMainImage(int ItemId, string imageCode)
+        public void UpdateMainImage(int ItemId, string imageCodeOrName)
         {
             // First, set `IsMain = false` for all images except the given main image
             var imagesToUpdate = _context.ItemImages
-                .Where(pi => pi.ItemId == ItemId && pi.ImageCode != imageCode)
+                .Where(pi => pi.ItemId == ItemId && (pi.ImageCode != imageCodeOrName || pi.ImageName == imageCodeOrName))
                 .ToList();
 
             foreach (var image in imagesToUpdate)
@@ -230,7 +262,7 @@ namespace SpiceCraft.Server.Repository
 
             // Then, set `IsMain = true` for the given main image
             var mainImage = _context.ItemImages
-                .FirstOrDefault(pi => pi.ItemId == ItemId && pi.ImageCode == imageCode);
+                .FirstOrDefault(pi => pi.ItemId == ItemId && (pi.ImageCode == imageCodeOrName || pi.ImageName == imageCodeOrName));
 
             if (mainImage != null)
             {
@@ -350,6 +382,26 @@ namespace SpiceCraft.Server.Repository
             }
 
             return false; // Return false if the product was not found
+        }
+
+        public async Task<int?> SaveImageDetails(ItemImagesDTO imageDetails)
+        {
+            List<ItemImage> itemImages = new List<ItemImage>();
+            foreach (var imageName in imageDetails.ImageNames)
+            {
+                int nextImageIndex = GetProductImageNextIndex(imageDetails.ItemId);
+                var itemImage = new ItemImage()
+                {
+                    ImageName = $"{nextImageIndex}-{imageDetails.ItemId}-{imageName}",
+                    ItemId = imageDetails.ItemId,
+                    IsMain = imageName == imageDetails.MainImageName,
+                };
+                itemImages.Add(itemImage);
+            }
+
+            _context.ItemImages.AddRange(itemImages);
+
+            return await  _context.SaveChangesAsync();
         }
 
     }

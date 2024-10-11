@@ -1,0 +1,12 @@
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.gallery {
+  flex-basis: 200px;
+}
+
+.dx-gallery-nav-button-next:hover {
+  background-color: transparent !important; /* Make background transparent */
+}

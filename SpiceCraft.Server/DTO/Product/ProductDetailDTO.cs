@@ -9,4 +9,6 @@ public class ProductDetailDTO
     public IEnumerable<CategoryDTO> Categories { get; set; }
     public IEnumerable<CategoryDTO> SubCategories { get; set; }
     public IEnumerable<ItemImageDTO> ProductImages { get; set; }
+    
+    public string? MainImageName { get; set; }
 }

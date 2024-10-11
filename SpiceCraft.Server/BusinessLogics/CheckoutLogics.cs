@@ -294,6 +294,15 @@ namespace SpiceCraft.Server.BusinessLogics
             {
                 await _orderBusinessLogic.ChangeOrderStatusAsync(userOrder.Data.OrderId, "Ready To Ship");
                 orderItemsResult.Message = "Order placed successfully";
+                
+                // Get order details for email notification
+                var orderDetails = await _orderBusinessLogic.GetUserOrderDetailsAsync(userOrder.Data.OrderId);
+                if (orderDetails != null)
+                {
+                    var emailService = new EmailHelper();
+                    // Send email notification to the customer
+                    Task.Run(() => emailService.SendNewOrderConfirmationEmailAsync("", "", orderDetails.Data));
+                }
             }
             else
             {

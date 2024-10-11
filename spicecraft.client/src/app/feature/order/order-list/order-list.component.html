@@ -2,7 +2,7 @@
   <sc-title [title]="'Order List'"></sc-title>
 </div>
 
-<div class="container mt-3">
+<div class="ms-5 me-5">
 <!-- DevExtreme DataGrid for displaying the shopping cart items -->
 <dx-data-grid
   [dataSource]="orderItems"
@@ -51,6 +51,7 @@
   <dxi-column dataField="paymentStatus" caption="Payment Status"></dxi-column>
   <dxi-column dataField="orderStatus" caption="Order Status"></dxi-column>
   <dxi-column dataField="shippingInfo" caption="Shipping Info"></dxi-column>
+  <dxi-column *ngIf="isInternaluser" dataField="customerName" caption="Customer Name"></dxi-column>
   <dxi-column dataField="totalCost" caption="Total Cost" [cellTemplate]="'priceTemplate'"></dxi-column>
 
   <div *dxTemplate="let data of 'priceTemplate'">

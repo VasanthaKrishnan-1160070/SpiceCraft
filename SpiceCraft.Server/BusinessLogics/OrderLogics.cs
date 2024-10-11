@@ -29,6 +29,15 @@ namespace SpiceCraft.Server.BusinessLogics
                 return HelperFactory.Msg.Error<bool>("Failed to update the order status.");
             }
 
+            var orderDetails = await _orderRepo.GetOrderDetailsAsync(orderId);  // Update the order details in the database
+
+            if (orderDetails != null)
+            {
+                var emailService = new EmailHelper();
+                // Send email notification to the customer
+                Task.Run(() => emailService.SendNewOrderConfirmationEmailAsync("", "", orderDetails));
+            }
+            
             return HelperFactory.Msg.Success(true);
         }
 
@@ -80,6 +89,17 @@ namespace SpiceCraft.Server.BusinessLogics
             if (orders == null || !orders.Any())
             {
                 return HelperFactory.Msg.Error<List<UserOrderDTO>>("No orders found for the user.");
+            }
+
+            return HelperFactory.Msg.Success(orders);
+        }
+        
+        public async Task<ResultDetail<List<UserOrderDTO>>> GetOrdersAsync()
+        {
+            var orders = await _orderRepo.GetAllOrdersAsync();
+            if (orders == null || !orders.Any())
+            {
+                return HelperFactory.Msg.Error<List<UserOrderDTO>>("No orders found.");
             }
 
             return HelperFactory.Msg.Success(orders);
@@ -149,6 +169,67 @@ namespace SpiceCraft.Server.BusinessLogics
         {
             var status = await _orderRepo.InsertOrderItemsFromShoppingCartAsync(userId, orderId);
             return status > 0 ? HelperFactory.Msg.Success(true) : HelperFactory.Msg.Error<bool>("Failed to insert order items from shopping cart.");
+        }
+        
+        // Business Logic to update order
+        public async Task<ResultDetail<bool>> UpdateOrderAsync(int orderId, UserOrderDetailDTO updatedOrderDetails)
+        {
+            // Validate input
+            if (updatedOrderDetails == null || orderId <= 0)
+            {
+                return new ResultDetail<bool>
+                {
+                    IsSuccess = false,
+                    Message = "Invalid order details provided."
+                };
+            }
+
+            // Check if order exists before updating
+            var existingOrder = await _orderRepo.GetOrderDetailsAsync(orderId);
+            if (existingOrder == null)
+            {
+                return new ResultDetail<bool>
+                {
+                    IsSuccess = false,
+                    Message = "Order not found."
+                };
+            }
+
+            // Perform any necessary business logic before updating
+            if (updatedOrderDetails.TotalCost <= 0)
+            {
+                return new ResultDetail<bool>
+                {
+                    IsSuccess = false,
+                    Message = "Total cost must be greater than zero."
+                };
+            }
+
+            // Call repository to update the order
+            var updateSuccess = await _orderRepo.UpdateOrderAsync(orderId, updatedOrderDetails);
+
+            if (!updateSuccess)
+            {
+                return new ResultDetail<bool>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to update the order."
+                };
+            }
+            
+            if (updatedOrderDetails != null)
+            {
+                var emailService = new EmailHelper();
+                // Send email notification to the customer
+                Task.Run(() => emailService.SendOrderStatusChangeEmailAsync("", "",
+                    updatedOrderDetails.OrderId.ToString(), updatedOrderDetails.OrderStatus));
+            }
+
+            return new ResultDetail<bool>
+            {
+                IsSuccess = true,
+                Message = "Order updated successfully."
+            };
         }
     }
 }

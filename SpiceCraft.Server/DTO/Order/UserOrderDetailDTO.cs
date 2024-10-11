@@ -11,6 +11,12 @@ public class UserOrderDetailDTO
     public ContactInfoDTO ContactInfo { get; set; }
     public string OrderStatus { get; set; }
     public decimal TotalCost { get; set; }
+    
+    public decimal ShippingCost { get; set; }
+    
+    public decimal Discount { get; set; }
+    
+    public decimal GST { get; set; }
     public IEnumerable<OrderDetailDTO> OrderItems { get; set; }
     
     public int ShippingOptionId { get; set; }

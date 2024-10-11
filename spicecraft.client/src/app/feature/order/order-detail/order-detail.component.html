@@ -1,6 +1,23 @@
+<sc-title [title]="'Order Detail'"></sc-title>
 
-<div class="p-4">
-  <sc-title [title]="'Order Detail'"></sc-title>
+<div class="p-4 d-flex justify-content-end align-items-center gap-3">
+
+  <!-- Save Button -->
+  <dx-button
+    text="Save Order"
+    type="success"
+    [visible]="isInternalUser"
+    (onClick)="saveOrder()"
+    class="ml-auto">
+  </dx-button>
+
+  <dx-button
+    text="Back"
+    type="danger"
+    [visible]="isInternalUser"
+    (onClick)="goBack()"
+    class="ml-auto">
+  </dx-button>
 </div>
 
 <div class="container p-5">
@@ -8,44 +25,109 @@
   <dx-form
     [formData]="orderDetails"
     [colCount]="2"
+    [readOnly]="!isInternalUser"
     labelLocation="top"
   >
     <!-- Order Info -->
     <dxi-item itemType="group" caption="Order Info">
-      <dxi-item dataField="orderStatus" [editorOptions]="{ disabled: true }" label="Order Status"></dxi-item>
-      <dxi-item dataField="totalCost" [editorOptions]="{ disabled: true }" label="Total Cost"></dxi-item>
+      <!-- Order Status SelectBox with Validation -->
+      <dxi-item
+        dataField="orderStatus"
+        [label]="{ text: 'Order Status' }"
+        editorType="dxSelectBox"
+        [editorOptions]="{
+          dataSource: orderStatusOptions,
+          displayExpr: 'name',
+          valueExpr: 'name'
+        }">
+          <dxi-validation-rule type="required" message="Order status is required"></dxi-validation-rule>
+      </dxi-item>
+
+      <!-- Total Cost with Validation -->
+      <dxi-item dataField="totalCost" label="Total Cost">
+          <dxi-validation-rule type="required" message="Total cost is required"></dxi-validation-rule>
+          <dxi-validation-rule type="numeric" message="Total cost must be a number"></dxi-validation-rule>
+      </dxi-item>
+      <!-- Total Cost with Validation -->
+      <dxi-item dataField="orderDate" label="Order Date" [editorOptions]="{disabled: true}" >
+        <dxi-validation-rule type="required" message="Total cost is required"></dxi-validation-rule>
+        <dxi-validation-rule type="numeric" message="Total cost must be a number"></dxi-validation-rule>
+      </dxi-item>
+
     </dxi-item>
 
     <!-- Contact Info -->
     <dxi-item itemType="group" caption="Contact Info">
-      <dxi-item dataField="contactInfo.name" [editorOptions]="{ disabled: true }" label="Name"></dxi-item>
-      <dxi-item dataField="contactInfo.email" [editorOptions]="{ disabled: true }" label="Email"></dxi-item>
-      <dxi-item dataField="contactInfo.phone" [editorOptions]="{ disabled: true }" label="Phone"></dxi-item>
+      <dxi-item dataField="contactInfo.name" label="Name">
+          <dxi-validation-rule type="required" message="Name is required"></dxi-validation-rule>
+      </dxi-item>
+      <dxi-item dataField="contactInfo.email" label="Email">
+          <dxi-validation-rule type="required" message="Email is required"></dxi-validation-rule>
+          <dxi-validation-rule type="email" message="Email format is invalid"></dxi-validation-rule>
+      </dxi-item>
+      <dxi-item dataField="contactInfo.phone" label="Phone">
+          <dxi-validation-rule type="required" message="Phone is required"></dxi-validation-rule>
+          <dxi-validation-rule type="pattern" [pattern]="'^[0-9]{10}$'" message="Phone must be 10 digits"></dxi-validation-rule>
+      </dxi-item>
     </dxi-item>
 
     <!-- Address -->
     <dxi-item itemType="group" caption="Address" [colSpan]="2">
-      <dxi-item dataField="shippingAddress.streetAddress1" [editorOptions]="{ disabled: true }" label="Street Address 1"></dxi-item>
-      <dxi-item dataField="shippingAddress.streetAddress2" [editorOptions]="{ disabled: true }" label="Street Address 2"></dxi-item>
-      <dxi-item dataField="shippingAddress.city" [editorOptions]="{ disabled: true }" label="City"></dxi-item>
-      <dxi-item dataField="shippingAddress.stateOrProvince" [editorOptions]="{ disabled: true }" label="State"></dxi-item>
-      <dxi-item dataField="shippingAddress.postalCode" [editorOptions]="{ disabled: true }" label="Postal Code"></dxi-item>
+      <dxi-item dataField="shippingAddress.streetAddress1" label="Street Address 1">
+          <dxi-validation-rule type="required" message="Street Address 1 is required"></dxi-validation-rule>
+      </dxi-item>
+      <dxi-item dataField="shippingAddress.streetAddress2" label="Street Address 2"></dxi-item>
+      <dxi-item dataField="shippingAddress.city" label="City">
+          <dxi-validation-rule type="required" message="City is required"></dxi-validation-rule>
+      </dxi-item>
+      <dxi-item dataField="shippingAddress.stateOrProvince" label="State">
+          <dxi-validation-rule type="required" message="State is required"></dxi-validation-rule>
+      </dxi-item>
+      <dxi-item dataField="shippingAddress.postalCode" label="Postal Code">
+          <dxi-validation-rule type="required" message="Postal Code is required"></dxi-validation-rule>
+          <dxi-validation-rule type="pattern" [pattern]="'^[0-9]{4}$'" message="Postal Code must be 4 digits"></dxi-validation-rule>
+      </dxi-item>
     </dxi-item>
   </dx-form>
 
-  <!-- Grid for Ordered Items -->
+  <!-- Grid for Ordered Items with Add/Delete and Quantity Editing -->
   <div class="mt-5">
     <h4>Ordered Items</h4>
 
+    <!-- Add Item Button -->
+<!--    <dx-button-->
+<!--      text="Add Item"-->
+<!--      type="default"-->
+<!--      icon="plus"-->
+<!--      (onClick)="addItem()"-->
+<!--      class="mb-3">-->
+<!--    </dx-button>-->
+
+    <!-- DataGrid for Order Items -->
     <dx-data-grid
       [dataSource]="orderDetails.orderItems"
-      [columns]="[
-        { dataField: 'itemName', caption: 'Item Name' },
-        { dataField: 'quantity', caption: 'Quantity' },
-        { dataField: 'price', caption: 'Price' }
-      ]"
       [showBorders]="true"
-    >
+      >
+<!--      [editing]="{-->
+<!--        mode: 'cell',-->
+<!--        allowUpdating: true,-->
+<!--        allowDeleting: true-->
+<!--      }"-->
+<!--    >-->
+      <dxi-column dataField="itemName" caption="Item Name"></dxi-column>
+      <dxi-column dataField="quantity" caption="Quantity">
+        <dxi-validation-rule type="required" message="Quantity is required"></dxi-validation-rule>
+        <dxi-validation-rule type="numeric" message="Quantity must be a number"></dxi-validation-rule>
+      </dxi-column>
+      <dxi-column dataField="price" caption="Price">
+        <dxi-validation-rule type="required" message="Price is required"></dxi-validation-rule>
+        <dxi-validation-rule type="numeric" message="Price must be a number"></dxi-validation-rule>
+      </dxi-column>
+
+      <!-- Delete Button Column -->
+<!--      <dxi-column type="buttons">-->
+<!--        <dxi-button name="delete"></dxi-button>-->
+<!--      </dxi-column>-->
     </dx-data-grid>
   </div>
 </div>

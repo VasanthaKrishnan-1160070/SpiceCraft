@@ -15,5 +15,9 @@ namespace SpiceCraft.Server.BusinessLogics.Interface
         Task<ResultDetail<IEnumerable<UserDTO>>> GetUserByRoleAsync(int roleId);
         Task<ResultDetail<bool>> CreateUserAsync(CreateUserRequest userRequest);
         Task<ResultDetail<bool>> CreateUpdateUserAsync(CreateUserRequest userRequest);
+        
+        Task<ResultDetail<bool>> ChangePasswordAsync(ChangePasswordRequest request);
+        
+        Task<ResultDetail<bool>> ToggleUserActiveAsync(int userId);
     }
 }
