@@ -38,7 +38,8 @@
       <div style="width:17%;"  class="navigation-content bg-plant-green">
         <sc-side-navigation [userType]="userType" [firstName]="firstName" ></sc-side-navigation>
       </div>
-      <div class="w-100">
+      <div  class="w-100">
+        <div id="content-container" class="mt-2"></div>
         <router-outlet></router-outlet>
       </div>
     </div>
@@ -49,6 +50,7 @@
         <sc-side-navigation [userType]="userType" [firstName]="firstName"></sc-side-navigation>
       </div>
       <div class="w-100">
+        <div id="content-container" class="mt-2"></div>
         <router-outlet></router-outlet>
       </div>
     </div>

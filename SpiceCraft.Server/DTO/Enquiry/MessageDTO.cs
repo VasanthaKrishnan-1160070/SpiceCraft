@@ -13,5 +13,7 @@
         public DateTime? MessageDate { get; set; }
         public string Receiver { get; set; }
         public string Sender { get; set; }
+        
+        public int EnquiryTypeId { get; set; }
     }
 }

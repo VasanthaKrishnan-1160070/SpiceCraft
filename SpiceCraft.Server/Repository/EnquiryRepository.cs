@@ -101,7 +101,9 @@ namespace SpiceCraft.Server.Repository
                                      ReceiverUserId = m.ReceiverUserId,
                                      MessageDate = m.CreatedAt,
                                      Receiver = r.FirstName + " " + r.LastName,
-                                     Sender = s.FirstName + " " + s.LastName
+                                     Sender = s.FirstName + " " + s.LastName,
+                                     EnquiryTypeId = et.EnquiryTypeId,
+                                     Subject = m.Subject?? et.EnquiryName
                                  }).FirstOrDefault();
 
             return latestMessage;
@@ -125,7 +127,9 @@ namespace SpiceCraft.Server.Repository
                                        ReceiverUserId = m.ReceiverUserId,
                                        MessageDate = m.CreatedAt,
                                        Receiver = r.FirstName + " " + r.LastName,
-                                       Sender = s.FirstName + " " + s.LastName
+                                       Sender = s.FirstName + " " + s.LastName,
+                                       EnquiryTypeId = et.EnquiryTypeId,
+                                       Subject = m.Subject?? et.EnquiryName
                                    }).ToList();
 
             var latestMessage = GetLatestMessageByEnquiryId(enquiryId);

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {AsyncPipe, DatePipe, NgForOf, NgIf} from "@angular/common";
+import {Component, inject, OnInit} from '@angular/core';
+import {AsyncPipe, DatePipe, Location, NgForOf, NgIf} from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { EnquiryService } from "../../../core/service/enquiry.service";
@@ -7,8 +7,11 @@ import { ResultDetailModel } from "../../../core/model/result-detail.model";
 import {MessageModel} from "../../../core/model/enquiry/message-model";
 import {EnquiryModel} from "../../../core/model/enquiry/enquiry-model";
 import {EnquiryTypeModel} from "../../../core/model/enquiry/enquiry-types";
-import {mergeMap, Observable} from "rxjs";
-import {map} from "rxjs/operators";
+import {mergeMap, Observable, Subject} from "rxjs";
+import {map, take, takeUntil} from "rxjs/operators";
+import {DxAccordionModule, DxButtonModule, DxFormModule, DxSelectBoxModule, DxTextAreaModule} from "devextreme-angular";
+import {EnquiryMessagesModel} from "../../../core/model/enquiry/enquiry-messages-model";
+import {NotifyService} from "../../../core/service/notify.service";
 
 @Component({
   selector: 'sc-enquiry-detail',
@@ -18,7 +21,12 @@ import {map} from "rxjs/operators";
     FormsModule,
     NgIf,
     AsyncPipe,
-    DatePipe
+    DatePipe,
+    DxFormModule,
+    DxSelectBoxModule,
+    DxAccordionModule,
+    DxTextAreaModule,
+    DxButtonModule
   ],
   templateUrl: './enquiry-detail.component.html',
   styleUrls: ['./enquiry-detail.component.css']
@@ -28,10 +36,13 @@ export class EnquiryDetailComponent implements OnInit {
   enquiry: EnquiryModel[] = [];  // This will store enquiries for the user
   replyInfo: MessageModel | null | undefined = null;  // This will store the details of the latest message
   currentUserId: number = 1;
-  enquiryTypes$!: Observable<EnquiryTypeModel[]>;
+  enquiryTypes!: EnquiryTypeModel[];
+  _locationService = inject(Location);
+  _notifyService = inject(NotifyService);
 
   replyMessageContent: string = '';  // The content for the reply message
-  enquiryId: number | null = null;  // Store the enquiry ID
+  enquiryId!: number;  // Store the enquiry ID
+  destroy$ = new Subject<void>();
 
   constructor(
     private enquiryService: EnquiryService,
@@ -52,17 +63,21 @@ export class EnquiryDetailComponent implements OnInit {
   }
 
   public getEnquiryTypes(){
-    this.enquiryTypes$ = this.enquiryService.getEnquiryTypes().pipe(
-      map(result =>  result.data as EnquiryTypeModel[] )
-    );
+     this.enquiryService.getEnquiryTypes().pipe(
+      map(result =>  result.data as EnquiryTypeModel[] ),
+      take(1),
+      takeUntil(this.destroy$)
+    ).subscribe(s => {
+      this.enquiryTypes = s;
+    });
   }
 
   // Fetch all messages for the enquiry
   getMessagesByEnquiryId(enquiryId: number) {
     this.enquiryService.getMessagesByEnquiryId(enquiryId).subscribe(
-      (response: ResultDetailModel<MessageModel[]>) => {
+      (response: ResultDetailModel<EnquiryMessagesModel>) => {
         if (response.isSuccess) {
-          this.messages = response.data as MessageModel[];  // Messages from API response
+          this.messages = (response.data as EnquiryMessagesModel)?.enquiryMessages;  // Messages from API response
         } else {
           console.error(response.message);
         }
@@ -71,6 +86,10 @@ export class EnquiryDetailComponent implements OnInit {
         console.error('Error fetching enquiry messages', error);
       }
     );
+  }
+
+  goBack() {
+    this._locationService.back();
   }
 
   // Fetch the latest message for the enquiry
@@ -91,8 +110,9 @@ export class EnquiryDetailComponent implements OnInit {
 
   // Submit the reply message
   submitReply() {
-    if (!this.replyInfo || !this.enquiryId) {
+    if (!this.replyInfo || !this.enquiryId || !this.replyMessageContent) {
       console.error('Cannot submit reply, no reply information or enquiry ID.');
+      this._notifyService.showError("Please enter message to send");
       return;
     }
 
@@ -102,7 +122,9 @@ export class EnquiryDetailComponent implements OnInit {
       messageContent: this.replyMessageContent,
       senderUserId: this.currentUserId,
       receiverUserId: this.replyInfo.senderUserId !== this.currentUserId ? this.replyInfo.senderUserId : this.replyInfo.receiverUserId,
-      messageDate: new Date()  // Add the current date for the message
+      messageDate: new Date(),  // Add the current date for the message,
+      enquiryTypeId: this.replyInfo.enquiryTypeId,
+      subject: this.replyInfo.subject,
     };
 
     // Post the reply via the service
@@ -110,7 +132,7 @@ export class EnquiryDetailComponent implements OnInit {
       (response: ResultDetailModel<boolean>) => {
         if (response.isSuccess) {
           // Handle successful reply submission, navigate back to enquiry list
-          this.router.navigate(['/enquiry']);
+          this.router.navigate(['/enquiry-list']);
         } else {
           console.error(response.message);
         }

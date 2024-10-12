@@ -1,61 +1,107 @@
 <div class="row offset-2 col-8 mt-4 bg-light p-4 rounded-2 border border-3 border-steel-blue">
   <div class="h-100">
-    <!-- Enquiry Type Dropdown (Disabled) -->
+    <div class="enquiry-container mt-4 p-4 border rounded-2">
+      <dx-form>
+        <dxi-item itemType="group">
+          <dxi-item [dataField]="'enquiryType'">
+            <dx-select-box
+              [dataSource]="enquiryTypes"
+              [valueExpr]="'enquiryTypeId'"
+              [displayExpr]="'enquiryName'"
+              [value]="replyInfo?.enquiryTypeId"
+            ></dx-select-box>
+          </dxi-item>
+        </dxi-item>
+      </dx-form>
 
-    <ng-container *ngIf="(enquiryTypes$ | async) as enquiryTypes">
-      <div class="form-group mb-3">
-        <label for="enquiryType">Enquiry Type</label>
-        <select id="enquiryType" class="form-control" disabled>
-          <option *ngFor="let item of enquiryTypes" [value]="item?.enquiryTypeId">
-            {{ item?.enquiryTypeName }}
-          </option>
-        </select>
-      </div>
-    </ng-container>
-    <!-- Messages Accordion -->
-    <div class="accordion" id="messagesAccordion">
-      <div class="accordion-item" *ngFor="let message of messages">
-        <h2 class="accordion-header" id="{{ message.messageId }}-parent">
-          <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                  [attr.data-bs-target]="'#collapse-' + message.messageId" aria-expanded="true"
-                  [attr.aria-controls]="'collapse-' + message.messageId">
-            <span class="d-flex justify-content-between w-100">
-              <span>
-                {{ message.senderUserId === currentUserId ? 'You' : message.sender }}:
-                {{ message.receiver }}
-              </span>
-              <span class="me-3">{{ message.messageDate | date: 'medium' }}</span>
-            </span>
-          </button>
-        </h2>
-        <div id="collapse-{{ message.messageId }}" class="accordion-collapse collapse show" >
-          <div class="accordion-body">
-            {{ message.messageContent }}
-          </div>
+      <div class="mt-3">
+
+      <dx-accordion
+        itemTemplate="item"
+        [collapsible]="true"
+        [multiple]="true"
+        itemTitleTemplate="title"
+        [dataSource]="messages" >
+
+        <div class="dx-theme-accent-as-background-color dx-theme-background-color-as-text-color" *dxTemplate="let data of 'title'">
+          @if(data.sender) {
+            <div>
+              {{'Sender: ' + (data.senderUserId !== currentUserId ? data.sender : 'You') + ' - ' + (data.messageDate | date:'short')}}
+            </div>
+
+          } @else if (data.receiver) {
+            <div>
+            {{'Sender: ' + (data.receiverUserId !== currentUserId ? data.receiver : 'You') + ' - ' + (data.messageDate | date:'short')}}
+            </div>
+          }
+        </div>
+        <div *dxTemplate="let data of 'item'">
+          <div>{{ data.messageContent }}</div>
+        </div>
+
+      </dx-accordion>
+
+      <div *ngIf="messages.length > 0" class="mt-3 mb-3">
+        <dx-text-area [(ngModel)]="replyMessageContent" [height]="100" [maxLength]="3000" placeholder="Write your reply here"></dx-text-area>
+        <div class="d-flex justify-content-end mt-2">
+          <dx-button text="Send" type="success" (onClick)="submitReply()"></dx-button>
+          <dx-button text="Cancel" type="danger" class="ms-2" (onClick)="goBack()"></dx-button>
         </div>
       </div>
-    </div>
-
-    <!-- Reply Form -->
-    <div *ngIf="messages && messages.length > 0" class="mt-3 mb-3">
-      <form (ngSubmit)="submitReply()" class="needs-validation" novalidate>
-        <!-- Reply Text Area -->
-        <div class="form-group mb-3">
-          <label for="replyMessage">Reply</label>
-          <textarea id="replyMessage" class="form-control" [(ngModel)]="replyMessageContent" name="messageContent" rows="10" maxlength="3000" required></textarea>
-        </div>
-
-        <!-- Hidden Fields -->
-<!--        <input type="hidden" [(ngModel)]="currentUserId" name="senderUserId" />-->
-<!--        <input type="hidden" [(ngModel)]="replyInfo?.senderUserId !== currentUserId ? replyInfo?.senderUserId : replyInfo.receiverUserId" name="receiverUserId" />-->
-<!--        <input type="hidden" [(ngModel)]="replyInfo?.enquiryId" name="enquiryId" />-->
-
-        <!-- Buttons -->
-        <div class="d-flex justify-content-end">
-          <button type="submit" class="btn btn-info me-3">Send</button>
-          <a class="btn btn-danger" routerLink="/enquiry">Cancel</a>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </div>
+
+<!--<div class="p-3 dx-theme-accent-as-background-color">-->
+<!--  <p class="fw-bold fs-4">dx-theme-accent-as-background-color</p>-->
+<!--</div>-->
+
+<!--<div class="p-3 dx-theme-accent-as-border-color border border-3">-->
+<!--  <p class="fw-bold fs-4">dx-theme-accent-as-border-color-->
+<!--  </p>-->
+<!--</div>-->
+
+<!--<div class="p-3 dx-theme-accent-as-text-color">-->
+<!--  <p class="fw-bold fs-4">dx-theme-accent-as-text-color-->
+<!--  </p>-->
+<!--</div>-->
+
+<!--<div class="p-3 dx-theme-background-color">-->
+<!--  <p class="fw-bold fs-4">dx-theme-background-color-->
+<!--  </p>-->
+<!--</div>-->
+
+<!--<div class="p-3 dx-theme-background-color-as-border-color border border-3">-->
+<!--  <p class="fw-bold fs-4">dx-theme-background-color-as-border-color-->
+<!--  </p>-->
+<!--</div>-->
+
+<!--<div class="p-3 dx-theme-background-color-as-text-color">-->
+<!--  <p class="fw-bold fs-4">dx-theme-background-color-as-text-color</p>-->
+<!--</div>-->
+
+<!--<div class="p-3 dx-theme-border-color border border-3">-->
+<!--  <p class="fw-bold fs-4">dx-theme-border-color</p>-->
+<!--</div>-->
+
+<!--<div class="p-3 dx-theme-border-color-as-background-color">-->
+<!--  <p class="fw-bold fs-4">dx-theme-border-color-as-background-color</p>-->
+<!--</div>-->
+
+<!--<div class="p-3 dx-theme-border-color-as-text-color border border-3">-->
+<!--  <p class="fw-bold fs-4">dx-theme-border-color-as-text-color </p>-->
+<!--</div>-->
+
+<!--<div class="p-3 dx-theme-text-color">-->
+<!--  <p class="fw-bold fs-4">dx-theme-text-color  </p>-->
+<!--</div>-->
+
+<!--<div class="p-3 dx-theme-text-color-as-background-color">-->
+<!--  <p class="fw-bold fs-4">dx-theme-text-color-as-background-color</p>-->
+<!--</div>-->
+
+
+<!--<div class="p-3 dx-theme-text-color-as-border-color border border-3">-->
+<!--  <p class="fw-bold fs-4">dx-theme-text-color-as-border-color </p>-->
+<!--</div>-->

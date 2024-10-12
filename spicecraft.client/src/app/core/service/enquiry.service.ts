@@ -8,6 +8,8 @@ import {EnquiryModel} from "../model/enquiry/enquiry-model";
 import {MessageModel} from "../model/enquiry/message-model";
 import {EnquiryCreationModel} from "../model/enquiry/enquiry-creation.model";
 import {EnquiryTypeModel} from "../model/enquiry/enquiry-types";
+import {EnquiryMessagesModel} from "../model/enquiry/enquiry-messages-model";
+import {InternalEnquiryModel} from "../model/enquiry/internal-enquiry.model";
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +23,8 @@ export class EnquiryService {
   }
 
   // Fetch enquiries for internal users
-  public getEnquiriesForInternalUser(userId: number): Observable<ResultDetailModel<EnquiryModel[]>> {
-    return this._api.get<ResultDetailModel<EnquiryModel[]>>(`/enquiry/internal/${userId}`);
+  public getEnquiriesForInternalUser(userId: number): Observable<ResultDetailModel<InternalEnquiryModel>> {
+    return this._api.get<ResultDetailModel<InternalEnquiryModel>>(`/enquiry/internal/${userId}`);
   }
 
   // Fetch the latest message for a specific enquiry
@@ -31,8 +33,8 @@ export class EnquiryService {
   }
 
   // Fetch all messages for a specific enquiry
-  public getMessagesByEnquiryId(enquiryId: number): Observable<ResultDetailModel<MessageModel[]>> {
-    return this._api.get<ResultDetailModel<MessageModel[]>>(`/enquiry/${enquiryId}/messages`);
+  public getMessagesByEnquiryId(enquiryId: number): Observable<ResultDetailModel<EnquiryMessagesModel>> {
+    return this._api.get<ResultDetailModel<EnquiryMessagesModel>>(`/enquiry/${enquiryId}/messages`);
   }
 
   // Create a new enquiry along with its first message

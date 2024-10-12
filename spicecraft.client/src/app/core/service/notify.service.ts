@@ -14,7 +14,7 @@ export class NotifyService {
         position: {
           my: 'top center',  // Display at the top center
           at: 'top center',
-          of: window,
+          of: '#content-container',
         },
       },
       type,

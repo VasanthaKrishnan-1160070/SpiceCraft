@@ -31,9 +31,9 @@ namespace SpiceCraft.Server.Controllers
             var result = _enquiryLogics.GetEnquiryByForInternalUser(userId);
             if (result.IsSuccess)
             {
-                return Ok(result.Data);
+                return Ok(result);
             }
-            return NotFound(result.Message);
+            return NotFound(result);
         }
 
         // GET: api/enquiry/{enquiryId}/latest-message
@@ -43,9 +43,9 @@ namespace SpiceCraft.Server.Controllers
             var result = _enquiryLogics.GetLatestMessageByEnquiryId(enquiryId);
             if (result.IsSuccess)
             {
-                return Ok(result.Data);
+                return Ok(result);
             }
-            return NotFound(result.Message);
+            return NotFound(result);
         }
 
         // GET: api/enquiry/{enquiryId}/messages
@@ -55,9 +55,9 @@ namespace SpiceCraft.Server.Controllers
             var result = _enquiryLogics.GetEnquiryMessagesByEnquiryId(enquiryId);
             if (result.IsSuccess)
             {
-                return Ok(result.Data);
+                return Ok(result);
             }
-            return NotFound(result.Message);
+            return NotFound(result);
         }
 
         // Get: api/enquiry/enquiry-types
@@ -83,7 +83,7 @@ namespace SpiceCraft.Server.Controllers
             {
                 return Ok(result.Data);  // Return the newly created enquiryId
             }
-            return BadRequest(result.Message);
+            return BadRequest(result);
         }
 
         // POST: api/enquiry/message
@@ -100,9 +100,9 @@ namespace SpiceCraft.Server.Controllers
 
             if (result.IsSuccess)
             {
-                return Ok(result.Message);  // Success message
+                return Ok(result);  // Success message
             }
-            return BadRequest(result.Message);
+            return BadRequest(result);
         }
 
         // GET: api/enquiry/message/{messageId}
@@ -112,9 +112,9 @@ namespace SpiceCraft.Server.Controllers
             var result = _enquiryLogics.GetMessageByMessageId(messageId);
             if (result.IsSuccess)
             {
-                return Ok(result.Data);
+                return Ok(result);
             }
-            return NotFound(result.Message);
+            return NotFound(result);
         }
     }
 }

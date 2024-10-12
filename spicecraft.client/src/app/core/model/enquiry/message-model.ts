@@ -8,4 +8,6 @@ export interface MessageModel {
   messageDate?: Date;  // Nullable
   receiver: string;
   sender: string;
+  enquiryTypeId: number;
+  subject: string;
 }

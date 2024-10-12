@@ -46,16 +46,79 @@
     <!-- Edit and Delete Buttons -->
     <dxi-column caption="View Detail" [width]="130" [cellTemplate]="'editButtonTemplate'" >
       <div *dxTemplate="let data of 'editButtonTemplate'">
-        <button class="btn btn-success" (click)="navigateToDetail(data)" >View Detail</button>
+        <dx-button type="success" text="View Detail" (onClick)="navigateToDetail(data)" ></dx-button>
       </div>
     </dxi-column>
 
-<!--    <dxi-column caption="Delete" [width]="90" [cellTemplate]="'deleteButtonTemplate'" >-->
-<!--      <div *dxTemplate="let data of 'deleteButtonTemplate'">-->
-<!--        <button class="btn btn-danger">Delete</button>-->
-<!--      </div>-->
-<!--    </dxi-column>-->
-
+    <!-- **New: Open Modal Button** -->
+    <dxi-column caption="Send Enquiry" [width]="130">
+      <div *dxTemplate="let data of 'cellTemplate'">
+        <dx-button text="Send Enquiry" type="default" (onClick)="openModal(data)"></dx-button>
+      </div>
+    </dxi-column>
   </dx-data-grid>
+
+  <dx-popup
+    [(visible)]="isModalVisible"
+    [width]="600"
+    [height]="auto"
+    [showTitle]="true"
+    title="Send Enquiry"
+    [dragEnabled]="false"
+    [closeOnOutsideClick]="true">
+
+    <dx-form
+      [formData]="formData"
+      [colCount]="1"
+      (onSubmit)="onFormSubmit($event)">
+
+      <dxi-item
+        dataField="enquiry_type_id"
+        editorType="dxSelectBox"
+        [editorOptions]="{
+        dataSource: enquiryTypeDataSource,
+        displayExpr: 'enquiry_name',
+        valueExpr: 'enquiry_type_id',
+        disabled: isDisabled
+      }"
+        [isRequired]="true"
+        label="Enquiry Type">
+      </dxi-item>
+
+      <dxi-item *ngIf="isUserInternal"
+                dataField="receiver_user_id"
+                editorType="dxSelectBox"
+                [editorOptions]="{
+        dataSource: customersDataSource,
+        displayExpr: 'name',
+        valueExpr: 'user_id',
+        disabled: isDisabled
+      }"
+                [isRequired]="true"
+                label="Customer">
+      </dxi-item>
+
+      <dxi-item
+        dataField="message_content"
+        editorType="dxTextArea"
+        [editorOptions]="{ height: 90 }"
+        [isRequired]="true"
+        label="Message">
+      </dxi-item>
+
+      <!-- Hidden Fields -->
+      <input type="hidden" name="sender_user_id" [value]="getCurrentUserId()" />
+      <input type="hidden" name="receiver_user_id" value="" />
+
+      <dxi-item>
+        <dx-button
+          text="Send"
+          type="success"
+          useSubmitBehavior="true">
+        </dx-button>
+      </dxi-item>
+
+    </dx-form>
+  </dx-popup>
 
 </div>
