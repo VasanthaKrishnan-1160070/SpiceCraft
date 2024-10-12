@@ -24,6 +24,7 @@
       [displayMode]="'full'"
       [showInfo]="true"
       [showPageSizeSelector]="true"
+
       [allowedPageSizes]="[10, 20, 50]"
       infoText="Page #{0}. Total: {1} ({2} items)"
       [showNavigationButtons]="true"
@@ -41,9 +42,9 @@
     <dxi-column dataField="minimumRequiredStock" caption="Min. Required Stock"></dxi-column>
 
     <!-- Edit Button to open Popup -->
-    <dxi-column caption="Edit Stock" [width]="100" [cellTemplate]="'editButtonTemplate'">
+    <dxi-column caption="Edit Stock" [width]="140" [cellTemplate]="'editButtonTemplate'">
       <div *dxTemplate="let data of 'editButtonTemplate'">
-        <button class="btn btn-success" (click)="openEditPopup(data.data)">Edit Stock</button>
+        <dx-button type="success" text="Edit Stock" (onClick)="openEditPopup(data.data)" ></dx-button>
       </div>
     </dxi-column>
   </dx-data-grid>
@@ -68,8 +69,8 @@
       </dx-form>
 
       <div class="d-flex gap-3 mt-4">
-        <button class="btn btn-success" (click)="saveStock()">Save</button>
-        <button class="btn btn-danger" (click)="closeEditPopup()">Cancel</button>
+        <dx-button type="success" text="Save" (onClick)="saveStock()" ></dx-button>
+        <dx-button type="danger" text="Cancel" (onClick)="closeEditPopup()" ></dx-button>
       </div>
     </div>
   </dx-popup>

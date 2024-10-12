@@ -57,21 +57,24 @@
       <span>${{ data.value }}</span>
     </div>
 
-    <!-- Action buttons for add/remove quantity and delete -->
-    <dxi-column [width]="300" caption="Actions" cellTemplate="actionsTemplate">
-      <!-- Template for action buttons -->
-      <div class="d-flex gap-2" *dxTemplate="let data of 'actionsTemplate'">
+    <dxi-column [width]="140" caption="View Detail" cellTemplate="viewDetailTemplate">
+      <div class="d-flex gap-2" *dxTemplate="let data of 'viewDetailTemplate'">
         <dx-button
           text="View Detail"
           type="success"
           [routerLink]="['/payment-detail', data.data.transactionId]"
         >
         </dx-button>
+      </div>
+    </dxi-column>
+
+    <dxi-column [width]="140" caption="View Order" cellTemplate="viewOrderTemplate">
+      <div class="d-flex gap-2" *dxTemplate="let data of 'viewOrderTemplate'">
         <dx-button
           text="View Order"
           type="success"
           [routerLink]="['/order-detail', data.data.orderId]"
-         >
+        >
         </dx-button>
       </div>
     </dxi-column>

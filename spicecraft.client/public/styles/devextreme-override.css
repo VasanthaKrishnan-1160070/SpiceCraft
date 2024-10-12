@@ -1,0 +1,9 @@
+.dx-datagrid-headers {
+  border-top-left-radius: 6px !important;
+  border-top-right-radius: 6px !important;
+}
+
+.dx-datagrid-rowsview {
+  border-bottom-left-radius: 6px !important;
+  border-bottom-right-radius: 6px !important;
+}

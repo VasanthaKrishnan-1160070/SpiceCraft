@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {TitleComponent} from "../../../../shared/components/title/title.component";
-import {DxDataGridModule, DxFormModule, DxPopupModule} from "devextreme-angular";
+import {DxButtonModule, DxDataGridModule, DxFormModule, DxPopupModule} from "devextreme-angular";
 import {ProductInventoryModel} from "../../../../core/model/inventory/product-inventory.model";
 import {InventoryService} from "../../../../core/service/inventory.service";
 import {Observable} from "rxjs";
@@ -16,7 +16,8 @@ import {AsyncPipe} from "@angular/common";
     DxDataGridModule,
     AsyncPipe,
     DxFormModule,
-    DxPopupModule
+    DxPopupModule,
+    DxButtonModule
   ],
   templateUrl: './b2b-inventory-list.component.html',
   styleUrl: './b2b-inventory-list.component.css'

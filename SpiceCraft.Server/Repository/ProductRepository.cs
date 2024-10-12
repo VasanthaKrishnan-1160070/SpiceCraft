@@ -18,50 +18,78 @@ namespace SpiceCraft.Server.Repository
             _context = context;
         }
 
-        public IEnumerable<ProductCatalogItemDTO> FilterProduct(int userId, int categoryId = 0, int subCategoryId = 0, string keyword = "", ProductFilterEnum filter = ProductFilterEnum.None, ProductSortingEnum sorting = ProductSortingEnum.NameAToZ, bool includeRemovedProducts = false)
+        public IEnumerable<ProductCatalogItemDTO> FilterProduct(int userId, int categoryId = 0, int subCategoryId = 0,
+            string keyword = "", ProductFilterEnum filter = ProductFilterEnum.None,
+            ProductSortingEnum sorting = ProductSortingEnum.NameAToZ, bool includeRemovedProducts = false)
         {
             // Initial query for products
             var query = from p in _context.Items
-                        join pc in _context.ItemCategories on p.CategoryId equals pc.CategoryId
-                        join iv in _context.Inventories on p.ItemId equals iv.ItemId
-                        join pi in _context.ItemImages.Where(i => i.IsMain == true) on p.ItemId equals pi.ItemId into imageJoin
-                        from pi in imageJoin.DefaultIfEmpty()
-                        join pp in _context.PromotionItems on p.ItemId equals pp.ItemId into promoProductJoin
-                        from pp in promoProductJoin.DefaultIfEmpty()
-                        join prc in _context.PromotionCategories on p.CategoryId equals prc.CategoryId into promoCatJoin
-                        from prc in promoCatJoin.DefaultIfEmpty()
-                        join pcp in _context.PromotionComboItems on p.ItemId equals pcp.ItemId into comboJoin
-                        from pcp in comboJoin.DefaultIfEmpty()
-                        join pbp in _context.PromotionBulkItems on p.ItemId equals pbp.ItemId into bulkPromoJoin
-                        from pbp in bulkPromoJoin.DefaultIfEmpty()
-                        select new ProductCatalogItemDTO
-                        {
-                            Price = p.Price,
-                            ItemName = p.ItemName,
-                            Description = p.Description,
-                            CreatedDate = p.CreatedAt,
-                            IsRemoved = p.IsRemoved,
-                            CurrentStock = iv.CurrentStock < 0 ? 0 : iv.CurrentStock,
-                            OwnProduct = p.OwnProduct,
-                            CategoryId = p.CategoryId,
-                            ImageCode = pi.ImageCode,
-                            CategoryName = pc.CategoryName,
-                            ItemId = p.ItemId,
-                            DiscountRate = pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0),
-                            BulkDiscountRate = pbp != null ? pbp.DiscountRate : 0,
-                            BulkDiscountRequiredQuantity = pbp != null ? pbp.RequiredQuantity : 0,
-                            ComboName = pcp != null ? pcp.ComboName : "",
-                            DiscountPrice = p.Price * (1 - ((pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0)) / 100)),
-                            IsInSale = (pp != null || prc != null) ? "Yes" : "No",
-                            IsLowStock = iv.CurrentStock < iv.LowStockThreshold ? "Yes" : "No",
-                            IsNoStock = iv.CurrentStock < 0 ? "Yes" : "No"
-                        };
+                join pc in _context.ItemCategories on p.CategoryId equals pc.CategoryId
+                join pi in _context.ItemImages.Where(i => i.IsMain == true) on p.ItemId equals pi.ItemId into imageJoin
+                from pi in imageJoin.DefaultIfEmpty()
+                join pp in _context.PromotionItems on p.ItemId equals pp.ItemId into promoProductJoin
+                from pp in promoProductJoin.DefaultIfEmpty()
+                join prc in _context.PromotionCategories on p.CategoryId equals prc.CategoryId into promoCatJoin
+                from prc in promoCatJoin.DefaultIfEmpty()
+                join pcp in _context.PromotionComboItems on p.ItemId equals pcp.ItemId into comboJoin
+                from pcp in comboJoin.DefaultIfEmpty()
+                join pbp in _context.PromotionBulkItems on p.ItemId equals pbp.ItemId into bulkPromoJoin
+                from pbp in bulkPromoJoin.DefaultIfEmpty()
+                select new ProductCatalogItemDTO
+                {
+                    Price = p.Price,
+                    ItemName = p.ItemName,
+                    Description = p.Description,
+                    CreatedDate = p.CreatedAt,
+                    IsRemoved = p.IsRemoved,
+                    CurrentStock = (from ii in _context.ItemIngredients
+                            join inv in _context.Inventories on ii.IngredientId equals inv.IngredientId
+                            where ii.ItemId == p.ItemId
+                            group new { ii, inv } by ii.ItemId
+                            into inventoryGroup
+                            select inventoryGroup.Min(g => g.inv.CurrentStock / g.ii.QuantityNeeded))
+                        .FirstOrDefault(),
+                    OwnProduct = p.OwnProduct,
+                    CategoryId = p.CategoryId,
+                    ImageCode = pi.ImageCode,
+                    CategoryName = pc.CategoryName,
+                    ItemId = p.ItemId,
+                    DiscountRate = pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0),
+                    BulkDiscountRate = pbp != null ? pbp.DiscountRate : 0,
+                    BulkDiscountRequiredQuantity = pbp != null ? pbp.RequiredQuantity : 0,
+                    ComboName = pcp != null ? pcp.ComboName : "",
+                    DiscountPrice = p.Price *
+                                    (1 - ((pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0)) / 100)),
+                    IsInSale = (pp != null || prc != null) ? "Yes" : "No",
+                    IsLowStock = (from ii in _context.ItemIngredients
+                            join inv in _context.Inventories on ii.IngredientId equals inv.IngredientId
+                            where ii.ItemId == p.ItemId
+                            group new { ii, inv } by ii.ItemId
+                            into inventoryGroup
+                            select inventoryGroup.Min(g => g.inv.CurrentStock / g.ii.QuantityNeeded) <
+                                   inventoryGroup.Min(g => g.inv.LowStockThreshold / g.ii.QuantityNeeded))
+                        .FirstOrDefault()
+                            ? "Yes"
+                            : "No",
+                    IsNoStock = (from ii in _context.ItemIngredients
+                            join inv in _context.Inventories on ii.IngredientId equals inv.IngredientId
+                            where ii.ItemId == p.ItemId
+                            group new { ii, inv } by ii.ItemId
+                            into inventoryGroup
+                            select inventoryGroup.Min(g => g.inv.CurrentStock / g.ii.QuantityNeeded) <= 0)
+                        .FirstOrDefault()
+                            ? "Yes"
+                            : "No"
+                };
 
             // Filtering based on categoryId and subCategoryId
             if (categoryId > 0)
             {
-                query = query.Where(p => _context.ItemCategories.Where(c => c.ParentCategoryId == categoryId).Select(c => c.CategoryId).Contains(p.CategoryId));
+                query = query.Where(p =>
+                    _context.ItemCategories.Where(c => c.ParentCategoryId == categoryId).Select(c => c.CategoryId)
+                        .Contains(p.CategoryId));
             }
+
             if (subCategoryId > 0)
             {
                 query = query.Where(p => p.CategoryId == subCategoryId);
@@ -305,7 +333,7 @@ namespace SpiceCraft.Server.Repository
 
         public ProductDetailDTO GetProductDetail(int? productId)
         {
-            // Get parent categories (assuming a method to retrieve them)
+            // Get parent categories
             var categories = GetParentCategories();
 
             // If productId is null, return an empty response with default values
@@ -322,37 +350,38 @@ namespace SpiceCraft.Server.Repository
 
             // Query the product details using LINQ
             var productDetails = (from pd in _context.Items
-                                  join pc in _context.ItemCategories on pd.CategoryId equals pc.CategoryId
-                                  join pp in _context.PromotionItems on pd.ItemId equals pp.ItemId into productPromo
-                                  from pp in productPromo.DefaultIfEmpty()
-                                  join prc in _context.PromotionCategories on pd.CategoryId equals prc.CategoryId into promoCat
-                                  from prc in promoCat.DefaultIfEmpty()
-                                  join iv in _context.Inventories on pd.ItemId equals iv.ItemId into inventory
-                                  from iv in inventory.DefaultIfEmpty()
-                                  join pi in _context.ItemImages on pd.ItemId equals pi.ItemId into productImage
-                                  from pi in productImage.DefaultIfEmpty()
-                                  where pd.ItemId == productId
-                                  select new ProductSummaryDTO
-                                  {
-                                      ItemId = pd.ItemId,
-                                      ItemName = pd.ItemName,
-                                      Description = pd.Description,
-                                      CreatedAt = pd.CreatedAt,
-                                      Price = pd.Price,
-                                      OwnProduct = pd.OwnProduct,
-                                      IsRemoved = pd.IsRemoved,
-                                      CategoryName = pc.CategoryName,
-                                      ParentCategoryId = _context.ItemCategories
-                                      .Where(c => c.CategoryId == pc.CategoryId)
-                                      .Select(c => c.ParentCategoryId)
-                                      .FirstOrDefault(),
-                                      SubCategoryId = pc.CategoryId,
-                                      DiscountRate = (pp != null ? pp.DiscountRate : prc != null ? prc.DiscountRate : 0),
-                                      CurrentStock = iv.CurrentStock,
-                                      IsMain = pi.IsMain
-                                  }).FirstOrDefault();
+                join pc in _context.ItemCategories on pd.CategoryId equals pc.CategoryId
+                join pp in _context.PromotionItems on pd.ItemId equals pp.ItemId into productPromo
+                from pp in productPromo.DefaultIfEmpty()
+                join prc in _context.PromotionCategories on pd.CategoryId equals prc.CategoryId into promoCat
+                from prc in promoCat.DefaultIfEmpty()
+                join pi in _context.ItemImages on pd.ItemId equals pi.ItemId into productImage
+                from pi in productImage.DefaultIfEmpty()
+                where pd.ItemId == productId
+                select new ProductSummaryDTO
+                {
+                    ItemId = pd.ItemId,
+                    ItemName = pd.ItemName,
+                    Description = pd.Description,
+                    CreatedAt = pd.CreatedAt,
+                    Price = pd.Price,
+                    OwnProduct = pd.OwnProduct,
+                    IsRemoved = pd.IsRemoved,
+                    CategoryName = pc.CategoryName,
+                    ParentCategoryId = pc.ParentCategoryId,
+                    SubCategoryId = pc.CategoryId,
+                    DiscountRate = (pp != null ? pp.DiscountRate : prc != null ? prc.DiscountRate : 0),
+                    CurrentStock = (from ii in _context.ItemIngredients
+                            join inv in _context.Inventories on ii.IngredientId equals inv.IngredientId
+                            where ii.ItemId == pd.ItemId
+                            group new { ii, inv } by ii.ItemId
+                            into inventoryGroup
+                            select inventoryGroup.Min(g => g.inv.CurrentStock / g.ii.QuantityNeeded))
+                        .FirstOrDefault(),
+                    IsMain = pi.IsMain
+                }).FirstOrDefault();
 
-            // Get product images (assuming a method to retrieve images)
+            // Get product images
             var productImages = GetProductImages(productId);
 
             // Get subcategories based on the parent category ID

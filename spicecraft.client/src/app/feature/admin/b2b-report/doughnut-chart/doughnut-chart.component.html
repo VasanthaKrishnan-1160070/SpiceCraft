@@ -1,0 +1,18 @@
+<dx-pie-chart
+  id="pie"
+  type="doughnut"
+  [title]="title"
+  palette="Soft Pastel"
+  [dataSource]="reportData"
+  (onPointClick)="pointClickHandler($event)"
+>
+  <dxo-export [enabled]="true"></dxo-export>
+  <dxo-legend
+    [margin]="0"
+    horizontalAlignment="right"
+    verticalAlignment="top"
+  ></dxo-legend>
+  <dxi-series *ngFor="let series of seriesFields" [argumentField]="series.argumentField" [valueField]="series.valueField" [name]="series.name">
+    <dxo-hover-style color="#ffd700"></dxo-hover-style>
+  </dxi-series>
+</dx-pie-chart>

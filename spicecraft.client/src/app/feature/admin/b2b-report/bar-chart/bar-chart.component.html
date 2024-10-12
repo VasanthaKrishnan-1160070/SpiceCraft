@@ -1,0 +1,17 @@
+<dx-chart id="chart"
+          [title]="title"
+          [dataSource]="reportData">
+  <dxo-common-series-settings argumentField="state" type="stackedBar">
+  </dxo-common-series-settings>
+  <dxi-series *ngFor="let series of seriesFields" [argumentField]="series.argumentField" [valueField]="series.valueField" [name]="series.name"></dxi-series>
+  <dxo-value-axis position="right">
+    <dxo-title text="Value"></dxo-title>
+  </dxo-value-axis>
+  <dxo-legend
+    verticalAlignment="bottom"
+    horizontalAlignment="center"
+    itemTextPosition="top">
+  </dxo-legend>
+  <dxo-export [enabled]="true"></dxo-export>
+  <dxo-tooltip [enabled]="true" location="edge"></dxo-tooltip>
+</dx-chart>

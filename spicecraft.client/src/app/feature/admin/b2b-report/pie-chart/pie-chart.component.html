@@ -1,0 +1,15 @@
+<dx-pie-chart
+  id="pie"
+  [title]="title"
+  palette="bright"
+  [dataSource]="reportData"
+  (onPointClick)="pointClickHandler($event)"
+  (onLegendClick)="legendClickHandler($event)"
+>
+  <dxi-series *ngFor="let series of seriesFields" [argumentField]="series.argumentField" [valueField]="series.valueField" [name]="series.name">
+    <dxo-label [visible]="true">
+      <dxo-connector [visible]="true" [width]="1"></dxo-connector>
+    </dxo-label>
+  </dxi-series>
+  <dxo-export [enabled]="true"></dxo-export>
+</dx-pie-chart>

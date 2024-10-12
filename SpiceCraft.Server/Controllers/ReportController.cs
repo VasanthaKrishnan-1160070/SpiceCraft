@@ -1,43 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SpiceCraft.Server.BusinessLogics.Interface;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace SpiceCraft.Server.Controllers
+namespace SpiceCraft.Server.Controllers;
+
+// ReportController.cs
+// ReportController.cs
+[ApiController]
+[Route("api/[controller]")]
+public class ReportController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ReportController : ControllerBase
+    private readonly IReportLogics _reportLogics;
+
+    public ReportController(IReportLogics reportLogics)
     {
-        // GET: api/<ReportController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
+        _reportLogics = reportLogics;
+    }
 
-        // GET api/<ReportController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+    [HttpGet("{reportName}")]
+    public async Task<IActionResult> GetReport(string reportName)
+    {
+        var result = await _reportLogics.GetReportByNameAsync(reportName);
+        if (result.IsSuccess)
         {
-            return "value";
+            return Ok(result);
         }
-
-        // POST api/<ReportController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<ReportController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<ReportController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        return BadRequest(result);
     }
 }
