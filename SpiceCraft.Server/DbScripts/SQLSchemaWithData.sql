@@ -159,14 +159,49 @@ create table CartItems (
     unique(CartId, ItemId)
 );
 
+/*
+   Example onions, green chili, capsigum, cauliflower, rice, Brocolli, spinach, curry leaves,
+   chicken, lamb, flour, ladies finger, beetroot, beans, curry powder, ginger, garlic,
+   oil and many more.
+   For drinks like wine it is just the wine as Ingredient
+*/
+create table Ingredients (
+  IngredientId int primary key identity(1,1),
+  IngredientName varchar(200) not null,
+  Unit varchar(100) check (Ingredients.Unit in ('Bag', 'Basket', 'Bunch', 'Individual', 'Box', 'Bottle')) not null default 'Individual',
+  ItemsPerUnit int not null default 1, -- for example for a unit of bag will have 30 onions or 1 item if it is individual
+  CreatedAt datetime default getdate(),
+  UpdatedAt datetime default getdate(),
+)
+
+/*
+   Relates the Ingredients needed to make that food item.
+   It also specifies Quantity needed for each plate.   
+*/
+create table ItemIngredients (
+  ItemIngredientId int primary key identity(1,1),
+  ItemId int not null,
+  IngredientId int not null,
+  Size varchar(100) check (ItemIngredients.Size in ('Small', 'Medium', 'Large')) default 'Medium', -- QuantityNeeded varies based on size as well
+  QuantityNeeded int not null default 1, -- quantity needed to make the item ( example 2 onions needed for that item )
+  CreatedAt datetime default getdate(),
+  UpdatedAt datetime default getdate(),
+  foreign key (ItemId) references Items(ItemId),
+  foreign key (IngredientId) references Ingredients(IngredientId)   
+)
+
+/*
+  Whenever the order is made for the item the inventory is reduced based on the ItemIngredients
+  QuantityNeeded
+*/
 create table Inventory (
     InventoryId int primary key identity(1,1),
-    ItemId int not null unique,
-    CurrentStock int not null,
-    LowStockThreshold int not null,
+    IngredientId int not null unique,
+    CurrentStock int not null, -- current stock is the unit of Ingredients multiplied by ItemsPerUnit mostly individual
+    LowStockThreshold int not null, -- low stock threshold stock is the unit of Ingredients multiplied by ItemsPerUnit mostly individual
     CreatedAt datetime default getdate(),
     UpdatedAt datetime default getdate(),
-    foreign key (ItemId) references Items(ItemId)
+    foreign key (IngredientId) references Ingredients(IngredientId)
 );
 
 create table PromotionItems (
@@ -323,6 +358,14 @@ create table Notification (
     foreign key (UserId) references Users(UserId)
 );
 
+create table Subscriptions (
+   SubscriptionId int primary key  identity(1,1),
+   UserId int not null,
+   CreatedAt datetime default getdate(),
+   UpdatedAt datetime default getdate(),
+   foreign key (UserId) references Users(UserId)
+)
+
 create table UserActivityLog (
   UserActivityLogId int primary key identity(1,1),
   UserId int not null, 
@@ -331,7 +374,40 @@ create table UserActivityLog (
   TimeSpent float null,
   SessionId varchar(200) null,
   ClickCount int default(1),
+  CreatedAt datetime default getdate(),
+  UpdatedAt datetime default getdate(),
   foreign key (UserId) references Users(UserId)
+)
+
+create table UserItemInteraction (
+ UserItemInteractionId int primary key identity(1,1),
+ UserId int not null,
+ Interaction int default(0),
+ CreatedAt datetime default getdate(),
+ UpdatedAt datetime default getdate(),
+ foreign key (UserId) references Users(UserId)
+)
+
+create table UserItemRating (
+  UserItemRating int primary key identity(1,1),
+  UserId int not null,
+  Rating int default 1,
+  ItemId int not null,
+  RatingDescription varchar(250) null,
+  CreatedAt datetime default getdate(),
+  UpdatedAt datetime default getdate(),
+  foreign key (UserId) references Users(UserId),
+  foreign key (ItemId) references Items(ItemId)
+)
+
+create table RecentlyViewed (
+    RecentlyViewedId int primary key identity(1,1),
+    UserId int not null,
+    ItemId int not null,
+    CreatedAt datetime default getdate(),
+    UpdatedAt datetime default getdate()
+    foreign key (UserId) references Users(UserId),
+    foreign key (ItemId) references Items(ItemId)
 )
 
 -- Insert Data into Tables
@@ -509,59 +585,505 @@ INSERT INTO Items (CategoryId, ItemName, OwnProduct, Discount, Description, Pric
 
 -- Other Mexican Items (CategoryId = 24)
 (24, 'Tamales', 1, 5.00, 'Mexican dish made of masa filled with meat or beans and steamed', 9.99),
-(24, 'Empanadas', 1, 5.00, 'Mexican pastry filled with sweet or savory ingredients', 6.99);
+(24, 'Empanadas', 1, 5.00, 'Mexican pastry filled with sweet or savory ingredients', 6.99),
+
+
+-- additional items 
+
+-- CategoryId 8 (Indian Appetizers)
+(8, 'Aloo Tikki', 1, 0, 'Spiced potato patties, popular in Indian street food', 5.99),
+
+-- CategoryId 9 (Mediterranean Appetizers)
+(9, 'Dolma', 1, 5.00, 'Stuffed grape leaves, a Mediterranean delicacy', 6.99),
+
+-- CategoryId 10 (Mexican Appetizers)
+(10, 'Elote', 1, 0, 'Mexican street corn with cotija cheese and chili powder', 4.99),
+
+-- CategoryId 11 (Indian Main Course)
+(11, 'Paneer Butter Masala', 1, 10.00, 'Cottage cheese cooked in a rich and creamy tomato gravy', 13.99),
+
+-- CategoryId 12 (Mediterranean Main Course)
+(12, 'Lamb Kebab', 1, 0, 'Grilled lamb skewers marinated in Mediterranean spices', 16.99),
+
+-- CategoryId 13 (Mexican Main Course)
+(13, 'Chicken Fajitas', 1, 5.00, 'Grilled chicken served with tortillas, onions, and peppers', 14.99),
+
+-- CategoryId 14 (Indian Desserts)
+(14, 'Rasmalai', 1, 5.00, 'Soft cheese patties soaked in flavored milk', 6.99),
+
+-- CategoryId 15 (Mediterranean Desserts)
+(15, 'Knafeh', 1, 0, 'Cheese pastry soaked in sweet sugar syrup, a Mediterranean favorite', 7.99),
+
+-- CategoryId 16 (Mexican Desserts)
+(16, 'Tres Leches Cake', 1, 0, 'Light sponge cake soaked in three types of milk', 6.99),
+
+-- CategoryId 17 (Indian Drinks)
+(17, 'Masala Chai', 1, 0, 'Indian spiced tea brewed with cardamom, cinnamon, and cloves', 2.99);
 
 
 
 -- Orders
-DECLARE @CurrentDate DATE = GETDATE();
+DECLARE @CurrentDate4 DATE = GETDATE();
 
 -- Insert Orders with dates ranging from 20 days back from the current date
 INSERT INTO Orders (UserId, OrderDate, ShippingOptionId, TotalCost, OrderStatus) VALUES 
-(1, DATEADD(DAY, -20, @CurrentDate), 1, 50.00, 'Prepared'),
-(2, DATEADD(DAY, -19, @CurrentDate), 2, 75.00, 'Shipped'),
-(3, DATEADD(DAY, -18, @CurrentDate), 3, 65.00, 'Ready To Ship'),
-(4, DATEADD(DAY, -17, @CurrentDate), 1, 45.00, 'Ready For Pickup'),
-(5, DATEADD(DAY, -16, @CurrentDate), 2, 95.00, 'Cancelled'),
-(6, DATEADD(DAY, -15, @CurrentDate), 3, 85.00, 'Returned'),
-(7, DATEADD(DAY, -14, @CurrentDate), 1, 35.00, 'Prepared'),
-(8, DATEADD(DAY, -13, @CurrentDate), 2, 25.00, 'Shipped'),
-(9, DATEADD(DAY, -12, @CurrentDate), 3, 15.00, 'Ready To Ship'),
-(10, DATEADD(DAY, -11, @CurrentDate), 1, 55.00, 'Ready For Pickup'),
-(11, DATEADD(DAY, -10, @CurrentDate), 2, 65.00, 'Cancelled'),
-(12, DATEADD(DAY, -9, @CurrentDate), 3, 75.00, 'Returned'),
-(13, DATEADD(DAY, -8, @CurrentDate), 1, 85.00, 'Prepared'),
-(14, DATEADD(DAY, -7, @CurrentDate), 2, 95.00, 'Shipped'),
-(15, DATEADD(DAY, -6, @CurrentDate), 3, 105.00, 'Ready To Ship'),
-(16, DATEADD(DAY, -5, @CurrentDate), 1, 115.00, 'Ready For Pickup'),
-(17, DATEADD(DAY, -4, @CurrentDate), 2, 125.00, 'Cancelled'),
-(18, DATEADD(DAY, -3, @CurrentDate), 3, 135.00, 'Returned'),
-(19, DATEADD(DAY, -2, @CurrentDate), 1, 145.00, 'Prepared'),
-(20, DATEADD(DAY, -1, @CurrentDate), 2, 155.00, 'Shipped');
+(1, DATEADD(DAY, -365, @CurrentDate4), 1, 60.00, 'Shipped'),
+(2, DATEADD(DAY, -360, @CurrentDate4), 2, 90.00, 'Prepared'),
+(3, DATEADD(DAY, -355, @CurrentDate4), 3, 55.00, 'Cancelled'),
+(4, DATEADD(DAY, -350, @CurrentDate4), 1, 80.00, 'Shipped'),
+(5, DATEADD(DAY, -345, @CurrentDate4), 2, 75.00, 'Prepared'),
+(6, DATEADD(DAY, -340, @CurrentDate4), 3, 95.00, 'Shipped'),
+(7, DATEADD(DAY, -335, @CurrentDate4), 1, 85.00, 'Cancelled'),
+(8, DATEADD(DAY, -330, @CurrentDate4), 2, 65.00, 'Prepared'),
+(9, DATEADD(DAY, -325, @CurrentDate4), 3, 70.00, 'Shipped'),
+(10, DATEADD(DAY, -320, @CurrentDate4), 1, 60.00, 'Cancelled'),
+(11, DATEADD(DAY, -315, @CurrentDate4), 2, 90.00, 'Prepared'),
+(12, DATEADD(DAY, -310, @CurrentDate4), 3, 55.00, 'Shipped'),
+(13, DATEADD(DAY, -305, @CurrentDate4), 1, 75.00, 'Cancelled'),
+(14, DATEADD(DAY, -300, @CurrentDate4), 2, 65.00, 'Shipped'),
+(15, DATEADD(DAY, -295, @CurrentDate4), 3, 80.00, 'Cancelled'),
+(16, DATEADD(DAY, -290, @CurrentDate4), 1, 60.00, 'Prepared'),
+(17, DATEADD(DAY, -285, @CurrentDate4), 2, 95.00, 'Shipped'),
+(18, DATEADD(DAY, -280, @CurrentDate4), 3, 70.00, 'Cancelled'),
+(19, DATEADD(DAY, -275, @CurrentDate4), 1, 85.00, 'Prepared'),
+(20, DATEADD(DAY, -270, @CurrentDate4), 2, 90.00, 'Shipped'),
+(1, DATEADD(DAY, -265, @CurrentDate4), 1, 55.00, 'Cancelled'),
+(2, DATEADD(DAY, -260, @CurrentDate4), 2, 75.00, 'Shipped'),
+(3, DATEADD(DAY, -255, @CurrentDate4), 3, 60.00, 'Prepared'),
+(4, DATEADD(DAY, -250, @CurrentDate4), 1, 90.00, 'Cancelled'),
+(5, DATEADD(DAY, -245, @CurrentDate4), 2, 65.00, 'Shipped'),
+(6, DATEADD(DAY, -240, @CurrentDate4), 3, 80.00, 'Prepared'),
+(7, DATEADD(DAY, -235, @CurrentDate4), 1, 85.00, 'Shipped'),
+(8, DATEADD(DAY, -230, @CurrentDate4), 2, 60.00, 'Prepared'),
+(9, DATEADD(DAY, -225, @CurrentDate4), 3, 95.00, 'Shipped'),
+(10, DATEADD(DAY, -220, @CurrentDate4), 1, 75.00, 'Cancelled'),
+(11, DATEADD(DAY, -215, @CurrentDate4), 2, 70.00, 'Shipped'),
+(12, DATEADD(DAY, -210, @CurrentDate4), 3, 85.00, 'Prepared'),
+(13, DATEADD(DAY, -205, @CurrentDate4), 1, 90.00, 'Shipped'),
+(14, DATEADD(DAY, -200, @CurrentDate4), 2, 60.00, 'Cancelled'),
+(15, DATEADD(DAY, -195, @CurrentDate4), 3, 95.00, 'Shipped'),
+(16, DATEADD(DAY, -190, @CurrentDate4), 1, 70.00, 'Prepared'),
+(17, DATEADD(DAY, -185, @CurrentDate4), 2, 85.00, 'Shipped'),
+(18, DATEADD(DAY, -180, @CurrentDate4), 3, 75.00, 'Cancelled'),
+(19, DATEADD(DAY, -175, @CurrentDate4), 1, 80.00, 'Shipped'),
+(20, DATEADD(DAY, -170, @CurrentDate4), 2, 60.00, 'Prepared'),
+(1, DATEADD(DAY, -165, @CurrentDate4), 1, 95.00, 'Shipped'),
+(2, DATEADD(DAY, -160, @CurrentDate4), 2, 85.00, 'Cancelled'),
+(3, DATEADD(DAY, -155, @CurrentDate4), 3, 75.00, 'Prepared'),
+(4, DATEADD(DAY, -150, @CurrentDate4), 1, 90.00, 'Shipped'),
+(5, DATEADD(DAY, -145, @CurrentDate4), 2, 60.00, 'Cancelled'),
+(6, DATEADD(DAY, -140, @CurrentDate4), 3, 80.00, 'Shipped'),
+(7, DATEADD(DAY, -135, @CurrentDate4), 1, 95.00, 'Prepared'),
+(8, DATEADD(DAY, -130, @CurrentDate4), 2, 70.00, 'Shipped'),
+(9, DATEADD(DAY, -125, @CurrentDate4), 3, 85.00, 'Cancelled'),
+(10, DATEADD(DAY, -120, @CurrentDate4), 1, 60.00, 'Shipped'),
+(11, DATEADD(DAY, -115, @CurrentDate4), 2, 90.00, 'Prepared'),
+(12, DATEADD(DAY, -110, @CurrentDate4), 3, 95.00, 'Cancelled'),
+(13, DATEADD(DAY, -105, @CurrentDate4), 1, 75.00, 'Shipped'),
+(14, DATEADD(DAY, -100, @CurrentDate4), 2, 65.00, 'Prepared'),
+(15, DATEADD(DAY, -95, @CurrentDate4), 3, 80.00, 'Shipped'),
+(1, '2023-10-12', 1, 60.00, 'Shipped'),
+(2, '2023-11-15', 2, 80.00, 'Cancelled'),
+(3, '2023-12-20', 3, 90.00, 'Prepared'),
+(4, '2024-01-22', 1, 110.00, 'Ready For Pickup'),
+(5, '2024-02-25', 2, 100.00, 'Returned'),
+(6, '2024-03-03', 3, 70.00, 'Shipped'),
+(7, '2024-04-18', 1, 55.00, 'Cancelled'),
+(8, '2024-05-12', 2, 120.00, 'Prepared'),
+(9, '2024-06-14', 3, 130.00, 'Shipped'),
+(10, '2024-07-20', 1, 90.00, 'Returned'),
+(11, '2024-08-10', 2, 95.00, 'Prepared'),
+(12, '2024-09-05', 3, 85.00, 'Shipped'),
+(13, '2024-09-29', 1, 115.00, 'Ready For Pickup'),
+(14, '2024-10-01', 2, 105.00, 'Returned'),
+(15, '2024-10-02', 3, 125.00, 'Cancelled');
+
 
 
 -- OrderDetails
-INSERT INTO OrderDetails (OrderId, ItemId, ActualPrice, DiscountRate, Quantity, PurchasePrice) VALUES 
-(1, 1, 15.99, 10.00, 1, 14.39),
-(2, 2, 17.99, 15.00, 2, 30.58),
-(3, 3, 13.99, 5.00, 1, 13.29),
-(4, 4, 3.99, 0, 3, 11.97),
-(5, 5, 4.99, 0, 2, 9.98),
-(6, 6, 6.99, 0, 4, 27.96),
-(7, 7, 12.99, 10.00, 1, 11.69),
-(8, 8, 7.99, 5.00, 2, 15.18),
-(9, 9, 8.99, 0, 1, 8.99),
-(10, 10, 8.99, 0, 3, 26.97),
-(11, 11, 10.99, 0, 2, 21.98),
-(12, 12, 11.99, 5.00, 1, 11.39),
-(13, 13, 9.99, 0, 2, 19.98),
-(14, 14, 5.99, 0, 3, 17.97),
-(15, 15, 4.99, 10.00, 4, 17.96),
-(16, 16, 18.99, 15.00, 1, 16.14),
-(17, 17, 9.99, 5.00, 2, 18.98),
-(18, 18, 14.99, 0, 1, 14.99),
-(19, 19, 13.99, 10.00, 1, 12.59),
-(20, 20, 15.99, 0, 2, 31.98);
+-- Insert OrderDetails for each of the 70 orders (random 1, 2, or 3 items per order)
+INSERT INTO OrderDetails (OrderId, ItemId, ActualPrice, DiscountRate, Quantity, PurchasePrice, SpiceLevel, Size) VALUES
+-- Order 1 (1 item)
+(1, 1, 12.99, 0, 1, 12.99, 'Medium', 'Medium'),
+
+-- Order 2 (2 items)
+(2, 2, 15.99, 5.00, 2, 30.38, 'Hot', 'Large'),
+(2, 3, 10.99, 0, 1, 10.99, 'Mild', 'Small'),
+
+-- Order 3 (3 items)
+(3, 4, 9.99, 10.00, 1, 8.99, 'Medium', 'Family Pack'),
+(3, 5, 12.99, 0, 2, 25.98, 'Hot', 'Medium'),
+(3, 6, 7.99, 5.00, 1, 7.59, 'Extra Hot', 'Small'),
+
+-- Order 4 (1 item)
+(4, 7, 16.99, 0, 1, 16.99, 'Medium', 'Medium'),
+
+-- Order 5 (2 items)
+(5, 8, 14.99, 5.00, 1, 14.24, 'Mild', 'Large'),
+(5, 9, 11.99, 0, 2, 23.98, 'Hot', 'Medium'),
+
+-- Order 6 (3 items)
+(6, 10, 13.99, 0, 2, 27.98, 'Medium', 'Small'),
+(6, 11, 9.99, 10.00, 1, 8.99, 'Mild', 'Medium'),
+(6, 12, 18.99, 5.00, 1, 18.04, 'Hot', 'Family Pack'),
+
+-- Order 7 (1 item)
+(7, 13, 17.99, 0, 1, 17.99, 'Medium', 'Medium'),
+
+-- Order 8 (2 items)
+(8, 14, 14.99, 5.00, 1, 14.24, 'Medium', 'Large'),
+(8, 15, 11.99, 0, 2, 23.98, 'Mild', 'Small'),
+
+-- Order 9 (3 items)
+(9, 16, 9.99, 10.00, 1, 8.99, 'Extra Hot', 'Medium'),
+(9, 17, 19.99, 0, 2, 39.98, 'Medium', 'Family Pack'),
+(9, 18, 7.99, 5.00, 1, 7.59, 'Hot', 'Small'),
+
+-- Order 10 (1 item)
+(10, 19, 16.99, 0, 1, 16.99, 'Medium', 'Large'),
+
+-- Order 11 (2 items)
+(11, 20, 14.99, 5.00, 1, 14.24, 'Mild', 'Large'),
+(11, 21, 12.99, 0, 2, 25.98, 'Medium', 'Medium'),
+
+-- Order 12 (3 items)
+(12, 22, 8.99, 10.00, 1, 8.09, 'Medium', 'Family Pack'),
+(12, 23, 9.99, 0, 1, 9.99, 'Mild', 'Medium'),
+(12, 24, 7.99, 5.00, 2, 15.18, 'Hot', 'Small'),
+
+-- Order 13 (1 item)
+(13, 25, 15.99, 0, 1, 15.99, 'Extra Hot', 'Medium'),
+
+-- Order 14 (2 items)
+(14, 26, 14.99, 5.00, 1, 14.24, 'Mild', 'Medium'),
+(14, 27, 12.99, 0, 2, 25.98, 'Medium', 'Large'),
+
+-- Order 15 (3 items)
+(15, 28, 10.99, 10.00, 1, 9.89, 'Hot', 'Small'),
+(15, 29, 13.99, 0, 2, 27.98, 'Medium', 'Large'),
+(15, 30, 8.99, 5.00, 1, 8.54, 'Mild', 'Medium'),
+
+-- Order 16 (1 item)
+(16, 3, 11.99, 0, 1, 11.99, 'Medium', 'Small'),
+
+-- Order 17 (2 items)
+(17, 2, 19.99, 5.00, 1, 18.99, 'Medium', 'Family Pack'),
+(17, 3, 17.99, 0, 2, 35.98, 'Hot', 'Large'),
+
+-- Order 18 (3 items)
+(18, 4, 14.99, 0, 1, 14.99, 'Mild', 'Medium'),
+(18, 5, 9.99, 10.00, 2, 17.98, 'Medium', 'Small'),
+(18, 6, 18.99, 5.00, 1, 18.04, 'Extra Hot', 'Family Pack'),
+
+-- Order 19 (1 item)
+(19, 7, 12.99, 0, 1, 12.99, 'Hot', 'Medium'),
+
+(20, 1, 14.99, 0, 2, 29.98, 'Hot', 'Medium'),
+(20, 2, 9.99, 5.00, 1, 9.49, 'Mild', 'Large'),
+
+-- Order 21 (1 item)
+(21, 3, 12.99, 10.00, 1, 11.69, 'Medium', 'Small'),
+
+-- Order 22 (3 items)
+(22, 4, 7.99, 0, 2, 15.98, 'Hot', 'Medium'),
+(22, 5, 9.99, 0, 1, 9.99, 'Mild', 'Large'),
+(22, 6, 10.99, 5.00, 1, 10.44, 'Medium', 'Small'),
+
+-- Order 23 (2 items)
+(23, 7, 8.99, 0, 2, 17.98, 'Extra Hot', 'Medium'),
+(23, 8, 15.99, 0, 1, 15.99, 'Mild', 'Family Pack'),
+
+-- Order 24 (3 items)
+(24, 9, 6.99, 5.00, 1, 6.64, 'Medium', 'Small'),
+(24, 10, 11.99, 0, 2, 23.98, 'Hot', 'Medium'),
+(24, 11, 13.99, 0, 1, 13.99, 'Mild', 'Large'),
+
+-- Continue the pattern for Orders 25 through 70
+
+-- Order 25 (1 item)
+(25, 12, 10.99, 0, 1, 10.99, 'Medium', 'Medium'),
+
+-- Order 26 (2 items)
+(26, 13, 14.99, 5.00, 1, 14.24, 'Hot', 'Large'),
+(26, 14, 12.99, 0, 2, 25.98, 'Medium', 'Medium'),
+
+-- Order 27 (3 items)
+(27, 15, 9.99, 10.00, 1, 8.99, 'Mild', 'Small'),
+(27, 16, 11.99, 0, 2, 23.98, 'Medium', 'Large'),
+(27, 17, 15.99, 0, 1, 15.99, 'Hot', 'Family Pack'),
+
+-- Order 28 (2 items)
+(28, 1, 10.99, 5.00, 1, 10.44, 'Medium', 'Medium'),
+(28, 2, 12.99, 0, 2, 25.98, 'Hot', 'Large'),
+
+-- Order 29 (1 item)
+(29, 3, 9.99, 10.00, 1, 8.99, 'Mild', 'Small'),
+
+-- Order 30 (3 items)
+(30, 4, 14.99, 0, 2, 29.98, 'Medium', 'Medium'),
+(30, 5, 8.99, 5.00, 1, 8.54, 'Mild', 'Large'),
+(30, 6, 13.99, 0, 1, 13.99, 'Extra Hot', 'Small'),
+
+-- Order 31 (2 items)
+(31, 7, 11.99, 0, 1, 11.99, 'Medium', 'Large'),
+(31, 8, 14.99, 5.00, 1, 14.24, 'Hot', 'Family Pack'),
+
+-- Order 32 (1 item)
+(32, 9, 9.99, 10.00, 1, 8.99, 'Mild', 'Medium'),
+
+-- Order 33 (3 items)
+(33, 10, 12.99, 0, 2, 25.98, 'Hot', 'Large'),
+(33, 11, 10.99, 5.00, 1, 10.44, 'Mild', 'Medium'),
+(33, 12, 7.99, 0, 1, 7.99, 'Medium', 'Small'),
+
+-- Order 34 (2 items)
+(34, 13, 13.99, 0, 1, 13.99, 'Hot', 'Family Pack'),
+(34, 14, 11.99, 5.00, 2, 22.78, 'Medium', 'Medium'),
+
+-- Order 35 (1 item)
+(35, 15, 8.99, 10.00, 1, 8.09, 'Mild', 'Large'),
+
+-- Order 36 (3 items)
+(36, 16, 14.99, 0, 2, 29.98, 'Medium', 'Medium'),
+(36, 17, 12.99, 5.00, 1, 12.34, 'Hot', 'Family Pack'),
+(36, 18, 9.99, 0, 1, 9.99, 'Extra Hot', 'Small'),
+
+-- Order 37 (2 items)
+(37, 19, 11.99, 0, 2, 23.98, 'Mild', 'Medium'),
+(37, 20, 7.99, 5.00, 1, 7.59, 'Medium', 'Small'),
+
+-- Order 38 (1 item)
+(38, 21, 8.99, 0, 1, 8.99, 'Hot', 'Large'),
+
+-- Order 39 (3 items)
+(39, 22, 9.99, 0, 1, 9.99, 'Mild', 'Small'),
+(39, 23, 14.99, 5.00, 1, 14.24, 'Medium', 'Medium'),
+(39, 24, 11.99, 0, 2, 23.98, 'Hot', 'Family Pack'),
+
+-- Order 40 (2 items)
+(40, 25, 12.99, 0, 1, 12.99, 'Medium', 'Medium'),
+(40, 26, 8.99, 5.00, 2, 17.08, 'Mild', 'Large'),
+
+-- Order 41 (1 item)
+(41, 27, 13.99, 0, 1, 13.99, 'Hot', 'Small'),
+
+-- Order 42 (3 items)
+(42, 28, 10.99, 0, 1, 10.99, 'Medium', 'Family Pack'),
+(42, 29, 11.99, 5.00, 2, 22.78, 'Hot', 'Medium'),
+(42, 30, 7.99, 0, 1, 7.99, 'Extra Hot', 'Small'),
+
+-- Order 43 (2 items)
+(43, 11, 8.99, 5.00, 1, 8.54, 'Mild', 'Large'),
+(43, 12, 12.99, 0, 1, 12.99, 'Medium', 'Medium'),
+
+-- Order 44 (1 item)
+(44, 3, 11.99, 0, 1, 11.99, 'Hot', 'Medium'),
+
+-- Order 45 (3 items)
+(45, 14, 12.99, 5.00, 1, 12.34, 'Mild', 'Small'),
+(45, 15, 8.99, 0, 2, 17.98, 'Medium', 'Large'),
+(45, 16, 9.99, 0, 1, 9.99, 'Extra Hot', 'Medium'),
+
+-- Order 46 (2 items)
+(46, 7, 14.99, 0, 2, 29.98, 'Hot', 'Family Pack'),
+(46, 8, 7.99, 5.00, 1, 7.59, 'Mild', 'Medium'),
+
+-- Order 47 (1 item)
+(47, 39, 12.99, 0, 1, 12.99, 'Medium', 'Small'),
+
+-- Order 48 (3 items)
+(48, 1, 8.99, 5.00, 1, 8.54, 'Hot', 'Medium'),
+(48, 2, 14.99, 0, 2, 29.98, 'Mild', 'Large'),
+(48, 3, 10.99, 5.00, 1, 10.44, 'Medium', 'Family Pack'),
+
+-- Order 49 (2 items)
+(49, 3, 12.99, 0, 1, 12.99, 'Extra Hot', 'Medium'),
+(49, 4, 9.99, 5.00, 1, 9.49, 'Mild', 'Large'),
+
+-- Order 50 (1 item)
+(50, 5, 11.99, 0, 1, 11.99, 'Medium', 'Small'),
+
+-- Order 51 (3 items)
+(51, 6, 12.99, 0, 2, 25.98, 'Hot', 'Medium'),
+(51, 7, 10.99, 5.00, 1, 10.44, 'Mild', 'Large'),
+(51, 8, 8.99, 0, 1, 8.99, 'Medium', 'Family Pack'),
+
+-- Order 52 (1 item)
+(52, 1, 10.99, 5.00, 1, 10.44, 'Mild', 'Small'),
+
+-- Order 53 (2 items)
+(53, 2, 13.99, 0, 2, 27.98, 'Hot', 'Medium'),
+(53, 3, 11.99, 0, 1, 11.99, 'Medium', 'Large'),
+
+-- Order 54 (3 items)
+(54, 4, 14.99, 5.00, 1, 14.24, 'Extra Hot', 'Family Pack'),
+(54, 5, 9.99, 10.00, 1, 8.99, 'Medium', 'Medium'),
+(54, 6, 12.99, 0, 2, 25.98, 'Hot', 'Small'),
+
+-- Order 55 (2 items)
+(55, 7, 8.99, 5.00, 1, 8.54, 'Mild', 'Medium'),
+(55, 8, 15.99, 0, 2, 31.98, 'Medium', 'Large'),
+
+-- Order 56 (1 item)
+(56, 9, 11.99, 0, 1, 11.99, 'Hot', 'Small'),
+
+-- Order 57 (3 items)
+(57, 10, 12.99, 5.00, 1, 12.34, 'Mild', 'Medium'),
+(57, 11, 13.99, 0, 1, 13.99, 'Medium', 'Family Pack'),
+(57, 12, 9.99, 0, 2, 19.98, 'Hot', 'Large'),
+
+-- Order 58 (2 items)
+(58, 13, 14.99, 0, 2, 29.98, 'Medium', 'Large'),
+(58, 14, 7.99, 5.00, 1, 7.59, 'Mild', 'Small'),
+
+-- Order 59 (1 item)
+(59, 15, 9.99, 10.00, 1, 8.99, 'Extra Hot', 'Medium'),
+
+-- Order 60 (3 items)
+(60, 16, 8.99, 0, 2, 17.98, 'Hot', 'Small'),
+(60, 17, 14.99, 0, 1, 14.99, 'Medium', 'Family Pack'),
+(60, 18, 11.99, 5.00, 1, 11.39, 'Mild', 'Large'),
+
+-- Order 61 (2 items)
+(61, 19, 10.99, 0, 1, 10.99, 'Hot', 'Medium'),
+(61, 20, 9.99, 5.00, 2, 18.98, 'Mild', 'Small'),
+
+-- Order 62 (1 item)
+(62, 21, 12.99, 0, 1, 12.99, 'Medium', 'Large'),
+
+-- Order 63 (3 items)
+(63, 22, 8.99, 5.00, 1, 8.54, 'Mild', 'Medium'),
+(63, 23, 12.99, 0, 2, 25.98, 'Medium', 'Family Pack'),
+(63, 24, 7.99, 0, 1, 7.99, 'Hot', 'Small'),
+
+-- Order 64 (2 items)
+(64, 25, 10.99, 0, 1, 10.99, 'Medium', 'Medium'),
+(64, 26, 9.99, 5.00, 2, 18.98, 'Mild', 'Large'),
+
+-- Order 65 (1 item)
+(65, 27, 14.99, 0, 1, 14.99, 'Extra Hot', 'Family Pack'),
+
+-- Order 66 (3 items)
+(66, 28, 13.99, 0, 2, 27.98, 'Hot', 'Medium'),
+(66, 29, 11.99, 5.00, 1, 11.39, 'Mild', 'Small'),
+(66, 30, 9.99, 0, 1, 9.99, 'Medium', 'Large'),
+
+-- Order 67 (2 items)
+(67, 1, 12.99, 0, 1, 12.99, 'Mild', 'Family Pack'),
+(67, 2, 8.99, 5.00, 2, 17.98, 'Medium', 'Medium'),
+
+-- Order 68 (1 item)
+(68, 33, 14.99, 0, 1, 14.99, 'Hot', 'Large'),
+
+-- Order 69 (3 items)
+(69, 4, 7.99, 5.00, 1, 7.59, 'Mild', 'Medium'),
+(69, 5, 12.99, 0, 2, 25.98, 'Medium', 'Large'),
+(69, 6, 8.99, 0, 1, 8.99, 'Hot', 'Small'),
+
+-- Order 70 (2 items)
+(70, 7, 11.99, 0, 2, 23.98, 'Mild', 'Medium'),
+(70, 8, 9.99, 5.00, 1, 9.49, 'Medium', 'Large');
+
+
+-- Payments
+DECLARE @CurrentDate2 DATE = GETDATE();
+
+-- Insert Payments with dates ranging from 20 days back from the current date
+INSERT INTO Payments (UserId, OrderId, PaymentMethod, Amount, PaymentStatus, PaymentDate) VALUES
+(1, 1, 'credit card', 60.00, 'Completed', DATEADD(DAY, -365, GETDATE())),
+(2, 2, 'gift card', 90.00, 'Completed', DATEADD(DAY, -360, GETDATE())),
+(3, 3, 'credit card', 55.00, 'Pending', DATEADD(DAY, -355, GETDATE())),
+(4, 4, 'client credit', 80.00, 'Failed', DATEADD(DAY, -350, GETDATE())),
+(5, 5, 'credit card', 75.00, 'Completed', DATEADD(DAY, -345, GETDATE())),
+(6, 6, 'credit card', 95.00, 'Completed', DATEADD(DAY, -340, GETDATE())),
+(7, 7, 'credit card and gift card', 85.00, 'Completed', DATEADD(DAY, -335, GETDATE())),
+(8, 8, 'gift card', 65.00, 'Pending', DATEADD(DAY, -330, GETDATE())),
+(9, 9, 'credit card', 70.00, 'Completed', DATEADD(DAY, -325, GETDATE())),
+(10, 10, 'client credit', 60.00, 'Failed', DATEADD(DAY, -320, GETDATE())),
+(11, 11, 'credit card', 90.00, 'Completed', DATEADD(DAY, -315, GETDATE())),
+(12, 12, 'credit card', 55.00, 'Completed', DATEADD(DAY, -310, GETDATE())),
+(13, 13, 'gift card', 75.00, 'Completed', DATEADD(DAY, -305, GETDATE())),
+(14, 14, 'credit card', 65.00, 'Completed', DATEADD(DAY, -300, GETDATE())),
+(15, 15, 'credit card', 80.00, 'Completed', DATEADD(DAY, -295, GETDATE())),
+(16, 16, 'credit card', 70.00, 'Completed', DATEADD(DAY, -290, GETDATE())),
+(17, 17, 'credit card', 85.00, 'Completed', DATEADD(DAY, -285, GETDATE())),
+(18, 18, 'credit card', 75.00, 'Pending', DATEADD(DAY, -280, GETDATE())),
+(19, 19, 'client credit', 80.00, 'Completed', DATEADD(DAY, -275, GETDATE())),
+(20, 20, 'credit card', 60.00, 'Completed', DATEADD(DAY, -270, GETDATE())),
+(1, 21, 'credit card', 90.00, 'Completed', DATEADD(DAY, -265, GETDATE())),
+(2, 22, 'gift card', 75.00, 'Completed', DATEADD(DAY, -260, GETDATE())),
+(3, 23, 'credit card', 65.00, 'Pending', DATEADD(DAY, -255, GETDATE())),
+(4, 24, 'credit card', 95.00, 'Completed', DATEADD(DAY, -250, GETDATE())),
+(5, 25, 'credit card', 85.00, 'Completed', DATEADD(DAY, -245, GETDATE())),
+(6, 26, 'client credit', 55.00, 'Failed', DATEADD(DAY, -240, GETDATE())),
+(7, 27, 'credit card', 65.00, 'Completed', DATEADD(DAY, -235, GETDATE())),
+(8, 28, 'gift card', 50.00, 'Completed', DATEADD(DAY, -230, GETDATE())),
+(9, 29, 'credit card', 90.00, 'Completed', DATEADD(DAY, -225, GETDATE())),
+(10, 30, 'credit card', 120.00, 'Completed', DATEADD(DAY, -220, GETDATE())),
+(11, 31, 'credit card', 75.00, 'Completed', DATEADD(DAY, -215, GETDATE())),
+(12, 32, 'credit card', 100.00, 'Completed', DATEADD(DAY, -210, GETDATE())),
+(13, 33, 'credit card', 90.00, 'Completed', DATEADD(DAY, -205, GETDATE())),
+(14, 34, 'gift card', 95.00, 'Completed', DATEADD(DAY, -200, GETDATE())),
+(15, 35, 'credit card', 70.00, 'Pending', DATEADD(DAY, -195, GETDATE())),
+(16, 36, 'credit card', 85.00, 'Completed', DATEADD(DAY, -190, GETDATE())),
+(17, 37, 'client credit', 65.00, 'Completed', DATEADD(DAY, -185, GETDATE())),
+(18, 38, 'credit card', 55.00, 'Completed', DATEADD(DAY, -180, GETDATE())),
+(19, 39, 'credit card', 90.00, 'Completed', DATEADD(DAY, -175, GETDATE())),
+(20, 40, 'gift card', 80.00, 'Completed', DATEADD(DAY, -170, GETDATE())),
+(1, 41, 'credit card', 60.00, 'Pending', DATEADD(DAY, -165, GETDATE())),
+(2, 42, 'credit card', 75.00, 'Completed', DATEADD(DAY, -160, GETDATE())),
+(3, 43, 'credit card', 65.00, 'Completed', DATEADD(DAY, -155, GETDATE())),
+(4, 44, 'client credit', 70.00, 'Failed', DATEADD(DAY, -150, GETDATE())),
+(5, 45, 'credit card', 85.00, 'Completed', DATEADD(DAY, -145, GETDATE())),
+(6, 46, 'credit card', 55.00, 'Completed', DATEADD(DAY, -140, GETDATE())),
+(7, 47, 'credit card', 100.00, 'Completed', DATEADD(DAY, -135, GETDATE())),
+(8, 48, 'client credit', 65.00, 'Completed', DATEADD(DAY, -130, GETDATE())),
+(9, 49, 'gift card', 55.00, 'Completed', DATEADD(DAY, -125, GETDATE())),
+(10, 50, 'credit card', 70.00, 'Completed', DATEADD(DAY, -120, GETDATE())),
+(11, 51, 'credit card', 95.00, 'Completed', DATEADD(DAY, -115, GETDATE())),
+(12, 52, 'credit card', 75.00, 'Completed', DATEADD(DAY, -110, GETDATE())),
+(13, 53, 'gift card', 85.00, 'Completed', DATEADD(DAY, -105, GETDATE())),
+(14, 54, 'credit card', 65.00, 'Completed', DATEADD(DAY, -100, GETDATE())),
+(15, 55, 'client credit', 60.00, 'Completed', DATEADD(DAY, -95, GETDATE())),
+(16, 56, 'credit card', 70.00, 'Completed', DATEADD(DAY, -90, GETDATE())),
+(17, 57, 'gift card', 75.00, 'Completed', DATEADD(DAY, -85, GETDATE())),
+(18, 58, 'credit card', 95.00, 'Completed', DATEADD(DAY, -80, GETDATE())),
+(19, 59, 'client credit', 80.00, 'Completed', DATEADD(DAY, -75, GETDATE())),
+(20, 60, 'credit card', 85.00, 'Completed', DATEADD(DAY, -70, GETDATE())),
+(1, 61, 'credit card', 70.00, 'Completed', DATEADD(DAY, -65, GETDATE())),
+(2, 62, 'client credit', 55.00, 'Completed', DATEADD(DAY, -60, GETDATE())),
+(3, 63, 'credit card', 75.00, 'Completed', DATEADD(DAY, -55, GETDATE())),
+(4, 64, 'gift card', 65.00, 'Completed', DATEADD(DAY, -50, GETDATE())),
+(5, 65, 'credit card', 85.00, 'Completed', DATEADD(DAY, -45, GETDATE())),
+(6, 66, 'client credit', 70.00, 'Completed', DATEADD(DAY, -40, GETDATE())),
+(7, 67, 'credit card', 75.00, 'Completed', DATEADD(DAY, -35, GETDATE())),
+(8, 68, 'credit card', 60.00, 'Completed', DATEADD(DAY, -30, GETDATE())),
+(9, 69, 'client credit', 85.00, 'Completed', DATEADD(DAY, -25, GETDATE())),
+(10, 70, 'credit card', 90.00, 'Completed', DATEADD(DAY, -20, GETDATE()));
+
+---- Invoices
+--INSERT INTO Invoices (OrderId, IssueDate, DueDate, TotalAmount, Paid) VALUES 
+--(1, '2024-08-01', '2024-08-10', 50.00, 1),
+--(2, '2024-08-02', '2024-08-11', 75.00, 1),
+--(3, '2024-08-03', '2024-08-12', 65.00, 1),
+--(4, '2024-08-04', '2024-08-13', 45.00, 0),
+--(5, '2024-08-05', '2024-08-14', 95.00, 1),
+--(6, '2024-08-06', '2024-08-15', 85.00, 0),
+--(7, '2024-08-07', '2024-08-16', 35.00, 1),
+--(8, '2024-08-08', '2024-08-17', 25.00, 1),
+--(9, '2024-08-09', '2024-08-18', 15.00, 0),
+--(10, '2024-08-10', '2024-08-19', 55.00, 1),
+--(11, '2024-08-11', '2024-08-20', 65.00, 0),
+--(12, '2024-08-12', '2024-08-21', 75.00, 1),
+--(13, '2024-08-13', '2024-08-22', 85.00, 0),
+--(14, '2024-08-14', '2024-08-23', 95.00, 1),
+--(15, '2024-08-15', '2024-08-24', 105.00, 0),
+--(16, '2024-08-16', '2024-08-25', 115.00, 1),
+--(17, '2024-08-17', '2024-08-26', 125.00, 1),
+--(18, '2024-08-18', '2024-08-27', 135.00, 1),
+--(19, '2024-08-19', '2024-08-28', 145.00, 0),
+--(20, '2024-08-20', '2024-08-29', 155.00, 1);
+
 
 
 -- ShoppingCarts
@@ -610,39 +1132,6 @@ INSERT INTO CartItems (CartId, ItemId, Quantity, PriceAtAdd) VALUES
 (19, 19, 1, 13.99),
 (20, 20, 2, 15.99);
 
-
--- Inventory
-INSERT INTO Inventory (ItemId, CurrentStock, LowStockThreshold) VALUES 
-(1, 100, 10),
-(2, 150, 15),
-(3, 200, 20),
-(4, 120, 12),
-(5, 140, 14),
-(6, 130, 13),
-(7, 110, 11),
-(8, 160, 16),
-(9, 170, 17),
-(10, 180, 18),
-(11, 190, 19),
-(12, 210, 21),
-(13, 220, 22),
-(14, 230, 23),
-(15, 240, 24),
-(16, 250, 25),
-(17, 260, 26),
-(18, 270, 27),
-(19, 280, 28),
-(20, 290, 29),
-(21, 300, 30),
-(22, 310, 31),
-(23, 320, 32),
-(24, 330, 33),
-(25, 340, 34),
-(26, 350, 35),
-(27, 360, 36),
-(28, 370, 37),
-(29, 380, 38),
-(30, 390, 39);
 
 -- PromotionItems
 INSERT INTO PromotionItems (ItemId, DiscountRate) VALUES 
@@ -782,28 +1271,6 @@ INSERT INTO CustomerRewards (RewardId, UserId, IsUsed) VALUES
 (19, 19, 0),
 (20, 20, 1);
 
--- Invoices
-INSERT INTO Invoices (OrderId, IssueDate, DueDate, TotalAmount, Paid) VALUES 
-(1, '2024-08-01', '2024-08-10', 50.00, 1),
-(2, '2024-08-02', '2024-08-11', 75.00, 1),
-(3, '2024-08-03', '2024-08-12', 65.00, 1),
-(4, '2024-08-04', '2024-08-13', 45.00, 0),
-(5, '2024-08-05', '2024-08-14', 95.00, 1),
-(6, '2024-08-06', '2024-08-15', 85.00, 0),
-(7, '2024-08-07', '2024-08-16', 35.00, 1),
-(8, '2024-08-08', '2024-08-17', 25.00, 1),
-(9, '2024-08-09', '2024-08-18', 15.00, 0),
-(10, '2024-08-10', '2024-08-19', 55.00, 1),
-(11, '2024-08-11', '2024-08-20', 65.00, 0),
-(12, '2024-08-12', '2024-08-21', 75.00, 1),
-(13, '2024-08-13', '2024-08-22', 85.00, 0),
-(14, '2024-08-14', '2024-08-23', 95.00, 1),
-(15, '2024-08-15', '2024-08-24', 105.00, 0),
-(16, '2024-08-16', '2024-08-25', 115.00, 1),
-(17, '2024-08-17', '2024-08-26', 125.00, 1),
-(18, '2024-08-18', '2024-08-27', 135.00, 1),
-(19, '2024-08-19', '2024-08-28', 145.00, 0),
-(20, '2024-08-20', '2024-08-29', 155.00, 1);
 
 -- EnquiryType
 INSERT INTO EnquiryType (EnquiryName) VALUES 
@@ -874,31 +1341,6 @@ INSERT INTO Messages (SenderUserId, ReceiverUserId, EnquiryId, Subject, MessageC
 (18, 17, 19, 'General Inquiry', 'What are your business hours?'),
 (20, 19, 20, 'Feedback and Complaints', 'I have a complaint about my order.');
 
--- Payments
-DECLARE @CurrentDate2 DATE = GETDATE();
-
--- Insert Payments with dates ranging from 20 days back from the current date
-INSERT INTO Payments (UserId, OrderId, PaymentMethod, Amount, PaymentStatus, PaymentDate) VALUES 
-(1, 1, 'credit card', 50.00, 'Completed', DATEADD(DAY, -20, @CurrentDate2)),
-(2, 2, 'gift card', 75.00, 'Completed', DATEADD(DAY, -19, @CurrentDate2)),
-(3, 3, 'credit card', 65.00, 'Pending', DATEADD(DAY, -18, @CurrentDate2)),
-(4, 4, 'client credit', 45.00, 'Failed', DATEADD(DAY, -17, @CurrentDate2)),
-(5, 5, 'credit card', 95.00, 'Completed', DATEADD(DAY, -16, @CurrentDate2)),
-(6, 6, 'credit card and gift card', 85.00, 'Completed', DATEADD(DAY, -15, @CurrentDate)),
-(7, 7, 'gift card', 35.00, 'Completed', DATEADD(DAY, -14, @CurrentDate2)),
-(8, 8, 'credit card', 25.00, 'Pending', DATEADD(DAY, -13, @CurrentDate2)),
-(9, 9, 'client credit', 15.00, 'Completed', DATEADD(DAY, -12, @CurrentDate2)),
-(10, 10, 'credit card', 55.00, 'Completed', DATEADD(DAY, -11, @CurrentDate2)),
-(11, 11, 'credit card', 65.00, 'Completed', DATEADD(DAY, -10, @CurrentDate2)),
-(12, 12, 'credit card', 75.00, 'Completed', DATEADD(DAY, -9, @CurrentDate2)),
-(13, 13, 'gift card', 85.00, 'Completed', DATEADD(DAY, -8, @CurrentDate2)),
-(14, 14, 'credit card', 95.00, 'Completed', DATEADD(DAY, -7, @CurrentDate2)),
-(15, 15, 'credit card', 105.00, 'Completed', DATEADD(DAY, -6, @CurrentDate2)),
-(16, 16, 'client credit', 115.00, 'Completed', DATEADD(DAY, -5, @CurrentDate2)),
-(17, 17, 'credit card and gift card', 125.00, 'Completed', DATEADD(DAY, -4, @CurrentDate2)),
-(18, 18, 'credit card', 135.00, 'Pending', DATEADD(DAY, -3, @CurrentDate2)),
-(19, 19, 'client credit', 145.00, 'Failed', DATEADD(DAY, -2, @CurrentDate2)),
-(20, 20, 'credit card', 155.00, 'Completed', DATEADD(DAY, -1, @CurrentDate2));
 
 
 -- GiftCards
@@ -1025,3 +1467,326 @@ INSERT INTO Notification (NotificationType, EntityId, IsRead, Title, Message, Us
 ('Message', 18, 1, 'New Message', 'You have received a new message.', 18),
 ('Order', 19, 0, 'Order Delivered', 'Your order has been delivered.', 19),
 ('Other', 20, 1, 'Promotion', 'Check out our latest promotions.', 20);
+
+-- Insert Ingredients (40 different ingredients)
+INSERT INTO Ingredients (IngredientName, Unit, ItemsPerUnit, CreatedAt, UpdatedAt) VALUES
+('Onions', 'Bag', 30, GETDATE(), GETDATE()),
+('Green Chili', 'Bag', 50, GETDATE(), GETDATE()),
+('Capsicum', 'Basket', 10, GETDATE(), GETDATE()),
+('Cauliflower', 'Individual', 1, GETDATE(), GETDATE()),
+('Rice', 'Bag', 25, GETDATE(), GETDATE()),
+('Broccoli', 'Basket', 5, GETDATE(), GETDATE()),
+('Spinach', 'Bunch', 10, GETDATE(), GETDATE()),
+('Curry Leaves', 'Bunch', 15, GETDATE(), GETDATE()),
+('Chicken', 'Box', 5, GETDATE(), GETDATE()),
+('Lamb', 'Box', 5, GETDATE(), GETDATE()),
+('Flour', 'Bag', 20, GETDATE(), GETDATE()),
+('Oil', 'Bottle', 1, GETDATE(), GETDATE()),
+('Ginger', 'Bunch', 15, GETDATE(), GETDATE()),
+('Garlic', 'Bunch', 20, GETDATE(), GETDATE()),
+('Wine', 'Bottle', 1, GETDATE(), GETDATE()),
+('Tomatoes', 'Bag', 20, GETDATE(), GETDATE()),
+('Cilantro', 'Bunch', 10, GETDATE(), GETDATE()),
+('Mint Leaves', 'Bunch', 10, GETDATE(), GETDATE()),
+('Carrots', 'Bag', 20, GETDATE(), GETDATE()),
+('Potatoes', 'Bag', 15, GETDATE(), GETDATE()),
+('Peas', 'Bag', 10, GETDATE(), GETDATE()),
+('Yogurt', 'Box', 6, GETDATE(), GETDATE()),
+('Butter', 'Box', 10, GETDATE(), GETDATE()),
+('Paneer', 'Box', 5, GETDATE(), GETDATE()),
+('Cumin Seeds', 'Bag', 50, GETDATE(), GETDATE()),
+('Mustard Seeds', 'Bag', 50, GETDATE(), GETDATE()),
+('Bay Leaves', 'Bunch', 25, GETDATE(), GETDATE()),
+('Turmeric Powder', 'Bag', 30, GETDATE(), GETDATE()),
+('Red Chili Powder', 'Bag', 30, GETDATE(), GETDATE()),
+('Coriander Powder', 'Bag', 30, GETDATE(), GETDATE()),
+('Cardamom', 'Bag', 20, GETDATE(), GETDATE()),
+('Cloves', 'Bag', 15, GETDATE(), GETDATE()),
+('Black Pepper', 'Bag', 50, GETDATE(), GETDATE()),
+('Sugar', 'Bag', 25, GETDATE(), GETDATE()),
+('Salt', 'Bag', 50, GETDATE(), GETDATE()),
+('Honey', 'Bottle', 1, GETDATE(), GETDATE()),
+('Milk', 'Bottle', 1, GETDATE(), GETDATE()),
+('Vanilla Extract', 'Bottle', 1, GETDATE(), GETDATE()),
+('Almonds', 'Bag', 20, GETDATE(), GETDATE()),
+('Coconut Milk', 'Box', 5, GETDATE(), GETDATE());
+
+-- Insert ItemIngredients (Link Items to Ingredients with quantity needed per size)
+-- Total of 60 rows for at least 2 ingredients per item
+
+-- Item 1: Samosas (CategoryId 8)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(1, 1, 'Medium', 2, GETDATE(), GETDATE()),  -- Onions
+(1, 11, 'Medium', 1, GETDATE(), GETDATE()); -- Flour
+
+-- Item 2: Pani Puri (CategoryId 8)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(2, 2, 'Medium', 5, GETDATE(), GETDATE()),  -- Green Chili
+(2, 11, 'Medium', 1, GETDATE(), GETDATE()); -- Flour
+
+-- Item 3: Falafel (CategoryId 9)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(3, 3, 'Medium', 1, GETDATE(), GETDATE()),  -- Capsicum
+(3, 13, 'Medium', 1, GETDATE(), GETDATE()); -- Ginger
+
+-- Item 4: Hummus (CategoryId 9)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(4, 7, 'Medium', 2, GETDATE(), GETDATE()),  -- Spinach
+(4, 12, 'Medium', 1, GETDATE(), GETDATE()); -- Oil
+
+-- Item 5: Butter Chicken (CategoryId 11)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(5, 9, 'Medium', 2, GETDATE(), GETDATE()),  -- Chicken
+(5, 17, 'Medium', 2, GETDATE(), GETDATE()); -- Tomatoes
+
+-- Item 6: Chicken Tikka Masala (CategoryId 11)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(6, 9, 'Medium', 3, GETDATE(), GETDATE()),  -- Chicken
+(6, 18, 'Medium', 1, GETDATE(), GETDATE()); -- Mint Leaves
+
+-- Item 7: Biryani (CategoryId 11)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(7, 5, 'Medium', 1, GETDATE(), GETDATE()),  -- Rice
+(7, 8, 'Medium', 2, GETDATE(), GETDATE());  -- Curry Leaves
+
+-- Item 8: Rogan Josh (CategoryId 11)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(8, 10, 'Medium', 2, GETDATE(), GETDATE()), -- Lamb
+(8, 19, 'Medium', 1, GETDATE(), GETDATE()); -- Carrots
+
+-- Item 9: Palak Paneer (CategoryId 11)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(9, 7, 'Medium', 3, GETDATE(), GETDATE()),  -- Spinach
+(9, 24, 'Medium', 2, GETDATE(), GETDATE()); -- Paneer
+
+-- Item 10: Vindaloo (CategoryId 11)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(10, 1, 'Medium', 2, GETDATE(), GETDATE()), -- Onions
+(10, 28, 'Medium', 1, GETDATE(), GETDATE()); -- Turmeric Powder
+
+-- Item 11: Gyro (CategoryId 12)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(11, 10, 'Medium', 2, GETDATE(), GETDATE()), -- Lamb
+(11, 3, 'Medium', 1, GETDATE(), GETDATE());  -- Capsicum
+
+-- Item 12: Shawarma (CategoryId 12)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(12, 9, 'Medium', 2, GETDATE(), GETDATE()),  -- Chicken
+(12, 17, 'Medium', 2, GETDATE(), GETDATE()); -- Tomatoes
+
+-- Item 13: Burritos (CategoryId 13)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(13, 20, 'Medium', 3, GETDATE(), GETDATE()), -- Potatoes
+(13, 2, 'Medium', 4, GETDATE(), GETDATE());  -- Green Chili
+
+-- Item 14: Tacos (CategoryId 13)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(14, 3, 'Medium', 1, GETDATE(), GETDATE()),  -- Capsicum
+(14, 21, 'Medium', 2, GETDATE(), GETDATE()); -- Peas
+
+
+-- Item 15: Quesadillas (CategoryId 13)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(15, 11, 'Medium', 1, GETDATE(), GETDATE()),  -- Flour
+(15, 23, 'Medium', 2, GETDATE(), GETDATE());  -- Butter
+
+-- Item 16: Enchiladas (CategoryId 13)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(16, 17, 'Medium', 2, GETDATE(), GETDATE()),  -- Tomatoes
+(16, 20, 'Medium', 3, GETDATE(), GETDATE());  -- Potatoes
+
+-- Item 17: Tostadas (CategoryId 13)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(17, 3, 'Medium', 1, GETDATE(), GETDATE()),   -- Capsicum
+(17, 28, 'Medium', 1, GETDATE(), GETDATE());  -- Turmeric Powder
+
+-- Item 18: Gulab Jamun (CategoryId 14)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(18, 34, 'Medium', 2, GETDATE(), GETDATE()),  -- Sugar
+(18, 23, 'Medium', 1, GETDATE(), GETDATE());  -- Butter
+
+-- Item 19: Baklava (CategoryId 15)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(19, 39, 'Medium', 1, GETDATE(), GETDATE()),  -- Almonds
+(19, 36, 'Medium', 1, GETDATE(), GETDATE());  -- Honey
+
+-- Item 20: Churros (CategoryId 16)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(20, 11, 'Medium', 1, GETDATE(), GETDATE()),  -- Flour
+(20, 34, 'Medium', 2, GETDATE(), GETDATE());  -- Sugar
+
+-- Item 21: Mango Lassi (CategoryId 17)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(21, 22, 'Medium', 1, GETDATE(), GETDATE()),  -- Yogurt
+(21, 37, 'Medium', 1, GETDATE(), GETDATE());  -- Milk
+
+-- Item 22: Turkish Coffee (CategoryId 18)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(22, 33, 'Medium', 1, GETDATE(), GETDATE()),  -- Black Pepper (as spice)
+(22, 37, 'Medium', 1, GETDATE(), GETDATE());  -- Milk
+
+-- Item 23: Horchata (CategoryId 19)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(23, 5, 'Medium', 1, GETDATE(), GETDATE()),   -- Rice
+(23, 34, 'Medium', 2, GETDATE(), GETDATE());  -- Sugar
+
+-- Item 24: Naan Bread (CategoryId 20)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(24, 11, 'Medium', 1, GETDATE(), GETDATE()),  -- Flour
+(24, 23, 'Medium', 1, GETDATE(), GETDATE());  -- Butter
+
+-- Item 25: Pita Bread (CategoryId 21)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(25, 11, 'Medium', 1, GETDATE(), GETDATE()),  -- Flour
+(25, 12, 'Medium', 1, GETDATE(), GETDATE());  -- Oil
+
+-- Item 26: Mexican Rice (CategoryId 22)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(26, 5, 'Medium', 1, GETDATE(), GETDATE()),   -- Rice
+(26, 2, 'Medium', 3, GETDATE(), GETDATE());   -- Green Chili
+
+-- Item 27: Spanakopita (CategoryId 23)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(27, 7, 'Medium', 2, GETDATE(), GETDATE()),   -- Spinach
+(27, 23, 'Medium', 1, GETDATE(), GETDATE());  -- Butter
+
+-- Item 28: Dolma (CategoryId 23)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(28, 8, 'Medium', 1, GETDATE(), GETDATE()),   -- Curry Leaves
+(28, 16, 'Medium', 1, GETDATE(), GETDATE());  -- Tomatoes
+
+-- Item 29: Tamales (CategoryId 24)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(29, 11, 'Medium', 1, GETDATE(), GETDATE()),  -- Flour
+(29, 20, 'Medium', 2, GETDATE(), GETDATE());  -- Potatoes
+
+-- Item 30: Empanadas (CategoryId 24)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(30, 11, 'Medium', 1, GETDATE(), GETDATE()),  -- Flour
+(30, 34, 'Medium', 2, GETDATE(), GETDATE());  -- Sugar
+
+-- Item 31: Aloo Tikki (CategoryId 8)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(31, 1, 'Medium', 2, GETDATE(), GETDATE()),  -- Onions
+(31, 20, 'Medium', 2, GETDATE(), GETDATE());  -- Potatoes
+
+-- Item 32: Dolma (CategoryId 9)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(32, 8, 'Medium', 1, GETDATE(), GETDATE()),  -- Curry Leaves
+(32, 16, 'Medium', 2, GETDATE(), GETDATE());  -- Tomatoes
+
+-- Item 33: Elote (CategoryId 10)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(33, 3, 'Medium', 2, GETDATE(), GETDATE()),  -- Capsicum
+(33, 17, 'Medium', 1, GETDATE(), GETDATE());  -- Tomatoes
+
+-- Item 34: Paneer Butter Masala (CategoryId 11)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(34, 24, 'Medium', 2, GETDATE(), GETDATE()),  -- Paneer
+(34, 23, 'Medium', 1, GETDATE(), GETDATE());  -- Butter
+
+-- Item 35: Lamb Kebab (CategoryId 12)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(35, 10, 'Medium', 2, GETDATE(), GETDATE()),  -- Lamb
+(35, 3, 'Medium', 1, GETDATE(), GETDATE());  -- Capsicum
+
+-- Item 36: Chicken Fajitas (CategoryId 13)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(36, 9, 'Medium', 2, GETDATE(), GETDATE()),  -- Chicken
+(36, 3, 'Medium', 1, GETDATE(), GETDATE());  -- Capsicum
+
+-- Item 37: Rasmalai (CategoryId 14)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(37, 22, 'Medium', 1, GETDATE(), GETDATE()),  -- Yogurt
+(37, 34, 'Medium', 2, GETDATE(), GETDATE());  -- Sugar
+
+-- Item 38: Knafeh (CategoryId 15)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(38, 39, 'Medium', 2, GETDATE(), GETDATE()),  -- Almonds
+(38, 36, 'Medium', 1, GETDATE(), GETDATE());  -- Honey
+
+-- Item 39: Tres Leches Cake (CategoryId 16)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(39, 37, 'Medium', 1, GETDATE(), GETDATE()),  -- Milk
+(39, 34, 'Medium', 2, GETDATE(), GETDATE());  -- Sugar
+
+-- Item 40: Masala Chai (CategoryId 17)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(40, 13, 'Medium', 1, GETDATE(), GETDATE()),  -- Ginger
+(40, 14, 'Medium', 2, GETDATE(), GETDATE());  -- Garlic
+
+-- Item 41: Samosas (CategoryId 8)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(41, 1, 'Medium', 2, GETDATE(), GETDATE()),  -- Onions
+(41, 20, 'Medium', 3, GETDATE(), GETDATE());  -- Potatoes
+
+-- Item 42: Pani Puri (CategoryId 8)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(42, 2, 'Medium', 5, GETDATE(), GETDATE()),  -- Green Chili
+(42, 11, 'Medium', 1, GETDATE(), GETDATE());  -- Flour
+
+-- Item 43: Falafel (CategoryId 9)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(43, 3, 'Medium', 1, GETDATE(), GETDATE()),  -- Capsicum
+(43, 13, 'Medium', 1, GETDATE(), GETDATE());  -- Ginger
+
+-- Item 44: Hummus (CategoryId 9)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(44, 7, 'Medium', 2, GETDATE(), GETDATE()),  -- Spinach
+(44, 12, 'Medium', 1, GETDATE(), GETDATE());  -- Oil
+
+-- Item 45: Tabbouleh (CategoryId 9)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(45, 7, 'Medium', 1, GETDATE(), GETDATE()),  -- Spinach
+(45, 17, 'Medium', 1, GETDATE(), GETDATE());  -- Tomatoes
+
+-- Item 46: Baba Ganoush (CategoryId 9)
+INSERT INTO ItemIngredients (ItemId, IngredientId, Size, QuantityNeeded, CreatedAt, UpdatedAt) VALUES
+(46, 3, 'Medium', 1, GETDATE(), GETDATE()),  -- Capsicum
+(46, 17, 'Medium', 2, GETDATE(), GETDATE());  -- Tomatoes
+
+
+-- Insert Inventory Data (for 40 Ingredients)
+INSERT INTO Inventory (IngredientId, CurrentStock, LowStockThreshold, CreatedAt, UpdatedAt) VALUES
+(1, 200, 30, GETDATE(), GETDATE()),   -- Onions
+(2, 300, 50, GETDATE(), GETDATE()),   -- Green Chili
+(3, 100, 20, GETDATE(), GETDATE()),   -- Capsicum
+(4, 50, 10, GETDATE(), GETDATE()),    -- Cauliflower
+(5, 150, 40, GETDATE(), GETDATE()),   -- Rice
+(6, 75, 15, GETDATE(), GETDATE()),    -- Broccoli
+(7, 60, 15, GETDATE(), GETDATE()),    -- Spinach
+(8, 90, 25, GETDATE(), GETDATE()),    -- Curry Leaves
+(9, 40, 10, GETDATE(), GETDATE()),    -- Chicken
+(10, 30, 10, GETDATE(), GETDATE()),   -- Lamb
+(11, 100, 25, GETDATE(), GETDATE()),  -- Flour
+(12, 20, 5, GETDATE(), GETDATE()),    -- Oil
+(13, 50, 10, GETDATE(), GETDATE()),   -- Ginger
+(14, 40, 10, GETDATE(), GETDATE()),   -- Garlic
+(15, 10, 2, GETDATE(), GETDATE()),    -- Wine
+(16, 70, 15, GETDATE(), GETDATE()),   -- Tomatoes
+(17, 50, 10, GETDATE(), GETDATE()),   -- Cilantro
+(18, 60, 15, GETDATE(), GETDATE()),   -- Mint Leaves
+(19, 40, 10, GETDATE(), GETDATE()),   -- Carrots
+(20, 50, 15, GETDATE(), GETDATE()),   -- Potatoes
+(21, 30, 10, GETDATE(), GETDATE()),   -- Peas
+(22, 25, 5, GETDATE(), GETDATE()),    -- Yogurt
+(23, 40, 10, GETDATE(), GETDATE()),   -- Butter
+(24, 20, 5, GETDATE(), GETDATE()),    -- Paneer
+(25, 90, 25, GETDATE(), GETDATE()),   -- Cumin Seeds
+(26, 70, 20, GETDATE(), GETDATE()),   -- Mustard Seeds
+(27, 60, 20, GETDATE(), GETDATE()),   -- Bay Leaves
+(28, 80, 25, GETDATE(), GETDATE()),   -- Turmeric Powder
+(29, 60, 20, GETDATE(), GETDATE()),   -- Red Chili Powder
+(30, 70, 20, GETDATE(), GETDATE()),   -- Coriander Powder
+(31, 30, 10, GETDATE(), GETDATE()),   -- Cardamom
+(32, 25, 8, GETDATE(), GETDATE()),    -- Cloves
+(33, 100, 30, GETDATE(), GETDATE()),  -- Black Pepper
+(34, 150, 50, GETDATE(), GETDATE()),  -- Sugar
+(35, 100, 30, GETDATE(), GETDATE()),  -- Salt
+(36, 15, 5, GETDATE(), GETDATE()),    -- Honey
+(37, 25, 10, GETDATE(), GETDATE()),   -- Milk
+(38, 10, 3, GETDATE(), GETDATE()),    -- Vanilla Extract
+(39, 40, 15, GETDATE(), GETDATE()),   -- Almonds
+(40, 20, 5, GETDATE(), GETDATE());    -- Coconut Milk
+
+

@@ -45,13 +45,21 @@ public partial class User
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
+    public virtual ICollection<RecentlyViewed> RecentlyVieweds { get; set; } = new List<RecentlyViewed>();
+
     public virtual Role Role { get; set; } = null!;
 
     public virtual ShoppingCart? ShoppingCart { get; set; }
 
+    public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
+
     public virtual ICollection<UserActivityLog> UserActivityLogs { get; set; } = new List<UserActivityLog>();
 
     public virtual ICollection<UserAddress> UserAddresses { get; set; } = new List<UserAddress>();
+
+    public virtual ICollection<UserItemInteraction> UserItemInteractions { get; set; } = new List<UserItemInteraction>();
+
+    public virtual ICollection<UserItemRating> UserItemRatings { get; set; } = new List<UserItemRating>();
 
     public virtual UsersCredential? UsersCredential { get; set; }
 }

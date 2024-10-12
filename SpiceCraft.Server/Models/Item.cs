@@ -31,9 +31,9 @@ public partial class Item
 
     public virtual ItemCategory Category { get; set; } = null!;
 
-    public virtual Inventory? Inventory { get; set; }
-
     public virtual ICollection<ItemImage> ItemImages { get; set; } = new List<ItemImage>();
+
+    public virtual ICollection<ItemIngredient> ItemIngredients { get; set; } = new List<ItemIngredient>();
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
@@ -42,4 +42,8 @@ public partial class Item
     public virtual PromotionComboItem? PromotionComboItem { get; set; }
 
     public virtual PromotionItem? PromotionItem { get; set; }
+
+    public virtual ICollection<RecentlyViewed> RecentlyVieweds { get; set; } = new List<RecentlyViewed>();
+
+    public virtual ICollection<UserItemRating> UserItemRatings { get; set; } = new List<UserItemRating>();
 }

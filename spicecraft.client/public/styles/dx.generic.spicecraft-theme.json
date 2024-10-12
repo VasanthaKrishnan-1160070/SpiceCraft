@@ -1,0 +1,118 @@
+{
+    "items": [
+        {
+            "key": "$datagrid-base-background-color",
+            "value": "rgba(70, 86, 114, 1)"
+        },
+        {
+            "key": "$datagrid-columnchooser-font-weight",
+            "value": "bold"
+        },
+        {
+            "key": "$datagrid-row-selected-color",
+            "value": "rgba(230, 237, 236, 1)"
+        },
+        {
+            "key": "$datagrid-cell-modified-border-color",
+            "value": "rgba(80, 153, 137, 0.87)"
+        },
+        {
+            "key": "$datagrid-row-focused-bg",
+            "value": "rgba(59, 173, 151, 1)"
+        },
+        {
+            "key": "$datagrid-selection-bg",
+            "value": "rgba(59, 173, 151, 1)"
+        },
+        {
+            "key": "$datagrid-hover-bg",
+            "value": "rgba(65, 240, 234, 0.12)"
+        },
+        {
+            "key": "$datagrid-base-color",
+            "value": "rgba(230, 242, 240, 1)"
+        },
+        {
+            "key": "$datagrid-link-color",
+            "value": "rgba(60, 197, 201, 1)"
+        },
+        {
+            "key": "$datagrid-focused-border-color",
+            "value": "rgba(60, 184, 189, 1)"
+        },
+        {
+            "key": "$datagrid-search-bg",
+            "value": "rgba(72, 171, 138, 1)"
+        },
+        {
+            "key": "$datagrid-columnchooser-item-color",
+            "value": "rgba(62, 184, 189, 1)"
+        },
+        {
+            "key": "$form-field-item-color",
+            "value": "rgba(101, 104, 107, 1)"
+        },
+        {
+            "key": "$form-group-border-color",
+            "value": "rgba(111, 190, 191, 1)"
+        },
+        {
+            "key": "$base-link-color",
+            "value": "rgba(240, 91, 65, 1)"
+        },
+        {
+            "key": "$texteditor-hover-border-color",
+            "value": "rgba(74, 168, 159, 1)"
+        },
+        {
+            "key": "$switch-border-color",
+            "value": "rgba(145, 147, 148, 1)"
+        },
+        {
+            "key": "$texteditor-focused-border-color",
+            "value": "rgba(78, 197, 199, 1)"
+        },
+        {
+            "key": "$calendar-cell-selected-bg",
+            "value": "rgba(75, 179, 147, 1)"
+        },
+        {
+            "key": "$calendar-hover-bg",
+            "value": "rgba(65, 240, 164, 0.24)"
+        },
+        {
+            "key": "$calendar-cell-active-bg",
+            "value": "rgba(65, 240, 190, 0.4)"
+        },
+        {
+            "key": "$texteditor-border-color",
+            "value": "rgba(112, 156, 153, 1)"
+        },
+        {
+            "key": "$selectbox-list-bg",
+            "value": "rgba(255, 255, 255, 1)"
+        },
+        {
+            "key": "$checkbox-hover-border-color",
+            "value": "rgba(18, 227, 133, 1)"
+        },
+        {
+            "key": "$checkbox-border-color-focused",
+            "value": "rgba(69, 209, 195, 1)"
+        },
+        {
+            "key": "$base-font-family",
+            "value": "'Open Sans', sans-serif"
+        },
+        {
+            "key": "$base-label-color",
+            "value": "rgba(114, 117, 120, 1)"
+        }
+    ],
+    "baseTheme": "generic.carmine",
+    "outputColorScheme": "spicecraft-theme",
+    "makeSwatch": false,
+    "version": "24.1.6",
+    "widgets": [],
+    "removeExternalResources": false
+}

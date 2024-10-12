@@ -38,7 +38,8 @@
               }
             ],
             "styles": [
-              "node_modules/devextreme/dist/css/dx.carmine.css",
+              "node_modules/devextreme/dist/css/dx.Carmine.css",
+              "node_modules/devextreme/dist/css/dx.generic.spicecraft-theme.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/aos/dist/aos.css",

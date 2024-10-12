@@ -30,6 +30,8 @@ public partial class SpiceCraftContext : DbContext
 
     public virtual DbSet<GiftCard> GiftCards { get; set; }
 
+    public virtual DbSet<Ingredient> Ingredients { get; set; }
+
     public virtual DbSet<Inventory> Inventories { get; set; }
 
     public virtual DbSet<Invoice> Invoices { get; set; }
@@ -39,6 +41,8 @@ public partial class SpiceCraftContext : DbContext
     public virtual DbSet<ItemCategory> ItemCategories { get; set; }
 
     public virtual DbSet<ItemImage> ItemImages { get; set; }
+
+    public virtual DbSet<ItemIngredient> ItemIngredients { get; set; }
 
     public virtual DbSet<Message> Messages { get; set; }
 
@@ -60,6 +64,8 @@ public partial class SpiceCraftContext : DbContext
 
     public virtual DbSet<PromotionItem> PromotionItems { get; set; }
 
+    public virtual DbSet<RecentlyViewed> RecentlyVieweds { get; set; }
+
     public virtual DbSet<Reward> Rewards { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
@@ -68,11 +74,17 @@ public partial class SpiceCraftContext : DbContext
 
     public virtual DbSet<ShoppingCart> ShoppingCarts { get; set; }
 
+    public virtual DbSet<Subscription> Subscriptions { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserActivityLog> UserActivityLogs { get; set; }
 
     public virtual DbSet<UserAddress> UserAddresses { get; set; }
+
+    public virtual DbSet<UserItemInteraction> UserItemInteractions { get; set; }
+
+    public virtual DbSet<UserItemRating> UserItemRatings { get; set; }
 
     public virtual DbSet<UsersCredential> UsersCredentials { get; set; }
 
@@ -83,9 +95,9 @@ public partial class SpiceCraftContext : DbContext
     {
         modelBuilder.Entity<CartItem>(entity =>
         {
-            entity.HasKey(e => e.CartItemId).HasName("PK__CartItem__488B0B0A7C011442");
+            entity.HasKey(e => e.CartItemId).HasName("PK__CartItem__488B0B0AE57C8CE1");
 
-            entity.HasIndex(e => new { e.CartId, e.ItemId }, "UQ__CartItem__F69B3F8EEE1A8CA9").IsUnique();
+            entity.HasIndex(e => new { e.CartId, e.ItemId }, "UQ__CartItem__F69B3F8E8F737D94").IsUnique();
 
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
@@ -105,11 +117,11 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<CorporateClient>(entity =>
         {
-            entity.HasKey(e => e.CorporateId).HasName("PK__Corporat__87E40386E0BCDBAD");
+            entity.HasKey(e => e.CorporateId).HasName("PK__Corporat__87E40386BBDA06BA");
 
-            entity.HasIndex(e => e.UserId, "UQ__Corporat__1788CC4D82339A83").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__Corporat__1788CC4D263A7414").IsUnique();
 
-            entity.HasIndex(e => e.CompanyName, "UQ__Corporat__9BCE05DC0897CF9B").IsUnique();
+            entity.HasIndex(e => e.CompanyName, "UQ__Corporat__9BCE05DCB1B20E76").IsUnique();
 
             entity.Property(e => e.Approved).HasDefaultValue(false);
             entity.Property(e => e.CompanyDescription).IsUnicode(false);
@@ -143,39 +155,39 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<CustomerGiftCard>(entity =>
         {
-            entity.HasKey(e => e.CustomerGiftCardId).HasName("PK__Customer__F382824D474D9586");
+            entity.HasKey(e => e.CustomerGiftCardId).HasName("PK__Customer__F382824D47803200");
 
             entity.ToTable("CustomerGiftCard");
 
             entity.HasOne(d => d.GiftCard).WithMany(p => p.CustomerGiftCards)
                 .HasForeignKey(d => d.GiftCardId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CustomerG__GiftC__4D5F7D71");
+                .HasConstraintName("FK__CustomerG__GiftC__5CA1C101");
 
             entity.HasOne(d => d.User).WithMany(p => p.CustomerGiftCards)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CustomerG__UserI__4C6B5938");
+                .HasConstraintName("FK__CustomerG__UserI__5BAD9CC8");
         });
 
         modelBuilder.Entity<CustomerReward>(entity =>
         {
-            entity.HasKey(e => e.CustomerRewardsId).HasName("PK__Customer__2E79ECCEE9DB0CF0");
+            entity.HasKey(e => e.CustomerRewardsId).HasName("PK__Customer__2E79ECCEAD30830D");
 
             entity.HasOne(d => d.Reward).WithMany(p => p.CustomerRewards)
                 .HasForeignKey(d => d.RewardId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CustomerR__Rewar__2739D489");
+                .HasConstraintName("FK__CustomerR__Rewar__367C1819");
 
             entity.HasOne(d => d.User).WithMany(p => p.CustomerRewards)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CustomerR__UserI__282DF8C2");
+                .HasConstraintName("FK__CustomerR__UserI__37703C52");
         });
 
         modelBuilder.Entity<Enquiry>(entity =>
         {
-            entity.HasKey(e => e.EnquiryId).HasName("PK__Enquiry__0A019B7D3C2E50E1");
+            entity.HasKey(e => e.EnquiryId).HasName("PK__Enquiry__0A019B7D077BB78A");
 
             entity.ToTable("Enquiry");
 
@@ -189,12 +201,12 @@ public partial class SpiceCraftContext : DbContext
             entity.HasOne(d => d.EnquiryType).WithMany(p => p.Enquiries)
                 .HasForeignKey(d => d.EnquiryTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Enquiry__Enquiry__339FAB6E");
+                .HasConstraintName("FK__Enquiry__Enquiry__42E1EEFE");
         });
 
         modelBuilder.Entity<EnquiryType>(entity =>
         {
-            entity.HasKey(e => e.EnquiryTypeId).HasName("PK__EnquiryT__BE8CFEFCC779702D");
+            entity.HasKey(e => e.EnquiryTypeId).HasName("PK__EnquiryT__BE8CFEFC943711A0");
 
             entity.ToTable("EnquiryType");
 
@@ -205,9 +217,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<GiftCard>(entity =>
         {
-            entity.HasKey(e => e.GiftCardId).HasName("PK__GiftCard__9FBB0CC1D2568D35");
+            entity.HasKey(e => e.GiftCardId).HasName("PK__GiftCard__9FBB0CC188CE58CB");
 
-            entity.HasIndex(e => e.Code, "UQ__GiftCard__A25C5AA7AA139D8C").IsUnique();
+            entity.HasIndex(e => e.Code, "UQ__GiftCard__A25C5AA7A9953A4E").IsUnique();
 
             entity.Property(e => e.Balance).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Code)
@@ -222,13 +234,33 @@ public partial class SpiceCraftContext : DbContext
                 .HasColumnType("datetime");
         });
 
+        modelBuilder.Entity<Ingredient>(entity =>
+        {
+            entity.HasKey(e => e.IngredientId).HasName("PK__Ingredie__BEAEB25AE9AB8868");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IngredientName)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+            entity.Property(e => e.ItemsPerUnit).HasDefaultValue(1);
+            entity.Property(e => e.Unit)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasDefaultValue("Individual");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+        });
+
         modelBuilder.Entity<Inventory>(entity =>
         {
-            entity.HasKey(e => e.InventoryId).HasName("PK__Inventor__F5FDE6B36C92ED3A");
+            entity.HasKey(e => e.InventoryId).HasName("PK__Inventor__F5FDE6B325C63A59");
 
             entity.ToTable("Inventory");
 
-            entity.HasIndex(e => e.ItemId, "UQ__Inventor__727E838AD03E45C0").IsUnique();
+            entity.HasIndex(e => e.IngredientId, "UQ__Inventor__BEAEB25B645D59CD").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -237,31 +269,31 @@ public partial class SpiceCraftContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.Item).WithOne(p => p.Inventory)
-                .HasForeignKey<Inventory>(d => d.ItemId)
+            entity.HasOne(d => d.Ingredient).WithOne(p => p.Inventory)
+                .HasForeignKey<Inventory>(d => d.IngredientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Inventory__ItemI__0C85DE4D");
+                .HasConstraintName("FK__Inventory__Ingre__1BC821DD");
         });
 
         modelBuilder.Entity<Invoice>(entity =>
         {
-            entity.HasKey(e => e.InvoiceId).HasName("PK__Invoices__D796AAB54E5C13D0");
+            entity.HasKey(e => e.InvoiceId).HasName("PK__Invoices__D796AAB5C35389EC");
 
-            entity.HasIndex(e => e.OrderId, "UQ__Invoices__C3905BCE7459F945").IsUnique();
+            entity.HasIndex(e => e.OrderId, "UQ__Invoices__C3905BCE8F29D774").IsUnique();
 
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(10, 2)");
 
             entity.HasOne(d => d.Order).WithOne(p => p.Invoice)
                 .HasForeignKey<Invoice>(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Invoices__OrderI__2CF2ADDF");
+                .HasConstraintName("FK__Invoices__OrderI__3C34F16F");
         });
 
         modelBuilder.Entity<Item>(entity =>
         {
-            entity.HasKey(e => e.ItemId).HasName("PK__Items__727E838BC43FEDB6");
+            entity.HasKey(e => e.ItemId).HasName("PK__Items__727E838BA6E2E734");
 
-            entity.HasIndex(e => new { e.CategoryId, e.ItemName }, "UQ__Items__6DED0D351F214A12").IsUnique();
+            entity.HasIndex(e => new { e.CategoryId, e.ItemName }, "UQ__Items__6DED0D357D6D0233").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -286,9 +318,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<ItemCategory>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__ItemCate__19093A0BC8EECC57");
+            entity.HasKey(e => e.CategoryId).HasName("PK__ItemCate__19093A0BBE5F02C2");
 
-            entity.HasIndex(e => e.CategoryName, "UQ__ItemCate__8517B2E028A0246C").IsUnique();
+            entity.HasIndex(e => e.CategoryName, "UQ__ItemCate__8517B2E023A9DBA8").IsUnique();
 
             entity.Property(e => e.CategoryName)
                 .HasMaxLength(300)
@@ -301,9 +333,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<ItemImage>(entity =>
         {
-            entity.HasKey(e => e.ImageId).HasName("PK__ItemImag__7516F70CE8CDE5E2");
+            entity.HasKey(e => e.ImageId).HasName("PK__ItemImag__7516F70CA470566A");
 
-            entity.HasIndex(e => e.ImageCode, "UQ__ItemImag__A7875E7203F6D8BC").IsUnique();
+            entity.HasIndex(e => e.ImageCode, "UQ__ItemImag__A7875E7228F3961B").IsUnique();
 
             entity.Property(e => e.ImageCode)
                 .HasMaxLength(300)
@@ -316,12 +348,39 @@ public partial class SpiceCraftContext : DbContext
             entity.HasOne(d => d.Item).WithMany(p => p.ItemImages)
                 .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ItemImage__ItemI__5224328E");
+                .HasConstraintName("FK__ItemImage__ItemI__6166761E");
+        });
+
+        modelBuilder.Entity<ItemIngredient>(entity =>
+        {
+            entity.HasKey(e => e.ItemIngredientId).HasName("PK__ItemIngr__D8B0DB39CD502AA9");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.QuantityNeeded).HasDefaultValue(1);
+            entity.Property(e => e.Size)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasDefaultValue("Medium");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Ingredient).WithMany(p => p.ItemIngredients)
+                .HasForeignKey(d => d.IngredientId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ItemIngre__Ingre__160F4887");
+
+            entity.HasOne(d => d.Item).WithMany(p => p.ItemIngredients)
+                .HasForeignKey(d => d.ItemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ItemIngre__ItemI__151B244E");
         });
 
         modelBuilder.Entity<Message>(entity =>
         {
-            entity.HasKey(e => e.MessageId).HasName("PK__Messages__C87C0C9C6123ADFA");
+            entity.HasKey(e => e.MessageId).HasName("PK__Messages__C87C0C9C035B5C24");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -338,21 +397,21 @@ public partial class SpiceCraftContext : DbContext
             entity.HasOne(d => d.Enquiry).WithMany(p => p.Messages)
                 .HasForeignKey(d => d.EnquiryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Messages__Enquir__3B40CD36");
+                .HasConstraintName("FK__Messages__Enquir__4A8310C6");
 
             entity.HasOne(d => d.ReceiverUser).WithMany(p => p.MessageReceiverUsers)
                 .HasForeignKey(d => d.ReceiverUserId)
-                .HasConstraintName("FK__Messages__Receiv__3A4CA8FD");
+                .HasConstraintName("FK__Messages__Receiv__498EEC8D");
 
             entity.HasOne(d => d.SenderUser).WithMany(p => p.MessageSenderUsers)
                 .HasForeignKey(d => d.SenderUserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Messages__Sender__395884C4");
+                .HasConstraintName("FK__Messages__Sender__489AC854");
         });
 
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E1291FD50E1");
+            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E12D7C00901");
 
             entity.ToTable("Notification");
 
@@ -377,14 +436,14 @@ public partial class SpiceCraftContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Notifications)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Notificat__UserI__5E8A0973");
+                .HasConstraintName("FK__Notificat__UserI__6DCC4D03");
         });
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF9C1531F9");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF155D8992");
 
-            entity.HasIndex(e => new { e.OrderDate, e.UserId }, "UQ__Orders__A7F88E8F30A778F0").IsUnique();
+            entity.HasIndex(e => new { e.OrderDate, e.UserId }, "UQ__Orders__A7F88E8FDE5F30E8").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -414,9 +473,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<OrderDetail>(entity =>
         {
-            entity.HasKey(e => e.OrderDetailsId).HasName("PK__OrderDet__9DD74DBDBAAD2B5A");
+            entity.HasKey(e => e.OrderDetailsId).HasName("PK__OrderDet__9DD74DBD188F487E");
 
-            entity.HasIndex(e => new { e.OrderId, e.ItemId }, "UQ__OrderDet__64B7B3F6D8454502").IsUnique();
+            entity.HasIndex(e => new { e.OrderId, e.ItemId }, "UQ__OrderDet__64B7B3F6553266C9").IsUnique();
 
             entity.Property(e => e.ActualPrice).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Description)
@@ -447,7 +506,7 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.TransactionId).HasName("PK__Payments__55433A6BC2DF27B0");
+            entity.HasKey(e => e.TransactionId).HasName("PK__Payments__55433A6BF08D69D5");
 
             entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.CreatedAt)
@@ -468,17 +527,17 @@ public partial class SpiceCraftContext : DbContext
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Payments__OrderI__42E1EEFE");
+                .HasConstraintName("FK__Payments__OrderI__5224328E");
 
             entity.HasOne(d => d.User).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Payments__UserId__43D61337");
+                .HasConstraintName("FK__Payments__UserId__531856C7");
         });
 
         modelBuilder.Entity<PaymentSchedule>(entity =>
         {
-            entity.HasKey(e => e.ScheduleId).HasName("PK__PaymentS__9C8A5B4910851794");
+            entity.HasKey(e => e.ScheduleId).HasName("PK__PaymentS__9C8A5B49D54C9375");
 
             entity.Property(e => e.ScheduleType)
                 .HasMaxLength(10)
@@ -491,37 +550,37 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<PromotionBulkItem>(entity =>
         {
-            entity.HasKey(e => e.PromotionBulkItemId).HasName("PK__Promotio__430AF235288229C3");
+            entity.HasKey(e => e.PromotionBulkItemId).HasName("PK__Promotio__430AF235B3EE1DF1");
 
-            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838ABB42AD78").IsUnique();
+            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838A3977C049").IsUnique();
 
             entity.Property(e => e.DiscountRate).HasColumnType("decimal(5, 2)");
 
             entity.HasOne(d => d.Item).WithOne(p => p.PromotionBulkItem)
                 .HasForeignKey<PromotionBulkItem>(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Promotion__ItemI__2180FB33");
+                .HasConstraintName("FK__Promotion__ItemI__30C33EC3");
         });
 
         modelBuilder.Entity<PromotionCategory>(entity =>
         {
-            entity.HasKey(e => e.PromotionCategoryId).HasName("PK__Promotio__0D44A8A9AA9A670F");
+            entity.HasKey(e => e.PromotionCategoryId).HasName("PK__Promotio__0D44A8A9456BA4D1");
 
-            entity.HasIndex(e => e.CategoryId, "UQ__Promotio__19093A0AE8A7F3A8").IsUnique();
+            entity.HasIndex(e => e.CategoryId, "UQ__Promotio__19093A0A26836D28").IsUnique();
 
             entity.Property(e => e.DiscountRate).HasColumnType("decimal(5, 2)");
 
             entity.HasOne(d => d.Category).WithOne(p => p.PromotionCategory)
                 .HasForeignKey<PromotionCategory>(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Promotion__Categ__160F4887");
+                .HasConstraintName("FK__Promotion__Categ__25518C17");
         });
 
         modelBuilder.Entity<PromotionComboItem>(entity =>
         {
-            entity.HasKey(e => e.PromotionComboItemsId).HasName("PK__Promotio__DD97A31EE4936857");
+            entity.HasKey(e => e.PromotionComboItemsId).HasName("PK__Promotio__DD97A31EB5109A86");
 
-            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838A9A04D35B").IsUnique();
+            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838A09CA9E11").IsUnique();
 
             entity.Property(e => e.BuyQuantity).HasDefaultValue(2);
             entity.Property(e => e.ComboName)
@@ -532,35 +591,59 @@ public partial class SpiceCraftContext : DbContext
             entity.HasOne(d => d.Item).WithOne(p => p.PromotionComboItem)
                 .HasForeignKey<PromotionComboItem>(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Promotion__ItemI__1BC821DD");
+                .HasConstraintName("FK__Promotion__ItemI__2B0A656D");
         });
 
         modelBuilder.Entity<PromotionItem>(entity =>
         {
-            entity.HasKey(e => e.PromotionItemId).HasName("PK__Promotio__2B1778CCA87817BF");
+            entity.HasKey(e => e.PromotionItemId).HasName("PK__Promotio__2B1778CC8D3258CE");
 
-            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838A3A592F3F").IsUnique();
+            entity.HasIndex(e => e.ItemId, "UQ__Promotio__727E838A676DFF74").IsUnique();
 
             entity.Property(e => e.DiscountRate).HasColumnType("decimal(5, 2)");
 
             entity.HasOne(d => d.Item).WithOne(p => p.PromotionItem)
                 .HasForeignKey<PromotionItem>(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Promotion__ItemI__114A936A");
+                .HasConstraintName("FK__Promotion__ItemI__208CD6FA");
+        });
+
+        modelBuilder.Entity<RecentlyViewed>(entity =>
+        {
+            entity.HasKey(e => e.RecentlyViewedId).HasName("PK__Recently__EDEACF37435E4833");
+
+            entity.ToTable("RecentlyViewed");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Item).WithMany(p => p.RecentlyVieweds)
+                .HasForeignKey(d => d.ItemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__RecentlyV__ItemI__0A688BB1");
+
+            entity.HasOne(d => d.User).WithMany(p => p.RecentlyVieweds)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__RecentlyV__Updat__09746778");
         });
 
         modelBuilder.Entity<Reward>(entity =>
         {
-            entity.HasKey(e => e.RewardId).HasName("PK__Rewards__825015B90CC3E4DB");
+            entity.HasKey(e => e.RewardId).HasName("PK__Rewards__825015B943F23317");
 
             entity.Property(e => e.RewardDescription).HasColumnType("text");
         });
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.RoleId).HasName("PK__Roles__8AFACE1A6E710884");
+            entity.HasKey(e => e.RoleId).HasName("PK__Roles__8AFACE1A97544E2A");
 
-            entity.HasIndex(e => e.RoleName, "UQ__Roles__8A2B616098A82820").IsUnique();
+            entity.HasIndex(e => e.RoleName, "UQ__Roles__8A2B6160AB10522F").IsUnique();
 
             entity.Property(e => e.RoleName)
                 .HasMaxLength(50)
@@ -569,9 +652,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<ShippingOption>(entity =>
         {
-            entity.HasKey(e => e.ShippingOptionId).HasName("PK__Shipping__642EC60D0CA4125C");
+            entity.HasKey(e => e.ShippingOptionId).HasName("PK__Shipping__642EC60D5C659118");
 
-            entity.HasIndex(e => e.ShippingOptionName, "UQ__Shipping__6AB401BAE1B112E7").IsUnique();
+            entity.HasIndex(e => e.ShippingOptionName, "UQ__Shipping__6AB401BAA7F2D4E2").IsUnique();
 
             entity.Property(e => e.Cost)
                 .HasDefaultValue(5.00m)
@@ -587,9 +670,9 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<ShoppingCart>(entity =>
         {
-            entity.HasKey(e => e.CartId).HasName("PK__Shopping__51BCD7B7A5A741C4");
+            entity.HasKey(e => e.CartId).HasName("PK__Shopping__51BCD7B7C112326A");
 
-            entity.HasIndex(e => e.UserId, "UQ__Shopping__1788CC4DA4198F3F").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__Shopping__1788CC4DBB78594F").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -604,11 +687,28 @@ public partial class SpiceCraftContext : DbContext
                 .HasConstraintName("FK__ShoppingC__UserI__02084FDA");
         });
 
+        modelBuilder.Entity<Subscription>(entity =>
+        {
+            entity.HasKey(e => e.SubscriptionId).HasName("PK__Subscrip__9A2B249D902DE3FE");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Subscriptions)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Subscript__UserI__72910220");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4CBC834BDF");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4CB6A81D82");
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534F1F9BE1E").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D1053443B49DBF").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -645,11 +745,14 @@ public partial class SpiceCraftContext : DbContext
 
         modelBuilder.Entity<UserActivityLog>(entity =>
         {
-            entity.HasKey(e => e.UserActivityLogId).HasName("PK__UserActi__488B2453461E2C33");
+            entity.HasKey(e => e.UserActivityLogId).HasName("PK__UserActi__488B245338D34632");
 
             entity.ToTable("UserActivityLog");
 
             entity.Property(e => e.ClickCount).HasDefaultValue(1);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.NavigationItem)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -659,16 +762,19 @@ public partial class SpiceCraftContext : DbContext
             entity.Property(e => e.SessionId)
                 .HasMaxLength(200)
                 .IsUnicode(false);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
 
             entity.HasOne(d => d.User).WithMany(p => p.UserActivityLogs)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__UserActiv__UserI__625A9A57");
+                .HasConstraintName("FK__UserActiv__UserI__7849DB76");
         });
 
         modelBuilder.Entity<UserAddress>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__UserAddr__091C2AFB069676FD");
+            entity.HasKey(e => e.AddressId).HasName("PK__UserAddr__091C2AFBA8419F17");
 
             entity.Property(e => e.AddressType)
                 .HasMaxLength(20)
@@ -693,18 +799,67 @@ public partial class SpiceCraftContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.UserAddresses)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__UserAddre__UserI__56E8E7AB");
+                .HasConstraintName("FK__UserAddre__UserI__662B2B3B");
+        });
+
+        modelBuilder.Entity<UserItemInteraction>(entity =>
+        {
+            entity.HasKey(e => e.UserItemInteractionId).HasName("PK__UserItem__3B423F2C4B3F1C2B");
+
+            entity.ToTable("UserItemInteraction");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Interaction).HasDefaultValue(0);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserItemInteractions)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__UserItemI__UserI__7E02B4CC");
+        });
+
+        modelBuilder.Entity<UserItemRating>(entity =>
+        {
+            entity.HasKey(e => e.UserItemRating1).HasName("PK__UserItem__72C794750A5B3A7E");
+
+            entity.ToTable("UserItemRating");
+
+            entity.Property(e => e.UserItemRating1).HasColumnName("UserItemRating");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Rating).HasDefaultValue(1);
+            entity.Property(e => e.RatingDescription)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Item).WithMany(p => p.UserItemRatings)
+                .HasForeignKey(d => d.ItemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__UserItemR__ItemI__04AFB25B");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserItemRatings)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__UserItemR__UserI__03BB8E22");
         });
 
         modelBuilder.Entity<UsersCredential>(entity =>
         {
-            entity.HasKey(e => e.UserCredentialId).HasName("PK__UsersCre__17C49DA72D11A051");
+            entity.HasKey(e => e.UserCredentialId).HasName("PK__UsersCre__17C49DA7A68B308A");
 
             entity.ToTable("UsersCredential");
 
-            entity.HasIndex(e => e.UserId, "UQ__UsersCre__1788CC4D28D1A64E").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__UsersCre__1788CC4D54DA4C0C").IsUnique();
 
-            entity.HasIndex(e => e.UserName, "UQ__UsersCre__C9F2845666E56652").IsUnique();
+            entity.HasIndex(e => e.UserName, "UQ__UsersCre__C9F284564B9F4D0F").IsUnique();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")

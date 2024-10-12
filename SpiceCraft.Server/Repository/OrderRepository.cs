@@ -58,15 +58,16 @@ namespace SpiceCraft.Server.Repository
             _context.OrderDetails.AddRange(cartItems);
             await _context.SaveChangesAsync();
 
-            // Adjust inventory for the products
+            // Adjust inventory for the ingredients used in the products
             var updateInventoryQuery = from od in _context.OrderDetails
-                join i in _context.Inventories on od.ItemId equals i.ItemId
+                join ii in _context.ItemIngredients on od.ItemId equals ii.ItemId
+                join i in _context.Inventories on ii.IngredientId equals i.IngredientId
                 where od.OrderId == orderId
-                select new { i, od.Quantity };
+                select new { i, ii.QuantityNeeded, od.Quantity };
 
             foreach (var item in updateInventoryQuery)
             {
-                item.i.CurrentStock -= item.Quantity;
+                item.i.CurrentStock -= item.QuantityNeeded * item.Quantity;
             }
 
             await _context.SaveChangesAsync();
@@ -89,72 +90,73 @@ namespace SpiceCraft.Server.Repository
 
         // Insert Order Items for Corporate Client
         public async Task<int> InsertOrderItemsForCorporateClientAsync(int userId, int orderId)
-        {
-            // Get cart item count
-            var cartItemCount = await _context.CartItems
-                .Where(ci => ci.Cart.UserId == userId && !ci.Cart.IsOrdered)
-                .CountAsync();
+{
+    // Get cart item count
+    var cartItemCount = await _context.CartItems
+        .Where(ci => ci.Cart.UserId == userId && !ci.Cart.IsOrdered)
+        .CountAsync();
 
-            if (cartItemCount == 0)
-            {
-                return 0;
-            }
+    if (cartItemCount == 0)
+    {
+        return 0;
+    }
 
-            // Insert order details for corporate client
-            var cartItems = await (from ci in _context.CartItems
-                join p in _context.Items on ci.ItemId equals p.ItemId
-                join pbp in _context.PromotionBulkItems on p.ItemId equals pbp.ItemId into pbpGroup
-                from pbp in pbpGroup.DefaultIfEmpty()
-                where ci.Cart.UserId == userId && !ci.Cart.IsOrdered
-                select new OrderDetail
-                {
-                    OrderId = orderId,
-                    ItemId = p.ItemId,
-                    ActualPrice = p.Price,
-                    DiscountRate = (pbp != null && ci.Quantity >= pbp.RequiredQuantity) ? pbp.DiscountRate : 0,
-                    Quantity = ci.Quantity,
-                    PurchasePrice = (pbp != null && ci.Quantity >= pbp.RequiredQuantity)
-                        ? p.Price * ci.Quantity * (1 - pbp.DiscountRate / 100)
-                        : p.Price * ci.Quantity,
-                    Description = ci.Description
-                }).ToListAsync();
+    // Insert order details for corporate client
+    var cartItems = await (from ci in _context.CartItems
+                           join p in _context.Items on ci.ItemId equals p.ItemId
+                           join pbp in _context.PromotionBulkItems on p.ItemId equals pbp.ItemId into pbpGroup
+                           from pbp in pbpGroup.DefaultIfEmpty()
+                           where ci.Cart.UserId == userId && !ci.Cart.IsOrdered
+                           select new OrderDetail
+                           {
+                               OrderId = orderId,
+                               ItemId = p.ItemId,
+                               ActualPrice = p.Price,
+                               DiscountRate = (pbp != null && ci.Quantity >= pbp.RequiredQuantity) ? pbp.DiscountRate : 0,
+                               Quantity = ci.Quantity,
+                               PurchasePrice = (pbp != null && ci.Quantity >= pbp.RequiredQuantity)
+                                   ? p.Price * ci.Quantity * (1 - pbp.DiscountRate / 100)
+                                   : p.Price * ci.Quantity,
+                               Description = ci.Description
+                           }).ToListAsync();
 
-            if (!cartItems.Any())
-            {
-                return 0;
-            }
+    if (!cartItems.Any())
+    {
+        return 0;
+    }
 
-            _context.OrderDetails.AddRange(cartItems);
-            await _context.SaveChangesAsync();
+    _context.OrderDetails.AddRange(cartItems);
+    await _context.SaveChangesAsync();
 
-            // Adjust inventory for the products
-            var updateInventoryQuery = from od in _context.OrderDetails
-                join i in _context.Inventories on od.ItemId equals i.ItemId
-                where od.OrderId == orderId
-                select new { i, od.Quantity };
+    // Adjust inventory for the ingredients used in the products
+    var updateInventoryQuery = from od in _context.OrderDetails
+                                join ii in _context.ItemIngredients on od.ItemId equals ii.ItemId
+                                join i in _context.Inventories on ii.IngredientId equals i.IngredientId
+                                where od.OrderId == orderId
+                                select new { i, ii.QuantityNeeded, od.Quantity };
 
-            foreach (var item in updateInventoryQuery)
-            {
-                item.i.CurrentStock -= item.Quantity;
-            }
+    foreach (var item in updateInventoryQuery)
+    {
+        item.i.CurrentStock -= item.QuantityNeeded * item.Quantity;
+    }
 
-            await _context.SaveChangesAsync();
+    await _context.SaveChangesAsync();
 
-            // Remove items from the shopping cart
-            var cartId = await _context.ShoppingCarts
-                .Where(sc => sc.UserId == userId && !sc.IsOrdered)
-                .Select(sc => sc.CartId)
-                .FirstOrDefaultAsync();
+    // Remove items from the shopping cart
+    var cartId = await _context.ShoppingCarts
+        .Where(sc => sc.UserId == userId && !sc.IsOrdered)
+        .Select(sc => sc.CartId)
+        .FirstOrDefaultAsync();
 
-            if (cartId != null)
-            {
-                var cartItemsToRemove = _context.CartItems.Where(ci => ci.CartId == cartId);
-                _context.CartItems.RemoveRange(cartItemsToRemove);
-                await _context.SaveChangesAsync();
-            }
+    if (cartId != null)
+    {
+        var cartItemsToRemove = _context.CartItems.Where(ci => ci.CartId == cartId);
+        _context.CartItems.RemoveRange(cartItemsToRemove);
+        await _context.SaveChangesAsync();
+    }
 
-            return 1;
-        }
+    return 1;
+}
 
         // Get Order Information
         public async Task<List<OrderDetailDTO>> GetOrderInfoAsync(int orderId)
@@ -349,15 +351,17 @@ namespace SpiceCraft.Server.Repository
             return userOrder;
         }
         
-        // Get Inventory details for a specific product
+        // Get Inventory details for a specific product by aggregating ingredient stocks
         public async Task<ProductInventoryDTO> GetInventoryForProductAsync(int itemId)
         {
-            var inventory = await (from i in _context.Inventories
-                where i.ItemId == itemId
+            var inventory = await (from ii in _context.ItemIngredients
+                join inv in _context.Inventories on ii.IngredientId equals inv.IngredientId
+                where ii.ItemId == itemId
+                group new { ii, inv } by ii.ItemId into inventoryGroup
                 select new ProductInventoryDTO
                 {
-                    ItemId = i.ItemId,
-                    AvailableStock = i.CurrentStock,
+                    ItemId = inventoryGroup.Key,
+                    AvailableStock = inventoryGroup.Min(g => g.inv.CurrentStock / g.ii.QuantityNeeded)
                 }).FirstOrDefaultAsync();
 
             if (inventory == null)
