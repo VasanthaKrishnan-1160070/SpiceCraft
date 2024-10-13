@@ -1,4 +1,37 @@
 <div class="d-flex flex-column align-items-center gap-5">
+
+  <div class="mt-5 pt-5">
+    <dx-funnel
+      id="pyramid"
+      palette="'Harmony light'"
+      [argumentField]="argumentField"
+      [valueField]="valueField"
+      [dataSource]="reportData"
+      [inverted]="true"
+      algorithm="dynamicHeight"
+      [sortData]="false"
+    >
+
+      <dxo-size
+        [height]="500"
+        [width]="900">
+      </dxo-size>
+      <dxo-title [text]="title">
+        <dxo-margin [bottom]="30"></dxo-margin>
+      </dxo-title>
+      <dxi-series *ngFor="let series of seriesFields" [argumentField]="series.argumentField" [valueField]="series.valueField" [name]="series.name">
+        <dxo-hover-style color="#ffd700"></dxo-hover-style>
+      </dxi-series>
+      <dxo-tooltip [enabled]="true"></dxo-tooltip>
+      <dxo-item>
+        <dxo-border [visible]="true"></dxo-border>
+      </dxo-item>
+      <dxo-legend [visible]="true"></dxo-legend>
+      <dxo-label [visible]="true" horizontalAlignment="left" backgroundColor="none">
+        <dxo-font [size]="16"></dxo-font>
+      </dxo-label>
+    </dx-funnel>
+  </div>
   <div>
   <dx-funnel
     id="funnel"
@@ -31,36 +64,4 @@
   </dx-funnel>
   </div>
 
-  <div class="mt-5 pt-5">
-  <dx-funnel
-    id="pyramid"
-    palette="'Harmony light'"
-    [argumentField]="argumentField"
-    [valueField]="valueField"
-    [dataSource]="reportData"
-    [inverted]="true"
-    algorithm="dynamicHeight"
-    [sortData]="false"
-  >
-
-    <dxo-size
-      [height]="500"
-      [width]="900">
-    </dxo-size>
-    <dxo-title [text]="title">
-      <dxo-margin [bottom]="30"></dxo-margin>
-    </dxo-title>
-    <dxi-series *ngFor="let series of seriesFields" [argumentField]="series.argumentField" [valueField]="series.valueField" [name]="series.name">
-      <dxo-hover-style color="#ffd700"></dxo-hover-style>
-    </dxi-series>
-    <dxo-tooltip [enabled]="true"></dxo-tooltip>
-    <dxo-item>
-      <dxo-border [visible]="true"></dxo-border>
-    </dxo-item>
-    <dxo-legend [visible]="true"></dxo-legend>
-    <dxo-label [visible]="true" horizontalAlignment="left" backgroundColor="none">
-      <dxo-font [size]="16"></dxo-font>
-    </dxo-label>
-  </dx-funnel>
-  </div>
 </div>

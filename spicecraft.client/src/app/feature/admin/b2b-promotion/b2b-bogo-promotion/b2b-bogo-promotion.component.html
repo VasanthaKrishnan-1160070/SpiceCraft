@@ -1,6 +1,6 @@
 <!-- Remove All Button -->
 <div class="d-flex justify-content-end">
-  <button class="btn btn-danger mb-3" (click)="removeAllBogoPromotions()">Remove All Promotions</button>
+  <dx-button class="mb-3" text="Remove All Promotions" type="danger" (onClick)="removeAllBogoPromotions()" ></dx-button>
 </div>
 <dx-data-grid
   [dataSource]="bogoPromotions$ | async"
@@ -18,7 +18,7 @@
   <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
   <dxo-paging
     [enabled]="true"
-    [pageSize]="5"
+    [pageSize]="10"
     [pageIndex]="1"
   >
   </dxo-paging>

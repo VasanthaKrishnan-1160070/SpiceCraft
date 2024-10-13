@@ -24,7 +24,7 @@
     >
       <!-- Column Chooser -->
       <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
-      <dxo-paging [enabled]="true" [pageSize]="5" [pageIndex]="1"></dxo-paging>
+      <dxo-paging [enabled]="true" [pageSize]="10" [pageIndex]="1"></dxo-paging>
       <dxo-pager
         [visible]="true"
         [displayMode]="'full'"
@@ -39,20 +39,19 @@
       <dxo-load-panel [enabled]="true"></dxo-load-panel>
 
       <!-- Define columns for Enquiry Data -->
-      <dxi-column dataField="enquiryId" caption="Enquiry ID" [width]="150"></dxi-column>
-      <dxi-column dataField="regarding" caption="Regarding" [width]="350"></dxi-column>
-      <dxi-column *ngIf="isUserInternal" dataField="requiresReply" caption="Requires Reply" [width]="150"></dxi-column>
-      <dxi-column dataField="sender" caption="Sender" [width]="250"></dxi-column>
+      <dxi-column dataField="enquiryId" caption="Enquiry ID" ></dxi-column>
+      <dxi-column dataField="regarding" caption="Regarding" ></dxi-column>
+      <dxi-column *ngIf="isUserInternal" dataField="requiresReply" caption="Requires Reply" ></dxi-column>
+      <dxi-column dataField="sender" caption="Sender" ></dxi-column>
       <dxi-column
         dataField="enquiryDate"
         caption="Enquiry Date"
         [dataType]="'date'"
         [format]="{ type: 'shortDate' }"
-        [width]="250"
       ></dxi-column>
 
       <!-- View Detail Button -->
-      <dxi-column caption="View Detail" [width]="150" [cellTemplate]="'viewDetailTemplate'">
+      <dxi-column caption="View Detail" [width]="120" [cellTemplate]="'viewDetailTemplate'">
         <div *dxTemplate="let data of 'viewDetailTemplate'">
           <dx-button type="success" text="View Detail" (onClick)="navigateToDetail(data)"></dx-button>
         </div>

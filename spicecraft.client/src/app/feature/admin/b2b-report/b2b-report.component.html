@@ -2,51 +2,79 @@
   <sc-title [title]="'Reports'"></sc-title>
 </div>
 
-<div class="ms-5 me-5 d-flex flex-column">
-    <div class="report-controls d-flex  gap-5 ms-5 p-5 border border-secondary border-opacity-25 ">
-      <div class="flex-grow-1 flex-fill d-flex">
-        <dx-form [formData]="formData">
-        <dxi-item [cssClass]="'flex-grow-1 flex-fill'" itemType="group" [colCount]="3">
-          <dxi-item [cssClass]="'flex-grow-1 flex-fill'" dataField="selectedReport" [editorType]="'dxSelectBox'"
-                    [editorOptions]="{dataSource: reportOptions, displayExpr: 'name', valueExpr: 'value'}" [colSpan]="1">
-            <dxo-label text="Select Report"></dxo-label>
-          </dxi-item>
+<div class="ms-5 me-5">
+  <div class="report-controls ms-5 p-5 border border-secondary border-opacity-25">
+    <div class="d-flex justify-content-between align-items-end ps-5 pe-5">
+      <!-- Select Report -->
+      <div class="flex-fill me-3">
+        <dx-select-box
+          [dataSource]="reportOptions"
+          displayExpr="name"
+          valueExpr="value"
+          [(value)]="formData.selectedReport"
+          placeholder="Select Report"
+          labelMode="floating"
+          stylingMode="outlined"
+        ></dx-select-box>
+      </div>
 
-          <dxi-item [cssClass]="'flex-grow-1 flex-fill'" dataField="selectedChartType" [editorType]="'dxSelectBox'"
-                    [editorOptions]="{dataSource: chartTypes}" [colSpan]="1">
-            <dxo-label text="Select Chart Type"></dxo-label>
-          </dxi-item>
+      <!-- Select Chart Type -->
+      <div class="flex-fill me-3">
+        <dx-select-box
+          [dataSource]="chartTypes"
+          [(value)]="formData.selectedChartType"
+          placeholder="Select Chart Type"
+          labelMode="floating"
+          stylingMode="outlined"
+        ></dx-select-box>
+      </div>
 
-          <dxi-item [cssClass]="'flex-grow-1 flex-fill'" itemType="button" [buttonOptions]="runButtonOptions" [colSpan]="1">
-            <dxo-label text="Run Report"></dxo-label>
-          </dxi-item>
-        </dxi-item>
-      </dx-form>
+      <!-- Run Report Button -->
+      <div class="">
+        <dx-button
+          text="Run Report"
+          type="success"
+          stylingMode="contained"
+          (onClick)="runReport()"
+          width="100%"
+        ></dx-button>
       </div>
     </div>
-    <div *ngIf="reportData" class="ms-5 me-5 mt-4">
-      @switch (selectedChartType) {
-        @case ("bar") {
-         <sc-bar-chart [reportData]="reportData" [seriesFields]="seriesFields" ></sc-bar-chart>
-        }
-        @case ("pie") {
-         <sc-pie-chart [reportData]="reportData" [seriesFields]="seriesFields" ></sc-pie-chart>
-        }
-        @case ("funnel") {
-         <sc-funnel-pyramid-chart [reportData]="reportData" [seriesFields]="seriesFields" ></sc-funnel-pyramid-chart>
-        }
-        @case ("sparkline") {
-         <sc-sparkline-chart [reportData]="reportData" [seriesFields]="seriesFields" ></sc-sparkline-chart>
-        }
-        @case ("doughnut") {
-          <sc-doughnut-chart [reportData]="reportData" [seriesFields]="seriesFields" ></sc-doughnut-chart>
-        }
-      }
-    </div>
-    <div *ngIf="reportData" class="ms-5 me-5 mt-5 pt-5 mb-5">
-       <sc-report-grid
-          [reportData]="reportData"
-           >
-       </sc-report-grid>
-    </div>
+  </div>
+
+  <!-- Chart Rendering -->
+  <div *ngIf="reportData" class="ms-5 me-5 mt-4">
+    <ng-container [ngSwitch]="selectedChartType">
+      <sc-bar-chart
+        *ngSwitchCase="'bar'"
+        [reportData]="reportData"
+        [seriesFields]="seriesFields"
+      ></sc-bar-chart>
+      <sc-pie-chart
+        *ngSwitchCase="'pie'"
+        [reportData]="reportData"
+        [seriesFields]="seriesFields"
+      ></sc-pie-chart>
+      <sc-funnel-pyramid-chart
+        *ngSwitchCase="'funnel'"
+        [reportData]="reportData"
+        [seriesFields]="seriesFields"
+      ></sc-funnel-pyramid-chart>
+      <sc-sparkline-chart
+        *ngSwitchCase="'sparkline'"
+        [reportData]="reportData"
+        [seriesFields]="seriesFields"
+      ></sc-sparkline-chart>
+      <sc-doughnut-chart
+        *ngSwitchCase="'doughnut'"
+        [reportData]="reportData"
+        [seriesFields]="seriesFields"
+      ></sc-doughnut-chart>
+    </ng-container>
+  </div>
+
+  <!-- Report Grid -->
+  <div *ngIf="reportData" class="ms-5 me-5 mt-5 pt-5 mb-5">
+    <sc-report-grid [reportData]="reportData"></sc-report-grid>
+  </div>
 </div>

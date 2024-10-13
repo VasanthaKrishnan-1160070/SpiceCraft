@@ -3,7 +3,7 @@ import {PromotionService} from "../../../../core/service/promotion.service";
 import {Observable} from "rxjs";
 import {BogoPromotionModel} from "../../../../core/model/promotion/bogo-promotion.model";
 import {map} from "rxjs/operators";
-import {DxDataGridModule, DxFormModule, DxPopupModule} from "devextreme-angular";
+import {DxButtonModule, DxDataGridModule, DxFormModule, DxPopupModule} from "devextreme-angular";
 import {AsyncPipe, CommonModule} from "@angular/common";
 import { confirm } from 'devextreme/ui/dialog';
 import notify from 'devextreme/ui/notify';
@@ -18,7 +18,8 @@ import {FormsModule} from "@angular/forms";
     CommonModule,
     DxPopupModule,
     FormsModule,
-    DxFormModule
+    DxFormModule,
+    DxButtonModule
   ],
   templateUrl: './b2b-bogo-promotion.component.html',
   styleUrl: './b2b-bogo-promotion.component.css'
