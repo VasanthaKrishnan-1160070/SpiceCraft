@@ -4,6 +4,7 @@
     <div class="col-6">
       <p class="text-center">Shipping Address</p>
       <dx-form
+        #addressForm
         [formData]="userAddress"
         [colCount]="1"
         [readOnly]="true"
@@ -92,9 +93,24 @@
           <dx-button type="success" text="Pay Now" (onClick)="isCreditCardPopupVisible = !isCreditCardPopupVisible"></dx-button>
 
           <!-- Payment and Place Order -->
-          <dx-popup [(visible)]="isCreditCardPopupVisible" [(hideOnOutsideClick)]="isCreditCardPopupVisible" title="Credit Card Payment" [width]="400" >
-            <dx-form [formData]="creditCardForm">
-              <dxi-item dataField="amountToPay" [editorOptions]="{'readOnly': true}" [label]="{ text: 'Amount to Pay' }">
+          <dx-popup
+            [(visible)]="isCreditCardPopupVisible"
+            [(hideOnOutsideClick)]="isCreditCardPopupVisible"
+            title="Credit Card Payment"
+            (onInitialized)="onFormInitialized($event)"
+            [width]="400"
+            [height]="380"
+          >
+            <dx-form
+              #paymentForm
+              [formData]="creditCardForm"
+              [colCount]="1"
+            >
+              <dxi-item
+                dataField="amountToPay"
+                [editorOptions]="{ readOnly: true }"
+                [label]="{ text: 'Amount to Pay' }"
+              >
                 <dxi-validation-rule type="required" message="Amount is required"></dxi-validation-rule>
               </dxi-item>
 
@@ -102,24 +118,51 @@
                 <dxi-validation-rule type="required" message="Card Holder Name is required"></dxi-validation-rule>
               </dxi-item>
 
-              <dxi-item dataField="cardNumber" [editorOptions]="{mode: 'text'}" [label]="{ text: 'Card Number' }">
+              <dxi-item
+                dataField="cardNumber"
+                [editorOptions]="{ mode: 'text' }"
+                [label]="{ text: 'Card Number' }"
+              >
                 <dxi-validation-rule type="required" message="Card Number is required"></dxi-validation-rule>
-                <dxi-validation-rule type="pattern" [pattern]="'^[0-9]{16}$'" message="Card Number must be 16 digits"></dxi-validation-rule>
+                <dxi-validation-rule
+                  type="pattern"
+                  [pattern]="'^[0-9]{16}$'"
+                  message="Card Number must be 16 digits"
+                ></dxi-validation-rule>
               </dxi-item>
 
-              <dxi-item dataField="expiryDate" [editorOptions]="{mode: 'text'}" [label]="{ text: 'Expiry Date (MM/YY)' }">
+              <dxi-item
+                dataField="expiryDate"
+                [editorOptions]="{ mode: 'text' }"
+                [label]="{ text: 'Expiry Date (MM/YY)' }"
+              >
                 <dxi-validation-rule type="required" message="Expiry Date is required"></dxi-validation-rule>
+                <dxi-validation-rule
+                  type="pattern"
+                  [pattern]="'^(0[1-9]|1[0-2])\/?([0-9]{2})$'"
+                  message="Expiry Date must be in MM/YY format"
+                ></dxi-validation-rule>
               </dxi-item>
 
-              <dxi-item dataField="cvv" [editorOptions]="{mode: 'number'}" [label]="{ text: 'CVV' }">
+              <dxi-item dataField="cvv" [editorOptions]="{ mode: 'number' }" [label]="{ text: 'CVV' }">
                 <dxi-validation-rule type="required" message="CVV is required"></dxi-validation-rule>
-                <dxi-validation-rule type="pattern" [pattern]="'^[0-9]{3}$'" message="CVV must be 3 digits"></dxi-validation-rule>
+                <dxi-validation-rule
+                  type="pattern"
+                  [pattern]="'^[0-9]{3}$'"
+                  message="CVV must be 3 digits"
+                ></dxi-validation-rule>
               </dxi-item>
+
               <dxi-item>
-                <dx-button type="success" text="Place Order" (onClick)="placeOrder('credit card')"></dx-button>
+                <dx-button
+                  type="success"
+                  text="Place Order"
+                  (onClick)="onFormSubmit()"
+                ></dx-button>
               </dxi-item>
             </dx-form>
           </dx-popup>
+
 
           <ng-template #noPaymentRequired>
             <dx-button [type]="'success'" text="Place Order" (onClick)="placeOrder('gift card')"></dx-button>

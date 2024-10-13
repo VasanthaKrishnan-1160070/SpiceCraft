@@ -100,6 +100,11 @@ namespace SpiceCraft.Server.BusinessLogics
             {
                 return HelperFactory.Msg.Error(result, "User Update/Creation Failed");
             }
+            
+            // Send email notification to the customer
+            Task.Run(() => new EmailHelper().SendAccountUpdateEmailAsync("", "",
+                false));
+            
             return HelperFactory.Msg.Success(result);
         }
 

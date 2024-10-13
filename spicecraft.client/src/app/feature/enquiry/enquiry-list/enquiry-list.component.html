@@ -2,123 +2,132 @@
   <sc-title [title]="'Enquiry Items'"></sc-title>
 </div>
 
-<div class="ms-5 me-5 ps-5">
-  <dx-data-grid
-    [dataSource]="enquiries$ | async"
-    [showBorders]="true"
-    [columnAutoWidth]="true"
-    [allowColumnReordering]="true"
-    [filterRow]="{ visible: true }"
-    [paging]="{ enabled: true, pageSize: 10 }"
-    [groupPanel]="{ visible: true }"
-    [grouping]="{ autoExpandAll: true }"
-    [sorting]="{ mode: 'multiple' }"
-    [selection]="{ mode: 'single' }"
-  >
-    <!-- Column Chooser -->
-    <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
-    <dxo-paging
-      [enabled]="true"
-      [pageSize]="5"
-      [pageIndex]="1"
+<div class="ms-5 me-2 ps-2 pe-2">
+    <div class="mb-4">
+      <dx-button text="Create Enquiry" type="success" (onClick)="openModal()"></dx-button>
+    </div>
+  <div>
+
+  <div>
+    <dx-data-grid
+      [dataSource]="enquiries$ | async"
+
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: true }"
+      [paging]="{ enabled: true, pageSize: 10 }"
+      [groupPanel]="{ visible: true }"
+      [grouping]="{ autoExpandAll: true }"
+      [sorting]="{ mode: 'multiple' }"
+      [selection]="{ mode: 'single' }"
     >
-    </dxo-paging>
-    <dxo-pager
-      [visible]="true"
-      [displayMode]="'full'"
-      [showInfo]="true"
-      [showPageSizeSelector]="true"
-      [allowedPageSizes]="[10, 20, 50]"
-      infoText="Page #{0}. Total: {1} ({2} items)"
-      [showNavigationButtons]="true">
-    </dxo-pager>
+      <!-- Column Chooser -->
+      <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
+      <dxo-paging [enabled]="true" [pageSize]="5" [pageIndex]="1"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [displayMode]="'full'"
+        [showInfo]="true"
+        [showPageSizeSelector]="true"
+        [allowedPageSizes]="[10, 20, 50]"
+        infoText="Page #{0}. Total: {1} ({2} items)"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
 
-    <!-- Load Panel -->
-    <dxo-load-panel [enabled]="true"></dxo-load-panel>
+      <!-- Load Panel -->
+      <dxo-load-panel [enabled]="true"></dxo-load-panel>
 
-    <!-- Define columns for Enquiry Data -->
-    <dxi-column dataField="enquiryId" caption="Enquiry ID" [width]="100"></dxi-column>
-    <dxi-column dataField="regarding" caption="Regarding" [width]="400"></dxi-column>
-    <dxi-column dataField="requiresReply" caption="Requires Reply" [width]="150"></dxi-column>
-    <dxi-column dataField="sender" caption="Sender" [width]="150"></dxi-column>
-    <dxi-column dataField="enquiryDate" caption="Enquiry Date" [dataType]="'date'" [format]="{ type: 'shortDate' }" [width]="150"></dxi-column>
+      <!-- Define columns for Enquiry Data -->
+      <dxi-column dataField="enquiryId" caption="Enquiry ID" [width]="150"></dxi-column>
+      <dxi-column dataField="regarding" caption="Regarding" [width]="350"></dxi-column>
+      <dxi-column *ngIf="isUserInternal" dataField="requiresReply" caption="Requires Reply" [width]="150"></dxi-column>
+      <dxi-column dataField="sender" caption="Sender" [width]="250"></dxi-column>
+      <dxi-column
+        dataField="enquiryDate"
+        caption="Enquiry Date"
+        [dataType]="'date'"
+        [format]="{ type: 'shortDate' }"
+        [width]="250"
+      ></dxi-column>
 
-    <!-- Edit and Delete Buttons -->
-    <dxi-column caption="View Detail" [width]="130" [cellTemplate]="'editButtonTemplate'" >
-      <div *dxTemplate="let data of 'editButtonTemplate'">
-        <dx-button type="success" text="View Detail" (onClick)="navigateToDetail(data)" ></dx-button>
-      </div>
-    </dxi-column>
-
-    <!-- **New: Open Modal Button** -->
-    <dxi-column caption="Send Enquiry" [width]="130">
-      <div *dxTemplate="let data of 'cellTemplate'">
-        <dx-button text="Send Enquiry" type="default" (onClick)="openModal(data)"></dx-button>
-      </div>
-    </dxi-column>
-  </dx-data-grid>
-
+      <!-- View Detail Button -->
+      <dxi-column caption="View Detail" [width]="150" [cellTemplate]="'viewDetailTemplate'">
+        <div *dxTemplate="let data of 'viewDetailTemplate'">
+          <dx-button type="success" text="View Detail" (onClick)="navigateToDetail(data)"></dx-button>
+        </div>
+      </dxi-column>
+    </dx-data-grid>
+  </div>
+  </div>
+  <!-- Modal Popup -->
   <dx-popup
     [(visible)]="isModalVisible"
     [width]="600"
-    [height]="auto"
+    [height]="350"
     [showTitle]="true"
     title="Send Enquiry"
     [dragEnabled]="false"
-    [closeOnOutsideClick]="true">
-
+    [closeOnOutsideClick]="true"
+  >
     <dx-form
       [formData]="formData"
       [colCount]="1"
-      (onSubmit)="onFormSubmit($event)">
-
+      (onInitialized)="onFormInitialized($event)"
+    >
+      <!-- Enquiry Type Field -->
       <dxi-item
-        dataField="enquiry_type_id"
+        dataField="enquiryTypeId"
         editorType="dxSelectBox"
         [editorOptions]="{
         dataSource: enquiryTypeDataSource,
-        displayExpr: 'enquiry_name',
-        valueExpr: 'enquiry_type_id',
+        displayExpr: 'enquiryName',
+        valueExpr: 'enquiryTypeId',
         disabled: isDisabled
       }"
-        [isRequired]="true"
-        label="Enquiry Type">
+        label="Enquiry Type"
+      >
+        <dxi-validation-rule type="required" message="Enquiry Type is required"></dxi-validation-rule>
       </dxi-item>
 
-      <dxi-item *ngIf="isUserInternal"
-                dataField="receiver_user_id"
-                editorType="dxSelectBox"
-                [editorOptions]="{
-        dataSource: customersDataSource,
-        displayExpr: 'name',
-        valueExpr: 'user_id',
-        disabled: isDisabled
-      }"
-                [isRequired]="true"
-                label="Customer">
-      </dxi-item>
-
+      <!-- Customer Field (Conditional) -->
       <dxi-item
-        dataField="message_content"
+        *ngIf="isUserInternal"
+        dataField="receiverUserId"
+        editorType="dxSelectBox"
+        [editorOptions]="{
+        dataSource: customers$ | async,
+        displayExpr: 'name',
+        valueExpr: 'userId',
+        disabled: isDisabled
+      }"
+        label="Customer"
+      >
+        <dxi-validation-rule type="required" message="Customer is required"></dxi-validation-rule>
+      </dxi-item>
+
+      <!-- Message Field -->
+      <dxi-item
+        dataField="initialMessage"
         editorType="dxTextArea"
         [editorOptions]="{ height: 90 }"
-        [isRequired]="true"
-        label="Message">
+        label="Message"
+      >
+        <dxi-validation-rule type="required" message="Message content is required"></dxi-validation-rule>
+        <dxi-validation-rule type="stringLength" [max]="500" message="Message cannot exceed 500 characters"></dxi-validation-rule>
       </dxi-item>
 
-      <!-- Hidden Fields -->
-      <input type="hidden" name="sender_user_id" [value]="getCurrentUserId()" />
-      <input type="hidden" name="receiver_user_id" value="" />
+      <!-- Hidden Fields (if needed) -->
+      <input type="hidden" name="senderUserId" [value]="currentUserId" />
 
+      <!-- Submit Button -->
       <dxi-item>
         <dx-button
           text="Send"
           type="success"
-          useSubmitBehavior="true">
-        </dx-button>
+          (onClick)="onFormSubmit()"
+        ></dx-button>
       </dxi-item>
-
     </dx-form>
   </dx-popup>
-
 </div>

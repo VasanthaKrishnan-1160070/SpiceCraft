@@ -1790,3 +1790,10 @@ INSERT INTO Inventory (IngredientId, CurrentStock, LowStockThreshold, CreatedAt,
 (40, 20, 5, GETDATE(), GETDATE());    -- Coconut Milk
 
 
+update Items
+ set Description = 'Indulge in our mouthwatering creation, carefully crafted to offer the perfect blend of bold flavors and wholesome goodness. Tender pieces of protein are marinated in a special blend of spices, wrapped in a warm, fluffy tortilla or bun. Each bite bursts with vibrant flavors, complemented by a crisp mix of fresh vegetables.
+
+A drizzle of our signature sauce adds a touch of creamy heat, perfectly balanced by the crunch of the veggies. To enhance the richness, a sprinkle of shredded cheese completes the experience, making every bite satisfying and full of texture.
+
+Whether you''re craving something with a kick or simply looking for a hearty, fulfilling meal, this dish is made with the freshest ingredients to deliver quality you can taste. It''s perfect for lunch, dinner, or whenever you''re in the mood for something comforting and flavorful.'
+where itemId > 0;

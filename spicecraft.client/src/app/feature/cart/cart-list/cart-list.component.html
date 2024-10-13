@@ -1,4 +1,8 @@
-<div class="container mt-3">
+<div class="p-4">
+  <sc-title [title]="'Shopping Cart'"></sc-title>
+</div>
+
+<div class="ms-5 me-5">
   <!-- Checkout button displayed if there are items in the cart -->
   <div *ngIf="cartItems.length > 0" class="d-flex justify-content-end mb-3">
     <dx-button text="Checkout" type="success" (onClick)="checkout()"></dx-button>

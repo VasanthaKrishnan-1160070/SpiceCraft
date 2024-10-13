@@ -1,5 +1,6 @@
 <!-- DevExtreme DataGrid for displaying the shopping cart items -->
 <dx-data-grid
+  #dataGrid
   [dataSource]="reportData"
   [showBorders]="true"
   [showRowLines]="true"
@@ -11,6 +12,7 @@
   [groupPanel]="{ visible: true }"
   [grouping]="{ autoExpandAll: true }"
   [sorting]="{ mode: 'multiple' }"
+  (onExporting)="exportGrid()"
 
 >
   <dxo-search-panel
@@ -21,7 +23,7 @@
   <!-- Column Chooser -->
   <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
   <dxo-header-filter [visible]="true"></dxo-header-filter>
-
+  <dxo-export [enabled]="true" ></dxo-export>
   <dxo-paging
     [enabled]="true"
     [pageSize]="5"

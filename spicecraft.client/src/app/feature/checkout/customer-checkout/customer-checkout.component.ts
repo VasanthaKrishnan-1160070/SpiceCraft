@@ -1,6 +1,13 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Router, RouterLink} from "@angular/router";
-import {DxButtonModule, DxFormModule, DxPopupModule, DxSelectBoxModule, DxTextBoxModule} from "devextreme-angular";
+import {
+  DxButtonModule,
+  DxFormComponent,
+  DxFormModule,
+  DxPopupModule,
+  DxSelectBoxModule,
+  DxTextBoxModule
+} from "devextreme-angular";
 import {FormsModule} from "@angular/forms";
 import {CheckoutService} from "../../../core/service/checkout.service";
 import {StartPostPaymentModel} from "../../../core/model/checkout/start-post-payment.model";
@@ -27,6 +34,8 @@ import {NotifyService} from "../../../core/service/notify.service";
   standalone: true
 })
 export class CustomerCheckoutComponent implements OnInit {
+  @ViewChild('paymentForm', { static: false }) paymentForm!: DxFormComponent;
+
   userAddress: any; // Replace with your user address model
   subTotal: number = 0;
   shippingCost: number = 0;
@@ -42,6 +51,7 @@ export class CustomerCheckoutComponent implements OnInit {
   countryName: string = '';
   errorMessage: string = '';
   isCreditCardPopupVisible: boolean = false;
+  formInstance!: any;
 
   creditCardForm: any = {
     amountToPay: '',
@@ -123,6 +133,25 @@ export class CustomerCheckoutComponent implements OnInit {
         this.errorMessage = response.message;
       }
     });
+  }
+
+  /** **Capture the form instance on initialization** */
+  onFormInitialized(e: any) {
+    this.formInstance = e.component;
+  }
+
+  /** **Handle Form Submission** */
+  onFormSubmit() {
+    const result = this.paymentForm.instance.validate();
+
+    if (result.isValid) {
+      this.placeOrder('credit card');
+      this.isCreditCardPopupVisible = false;
+    } else {
+      // Handle validation errors
+      console.log('Form is invalid');
+      this.notifyService.showError('Please fix the validation errors and try again.');
+    }
   }
 
   placeOrder(paymentMethod: string) {

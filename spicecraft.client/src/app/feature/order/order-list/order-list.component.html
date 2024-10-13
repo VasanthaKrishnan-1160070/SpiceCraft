@@ -60,7 +60,7 @@
   </div>
 
   <!-- Action buttons for add/remove quantity and delete -->
-  <dxi-column [width]="300" caption="Actions" cellTemplate="actionsTemplate">
+  <dxi-column [width]="150" caption="View Detail" cellTemplate="actionsTemplate">
     <!-- Template for action buttons -->
     <div class="d-flex gap-2" *dxTemplate="let data of 'actionsTemplate'">
       <dx-button
@@ -68,11 +68,6 @@
         type="success"
         [routerLink]="['/order-detail', data.data.orderId]"
         >
-      </dx-button>
-      <dx-button
-        text="Cancel Order"
-        type="danger"
-        (onClick)="cancelOrder(data.data.orderId)">
       </dx-button>
     </div>
   </dxi-column>

@@ -7,16 +7,18 @@ import {take, takeUntil} from "rxjs/operators";
 import {Subject} from "rxjs";
 import {Router} from "@angular/router";
 import {MessageService} from "../../../core/service/message.service";
+import {TitleComponent} from "../../../shared/components/title/title.component";
 
 @Component({
   selector: 'sc-cart-list',
   standalone: true,
-  imports: [
-    DxDataGridModule,
-    DxButtonModule,
-    NgIf,
-    AsyncPipe
-  ],
+    imports: [
+        DxDataGridModule,
+        DxButtonModule,
+        NgIf,
+        AsyncPipe,
+        TitleComponent
+    ],
   templateUrl: './cart-list.component.html',
   styleUrl: './cart-list.component.css'
 })

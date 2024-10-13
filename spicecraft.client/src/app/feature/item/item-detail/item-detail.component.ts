@@ -80,6 +80,8 @@ export class ItemDetailComponent implements  OnInit, OnDestroy{
   itemImages: ItemImageModel[] = [];
   isUserInternal: boolean = this._authService.isInternalUser(); // Set based on user role
   isCustomer = this._authService.isUserCustomer();
+  categoryName!: string;
+  subCategoryName!: string;
 
 
 
@@ -110,8 +112,14 @@ export class ItemDetailComponent implements  OnInit, OnDestroy{
           // now adding the allImages which will be shown in the lookup
           this.itemImages.forEach((item: ItemImageModel) => {
               this.allImages.push({name: item.imageName});
-              this.galleryImages.push({imageAlt: item.imageName, imageSrc: `${environment.backend_url}/uploads/items/${item.imageCode}`});
+              this.galleryImages.push({imageAlt: item.imageName, imageCode: item.imageCode , imageSrc: `${environment.backend_url}/uploads/items/${item.imageCode}`});
           });
+
+
+          this.categoryName = this.itemSummary.categoryName;
+
+          const subCategory = this.subCategories.find((subCat) => subCat.categoryId === this.itemSummary.subCategoryId);
+          this.subCategoryName = subCategory ? subCategory.categoryName : 'N/A';
         }
       )
   }
