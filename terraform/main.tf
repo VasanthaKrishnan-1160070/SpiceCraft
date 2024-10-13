@@ -14,9 +14,6 @@ data "aws_subnets" "default" {
   }
 }
 
-# Fetch the latest Amazon Linux 2 AMI (No longer needed for Fargate)
-# Remove the EC2 instance setup and related configurations
-
 # Create CloudWatch Log Groups
 resource "aws_cloudwatch_log_group" "spicecraft_client_logs" {
   name              = "/ecs/spicecraft-client-logs"
@@ -106,7 +103,7 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-# Create Security Group for ECS and RDS
+# Create Security Group for Fargate tasks
 resource "aws_security_group" "ecs_security_group" {
   vpc_id = data.aws_vpc.default.id
 
@@ -215,7 +212,11 @@ resource "aws_ecs_service" "spicecraft_service" {
   network_configuration {
     subnets          = data.aws_subnets.default.ids
     security_groups  = [aws_security_group.ecs_security_group.id]
-    assign_public_ip = true
+    assign_public_ip = true  # Set to true or false based on your requirements
+  }
+
+  tags = {
+    Name = "spicecraft-service"
   }
 }
 
