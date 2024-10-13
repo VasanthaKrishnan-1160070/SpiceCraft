@@ -1,6 +1,6 @@
 {
   "family": "spicecraft-task",
-  "networkMode": "awsvpc",
+  "networkMode": "bridge", 
   "containerDefinitions": [
     {
       "name": "spicecraft-client-container",
@@ -83,9 +83,7 @@
       }
     }
   ],
-  "requiresCompatibilities": [
-    "FARGATE"
-  ],
+  "requiresCompatibilities": [ "EC2" ],
   "cpu": "1024",
   "memory": "2048",
   "executionRoleArn": "arn:aws:iam::051826709341:role/ecsTaskExecutionRole",
