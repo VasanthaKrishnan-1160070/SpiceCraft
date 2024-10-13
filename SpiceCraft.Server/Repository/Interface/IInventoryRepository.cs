@@ -1,4 +1,5 @@
 ﻿using SpiceCraft.Server.DTO.Inventory;
+using SpiceCraft.Server.Helpers;
 
 namespace SpiceCraft.Server.Repository.Interface
 {
@@ -9,5 +10,6 @@ namespace SpiceCraft.Server.Repository.Interface
         bool UpdateStock(int productId, int currentStock);
         bool InsertProductToInventory(int productId, int currentStock, int lowStockThreshold);
         int DecrementProductStock(int productId, int quantity);
+        Task<List<IngredientDTO>> GetLowStockIngredientsAsync();
     }
 }

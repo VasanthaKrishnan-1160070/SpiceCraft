@@ -231,5 +231,33 @@ namespace SpiceCraft.Server.BusinessLogics
                 Message = "Order updated successfully."
             };
         }
+        
+        // 1. Get Today's Orders Count
+        public async Task<ResultDetail<int>> GetTodaysOrdersCountAsync()
+        {
+            int count = await _orderRepo.GetTodaysOrdersCountAsync();
+            return HelperFactory.Msg.Success(count);
+        }
+
+        // 2. Get Orders That Need to Be Shipped
+        public async Task<ResultDetail<int>> GetOrdersToShipCountAsync()
+        {
+            int count = await _orderRepo.GetOrdersToShipCountAsync();
+            return HelperFactory.Msg.Success(count);
+        }
+
+        // 3. Get Total Sales Today
+        public async Task<ResultDetail<decimal>> GetTotalSalesTodayAsync()
+        {
+            decimal totalSales = await _orderRepo.GetTotalSalesTodayAsync();
+            return HelperFactory.Msg.Success(totalSales);
+        }
+
+        // 4. Get Total Sales This Month
+        public async Task<ResultDetail<decimal>> GetTotalSalesThisMonthAsync()
+        {
+            decimal totalSales = await _orderRepo.GetTotalSalesThisMonthAsync();
+            return HelperFactory.Msg.Success(totalSales);
+        }
     }
 }

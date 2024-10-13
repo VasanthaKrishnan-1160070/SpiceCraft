@@ -111,5 +111,53 @@ public class OrderController : ControllerBase
         }
         return BadRequest(result.Message);
     }
+    
+    // 1. Get Today's Orders Count
+    [HttpGet("count/today")]
+    public async Task<IActionResult> GetTodaysOrdersCount()
+    {
+        var result = await _orderLogics.GetTodaysOrdersCountAsync();
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result.Message);
+    }
+
+    // 2. Get Orders That Need to Be Shipped
+    [HttpGet("count/to-ship")]
+    public async Task<IActionResult> GetOrdersToShipCount()
+    {
+        var result = await _orderLogics.GetOrdersToShipCountAsync();
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result.Message);
+    }
+
+    // 3. Get Total Sales Today
+    [HttpGet("sales/today")]
+    public async Task<IActionResult> GetTotalSalesToday()
+    {
+        var result = await _orderLogics.GetTotalSalesTodayAsync();
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result.Message);
+    }
+
+    // 4. Get Total Sales This Month
+    [HttpGet("sales/month")]
+    public async Task<IActionResult> GetTotalSalesThisMonth()
+    {
+        var result = await _orderLogics.GetTotalSalesThisMonthAsync();
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result.Message);
+    }
 }
 }

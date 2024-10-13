@@ -481,5 +481,37 @@ namespace SpiceCraft.Server.Repository
 
             return newOrder.OrderId > 0;
         }
+        
+        // dashboard methods
+        public async Task<int> GetTodaysOrdersCountAsync()
+        {
+            var today = DateTime.Today;
+            return await _context.Orders
+                .Where(o => o.OrderDate >= today)
+                .CountAsync();
+        }
+        
+        public async Task<int> GetOrdersToShipCountAsync()
+        {
+            return await _context.Orders
+                .Where(o => o.OrderStatus == "Pending" || o.OrderStatus == "Prepared")
+                .CountAsync();
+        }
+        
+        public async Task<decimal> GetTotalSalesTodayAsync()
+        {
+            var today = DateTime.Today;
+            return await _context.Orders
+                .Where(o => o.OrderDate >= today)
+                .SumAsync(o => o.TotalCost);
+        }
+        
+        public async Task<decimal> GetTotalSalesThisMonthAsync()
+        {
+            var firstDayOfMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            return await _context.Orders
+                .Where(o => o.OrderDate >= firstDayOfMonth)
+                .SumAsync(o => o.TotalCost);
+        }
     }
 }

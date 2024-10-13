@@ -25,6 +25,9 @@
     <PackageJsonDependenciesBootstrap Condition="$(PackageJsonDependenciesBootstrap) == ''">^5.3.3</PackageJsonDependenciesBootstrap>
     <PackageJsonDependenciesDevextreme Condition="$(PackageJsonDependenciesDevextreme) == ''">^24.1.4</PackageJsonDependenciesDevextreme>
     <PackageJsonDependenciesDevextremeAngular Condition="$(PackageJsonDependenciesDevextremeAngular) == ''">^24.1.4</PackageJsonDependenciesDevextremeAngular>
+    <PackageJsonDependenciesExceljs Condition="$(PackageJsonDependenciesExceljs) == ''">^4.2.1</PackageJsonDependenciesExceljs>
+    <PackageJsonDependenciesFileSaver Condition="$(PackageJsonDependenciesFileSaver) == ''">^2.0.5</PackageJsonDependenciesFileSaver>
+    <PackageJsonDependenciesFileSaverEs Condition="$(PackageJsonDependenciesFileSaverEs) == ''">^2.0.5</PackageJsonDependenciesFileSaverEs>
     <PackageJsonDependenciesHtml2canvas Condition="$(PackageJsonDependenciesHtml2canvas) == ''">^1.4.1</PackageJsonDependenciesHtml2canvas>
     <PackageJsonDependenciesJestEditorSupport Condition="$(PackageJsonDependenciesJestEditorSupport) == ''">*</PackageJsonDependenciesJestEditorSupport>
     <PackageJsonDependenciesJspdf Condition="$(PackageJsonDependenciesJspdf) == ''">^2.5.2</PackageJsonDependenciesJspdf>
@@ -39,6 +42,8 @@
     <PackageJsonDevdependenciesAngularCli Condition="$(PackageJsonDevdependenciesAngularCli) == ''">^18.1.0</PackageJsonDevdependenciesAngularCli>
     <PackageJsonDevdependenciesAngularCompilerCli Condition="$(PackageJsonDevdependenciesAngularCompilerCli) == ''">^18.1.0</PackageJsonDevdependenciesAngularCompilerCli>
     <PackageJsonDevdependenciesTypesAos Condition="$(PackageJsonDevdependenciesTypesAos) == ''">^3.0.7</PackageJsonDevdependenciesTypesAos>
+    <PackageJsonDevdependenciesTypesFileSaver Condition="$(PackageJsonDevdependenciesTypesFileSaver) == ''">^2.0.7</PackageJsonDevdependenciesTypesFileSaver>
+    <PackageJsonDevdependenciesTypesFileSaverEs Condition="$(PackageJsonDevdependenciesTypesFileSaverEs) == ''">^2.0.3</PackageJsonDevdependenciesTypesFileSaverEs>
     <PackageJsonDevdependenciesTypesJasmine Condition="$(PackageJsonDevdependenciesTypesJasmine) == ''">~5.1.0</PackageJsonDevdependenciesTypesJasmine>
     <PackageJsonDevdependenciesJasmineCore Condition="$(PackageJsonDevdependenciesJasmineCore) == ''">~5.1.0</PackageJsonDevdependenciesJasmineCore>
     <PackageJsonDevdependenciesKarma Condition="$(PackageJsonDevdependenciesKarma) == ''">~6.4.0</PackageJsonDevdependenciesKarma>

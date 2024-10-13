@@ -33,5 +33,10 @@ namespace SpiceCraft.Server.BusinessLogics.Interface
         Task<ResultDetail<bool>> InsertOrderItemsFromShoppingCartAsync(int userId, int orderId);
 
         Task<ResultDetail<bool>> UpdateOrderAsync(int orderId, UserOrderDetailDTO updatedOrderDetails);
+        
+        Task<ResultDetail<int>> GetTodaysOrdersCountAsync();
+        Task<ResultDetail<int>> GetOrdersToShipCountAsync();
+        Task<ResultDetail<decimal>> GetTotalSalesTodayAsync();
+        Task<ResultDetail<decimal>> GetTotalSalesThisMonthAsync();
     }
 }

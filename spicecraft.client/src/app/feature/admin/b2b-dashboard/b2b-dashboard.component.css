@@ -1,0 +1,15 @@
+.card {
+  min-height: 150px;
+}
+
+.card .card-title {
+  font-size: 2rem;
+}
+
+.container-fluid {
+  padding: 20px;
+}
+
+h3 {
+  margin-bottom: 20px;
+}

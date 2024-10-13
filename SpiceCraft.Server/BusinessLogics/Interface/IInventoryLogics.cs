@@ -22,4 +22,6 @@ public interface IInventoryLogics
 
     // Decrement the stock for a given product by a specific quantity
     Task<ResultDetail<int>> DecrementProductStockAsync(int itemId, int quantity);
+    
+    Task<ResultDetail<List<IngredientDTO>>> GetLowStockIngredientsAsync();
 }

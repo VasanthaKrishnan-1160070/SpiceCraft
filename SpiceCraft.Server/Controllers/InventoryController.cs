@@ -67,4 +67,16 @@ public class InventoryController(IInventoryLogics inventoryLogics) : ControllerB
         }
         return BadRequest(result.Message);
     }
+    
+    // Get ingredients that are running low on stock
+    [HttpGet("low-stock")]
+    public async Task<IActionResult> GetLowStockIngredients()
+    {
+        var result = await inventoryLogics.GetLowStockIngredientsAsync();
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return NotFound(result.Message);
+    }
 }

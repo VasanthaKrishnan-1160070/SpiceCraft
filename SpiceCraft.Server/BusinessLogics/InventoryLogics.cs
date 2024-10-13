@@ -73,4 +73,16 @@ public class InventoryLogics : IInventoryLogics
 
         return HelperFactory.Msg.Success(updatedStock, "Stock decremented successfully.");
     }
+    
+    // Get ingredients that are running low on stock
+    public async Task<ResultDetail<List<IngredientDTO>>> GetLowStockIngredientsAsync()
+    {
+        var ingredients = await _inventoryRepository.GetLowStockIngredientsAsync();
+        if (ingredients == null || !ingredients.Any())
+        {
+            return HelperFactory.Msg.Error<List<IngredientDTO>>("No ingredients are running low on stock.");
+        }
+
+        return HelperFactory.Msg.Success(ingredients);
+    }
 }

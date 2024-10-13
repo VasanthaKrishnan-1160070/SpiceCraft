@@ -66,6 +66,70 @@
       </div>
     </div>
 
+
+    <div class="container-fluid mt-4">
+      <!-- Row for Key Metrics -->
+      <div class="row">
+        <!-- Today's Orders -->
+        <div class="col-md-3">
+          <div class="card text-white bg-info mb-3">
+            <div class="card-header">Today's Orders</div>
+            <div class="card-body">
+              <h5 class="card-title">{{ todaysOrders }}</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders to Be Shipped -->
+        <div class="col-md-3">
+          <div class="card text-white bg-warning mb-3">
+            <div class="card-header">Orders to Be Shipped</div>
+            <div class="card-body">
+              <h5 class="card-title">{{ ordersToShip }}</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Sales Today -->
+        <div class="col-md-3">
+          <div class="card text-white bg-success mb-3">
+            <div class="card-header">Total Sales Today</div>
+            <div class="card-body">
+              <h5 class="card-title">{{ totalSalesToday | currency }}</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Sales This Month -->
+        <div class="col-md-3">
+          <div class="card text-white bg-primary mb-3">
+            <div class="card-header">Total Sales This Month</div>
+            <div class="card-body">
+              <h5 class="card-title">{{ totalSalesMonth | currency }}</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row for Low Stock Ingredients -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <h3>Ingredients Running Out of Stock</h3>
+          <dx-data-grid
+            [dataSource]="lowStockIngredients"
+            [showBorders]="true"
+            [paging]="{ pageSize: 10 }"
+            [height]="400"
+          >
+            <dxi-column dataField="ingredientName" caption="Ingredient"></dxi-column>
+            <dxi-column dataField="currentStock" caption="Current Stock"></dxi-column>
+            <dxi-column dataField="reorderLevel" caption="Reorder Level"></dxi-column>
+          </dx-data-grid>
+        </div>
+      </div>
+    </div>
+
+
     <!-- Handy Links Section -->
     <div class="row justify-content-center p-3">
       <p class="text-center text-secondary display-6">Some Handy Links</p>

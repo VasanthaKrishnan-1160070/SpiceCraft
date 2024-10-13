@@ -15,7 +15,10 @@ namespace SpiceCraft.Server.Repository.Interface
         Task<ProductInventoryDTO> GetInventoryForProductAsync(int productId);
         Task<bool> CreateUserOrderAsync(OrderDTO order);
         Task<UserOrderDetailDTO> GetOrderDetailsAsync(int orderId);
-
         Task<bool> UpdateOrderAsync(int orderId, UserOrderDetailDTO updatedOrderDetails);
+        Task<int> GetTodaysOrdersCountAsync();
+        Task<int> GetOrdersToShipCountAsync();
+        Task<decimal> GetTotalSalesTodayAsync();
+        Task<decimal> GetTotalSalesThisMonthAsync();
     }
 }

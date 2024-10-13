@@ -64,4 +64,22 @@ export class OrderService {
       { name: 'Returned', value: 'Returned' }
     ];
   }
+
+  // For dashboard
+  getTodaysOrdersCount(): Observable<ResultDetailModel<number>> {
+    return this._api.get<ResultDetailModel<number>>(`/order/count/today`);
+  }
+
+  getOrdersToShipCount(): Observable<ResultDetailModel<number>> {
+    return this._api.get<ResultDetailModel<number>>(`/order/count/to-ship`);
+  }
+
+  getTotalSalesToday(): Observable<ResultDetailModel<number>> {
+    return this._api.get<ResultDetailModel<number>>(`/order/sales/today`);
+  }
+
+  getTotalSalesMonth(): Observable<ResultDetailModel<number>> {
+    return this._api.get<ResultDetailModel<number>>(`/order/sales/month`);
+  }
+
 }
