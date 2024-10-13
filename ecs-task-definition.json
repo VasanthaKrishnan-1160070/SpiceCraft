@@ -6,6 +6,16 @@
   "memory": "2048",
   "executionRoleArn": "arn:aws:iam::051826709341:role/ecsTaskExecutionRole",
   "taskRoleArn": "arn:aws:iam::051826709341:role/ecsTaskRole",
+  "volumes": [
+    {
+      "name": "uploads-volume",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "${efsFileSystemId}",  // Replace with your EFS File System ID
+        "transitEncryption": "ENABLED",
+        "rootDirectory": "/"
+      }
+    }
+  ],
   "containerDefinitions": [
     {
       "name": "spicecraft-client-container",
@@ -17,6 +27,13 @@
         {
           "containerPort": 80,
           "protocol": "tcp"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "uploads-volume",
+          "containerPath": "/uploads/items",
+          "readOnly": false
         }
       ],
       "logConfiguration": {
@@ -40,47 +57,24 @@
           "protocol": "tcp"
         }
       ],
+      "mountPoints": [
+        {
+          "sourceVolume": "uploads-volume",
+          "containerPath": "/uploads/profiles",
+          "readOnly": false
+        },
+        {
+          "sourceVolume": "uploads-volume",
+          "containerPath": "/uploads/common",
+          "readOnly": false
+        }
+      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/spicecraft-server-logs",
           "awslogs-region": "${AWS_REGION}",
           "awslogs-stream-prefix": "spicecraft-server"
-        }
-      }
-    },
-    {
-      "name": "mssql-container",
-      "image": "mcr.microsoft.com/mssql/server:2022:${IMAGE_TAG}",
-      "cpu": 512,
-      "memory": 1024,
-      "essential": true,
-      "portMappings": [
-        {
-          "containerPort": 1433,
-          "protocol": "tcp"
-        }
-      ],
-      "environment": [
-        {
-          "name": "ACCEPT_EULA",
-          "value": "Y"
-        },
-        {
-          "name": "MSSQL_SA_PASSWORD",
-          "value": "${MSSQL_SA_PASSWORD}"
-        },
-        {
-          "name": "MSSQL_PID",
-          "value": "Developer"
-        }
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/mssql-logs",
-          "awslogs-region": "${AWS_REGION}",
-          "awslogs-stream-prefix": "mssql"
         }
       }
     }

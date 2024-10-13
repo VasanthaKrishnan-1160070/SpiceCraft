@@ -103,7 +103,7 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-# Create Security Group for Fargate tasks
+# Create Security Group for ECS and EFS
 resource "aws_security_group" "ecs_security_group" {
   vpc_id = data.aws_vpc.default.id
 
@@ -128,6 +128,13 @@ resource "aws_security_group" "ecs_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Required for EFS
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -140,12 +147,32 @@ resource "aws_security_group" "ecs_security_group" {
   }
 }
 
+# Create EFS File System
+resource "aws_efs_file_system" "spicecraft_efs" {
+  creation_token = "spicecraft-efs"
+  lifecycle_policy {
+    transition_to_ia = "AFTER_30_DAYS"  # Transition to Infrequent Access after 30 days
+  }
+  tags = {
+    Name = "spicecraft-efs"
+  }
+}
+
+# Create EFS Mount Targets in each Subnet
+resource "aws_efs_mount_target" "spicecraft_efs_mount" {
+  for_each = toset(data.aws_subnets.default.ids)
+
+  file_system_id  = aws_efs_file_system.spicecraft_efs.id
+  subnet_id       = each.value
+  security_groups = [aws_security_group.ecs_security_group.id]
+}
+
 # Create ECS Cluster
 resource "aws_ecs_cluster" "spicecraft" {
   name = "spicecraft-cluster"
 }
 
-# Create ECS Task Definition for Fargate
+# Create ECS Task Definition for Fargate with EFS Mount
 resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
   network_mode             = "awsvpc"  # Required for Fargate
@@ -154,6 +181,17 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
   requires_compatibilities = ["FARGATE"]  # Fargate Compatibility
+
+  # Define EFS volume for Fargate
+  volume {
+    name = "uploads-volume"
+
+    efs_volume_configuration {
+      file_system_id     = aws_efs_file_system.spicecraft_efs.id
+      transit_encryption = "ENABLED"
+      root_directory     = "/"  # Or specify a specific directory like "/uploads" if needed
+    }
+  }
 
   container_definitions = jsonencode([
     {
@@ -166,6 +204,13 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
         {
           containerPort = 80
           protocol      = "tcp"
+        }
+      ]
+      mountPoints = [
+        {
+          sourceVolume  = "uploads-volume"
+          containerPath = "/uploads/items"
+          readOnly      = false
         }
       ]
       logConfiguration = {
@@ -187,6 +232,18 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
         {
           containerPort = 8080
           protocol      = "tcp"
+        }
+      ]
+      mountPoints = [
+        {
+          sourceVolume  = "uploads-volume"
+          containerPath = "/uploads/profiles"
+          readOnly      = false
+        },
+        {
+          sourceVolume  = "uploads-volume"
+          containerPath = "/uploads/common"
+          readOnly      = false
         }
       ]
       logConfiguration = {
