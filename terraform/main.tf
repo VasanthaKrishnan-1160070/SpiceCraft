@@ -14,15 +14,8 @@ data "aws_subnets" "default" {
   }
 }
 
-# Fetch the latest Amazon Linux 2 AMI
-data "aws_ami" "amzn2" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
+# Fetch the latest Amazon Linux 2 AMI (No longer needed for Fargate)
+# Remove the EC2 instance setup and related configurations
 
 # Create CloudWatch Log Groups
 resource "aws_cloudwatch_log_group" "spicecraft_client_logs" {
@@ -113,7 +106,7 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-# Create Security Group for EC2 instance and RDS
+# Create Security Group for ECS and RDS
 resource "aws_security_group" "ecs_security_group" {
   vpc_id = data.aws_vpc.default.id
 
@@ -150,56 +143,31 @@ resource "aws_security_group" "ecs_security_group" {
   }
 }
 
-# Create EC2 Instance for ECS Cluster
-resource "aws_instance" "ecs_instance" {
-  ami                         = data.aws_ami.amzn2.id  # Use the fetched Amazon Linux 2 AMI ID
-  instance_type               = "t2.micro"
-  iam_instance_profile        = aws_iam_instance_profile.ecs_instance_profile.name
-  vpc_security_group_ids      = [aws_security_group.ecs_security_group.id]
-  subnet_id                   = data.aws_subnets.default.ids[0]
-  associate_public_ip_address = true
-
-  user_data = <<-EOF
-              #!/bin/bash
-              echo ECS_CLUSTER=${aws_ecs_cluster.spicecraft.name} >> /etc/ecs/ecs.config
-              EOF
-
-  tags = {
-    Name = "spicecraft-ec2-instance"
-  }
-}
-
-# Create IAM Instance Profile for EC2
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "ecsInstanceProfile"
-  role = aws_iam_role.ecs_task_execution_role.name
-}
-
 # Create ECS Cluster
 resource "aws_ecs_cluster" "spicecraft" {
   name = "spicecraft-cluster"
 }
 
-# Create ECS Task Definition
+# Create ECS Task Definition for Fargate
 resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
-  network_mode             = "bridge"
-  cpu                      = "256"
-  memory                   = "512"
+  network_mode             = "awsvpc"  # Required for Fargate
+  cpu                      = "1024"   # Example CPU configuration for Fargate
+  memory                   = "2048"   # Example Memory configuration for Fargate
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
+  requires_compatibilities = ["FARGATE"]  # Fargate Compatibility
 
   container_definitions = jsonencode([
     {
       name      = "spicecraft-client-container"
       image     = "${aws_ecr_repository.spicecraft_client.repository_url}:latest"
-      cpu       = 128
-      memory    = 256
+      cpu       = 256
+      memory    = 512
       essential = true
       portMappings = [
         {
           containerPort = 80
-          hostPort      = 80
           protocol      = "tcp"
         }
       ]
@@ -215,13 +183,12 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
     {
       name      = "spicecraft-server-container"
       image     = "${aws_ecr_repository.spicecraft_server.repository_url}:latest"
-      cpu       = 128
-      memory    = 256
+      cpu       = 256
+      memory    = 512
       essential = true
       portMappings = [
         {
           containerPort = 8080
-          hostPort      = 8080
           protocol      = "tcp"
         }
       ]
@@ -237,13 +204,19 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
   ])
 }
 
-# Create ECS Service to run on EC2
+# Create ECS Service for Fargate
 resource "aws_ecs_service" "spicecraft_service" {
   name            = "spicecraft-service"
   cluster         = aws_ecs_cluster.spicecraft.id
   task_definition = aws_ecs_task_definition.spicecraft_task.arn
   desired_count   = 1
-  launch_type     = "EC2"
+  launch_type     = "FARGATE"  # Changed to Fargate
+
+  network_configuration {
+    subnets          = data.aws_subnets.default.ids
+    security_groups  = [aws_security_group.ecs_security_group.id]
+    assign_public_ip = true
+  }
 }
 
 # Create RDS instance for SQL Server Express
