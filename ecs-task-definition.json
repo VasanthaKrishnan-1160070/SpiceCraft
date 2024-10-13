@@ -1,6 +1,11 @@
 {
   "family": "spicecraft-task",
-  "networkMode": "awsvpc",  // Required for Fargate
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::051826709341:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::051826709341:role/ecsTaskRole",
   "containerDefinitions": [
     {
       "name": "spicecraft-client-container",
@@ -79,10 +84,5 @@
         }
       }
     }
-  ],
-  "requiresCompatibilities": [ "FARGATE" ],
-  "cpu": "1024",
-  "memory": "2048",
-  "executionRoleArn": "arn:aws:iam::051826709341:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::051826709341:role/ecsTaskRole"
+  ]
 }
