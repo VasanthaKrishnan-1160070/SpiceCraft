@@ -10,7 +10,7 @@
     {
       "name": "uploads-volume",
       "efsVolumeConfiguration": {
-        "fileSystemId": "${efsFileSystemId}",  // Replace with your EFS File System ID
+        "fileSystemId": "fs-12345678", 
         "transitEncryption": "ENABLED",
         "rootDirectory": "/"
       }
@@ -19,7 +19,7 @@
   "containerDefinitions": [
     {
       "name": "spicecraft-client-container",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:${IMAGE_TAG}",
+      "image": "051826709341.dkr.ecr.ap-southeast-2.amazonaws.com/spicecraft-client:latest",
       "cpu": 256,
       "memory": 512,
       "essential": true,
@@ -40,14 +40,14 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/spicecraft-client-logs",
-          "awslogs-region": "${AWS_REGION}",
+          "awslogs-region": "ap-southeast-2",
           "awslogs-stream-prefix": "spicecraft-client"
         }
       }
     },
     {
       "name": "spicecraft-server-container",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:${IMAGE_TAG}",
+      "image": "051826709341.dkr.ecr.ap-southeast-2.amazonaws.com/spicecraft-server:latest",
       "cpu": 256,
       "memory": 512,
       "essential": true,
@@ -73,7 +73,7 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/spicecraft-server-logs",
-          "awslogs-region": "${AWS_REGION}",
+          "awslogs-region": "ap-southeast-2",
           "awslogs-stream-prefix": "spicecraft-server"
         }
       }
