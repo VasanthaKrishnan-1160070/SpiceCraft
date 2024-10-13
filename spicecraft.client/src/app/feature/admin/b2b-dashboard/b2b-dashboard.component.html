@@ -11,60 +11,60 @@
     </p>
 
     <!-- Dashboard Cards -->
-    <div class="row justify-content-center p-3">
+<!--    <div class="row justify-content-center p-3">-->
 
-      <div class="col-3">
-        <div class="card bg-twilight rounded link-box">
-          <div class="card-header text-white fw-light">New Messages</div>
-          <div class="card-body">
-            <h5 class="card-title text-center text-white fw-light">
-              <a class="text-white text-decoration-none" [routerLink]="['/enquiry']">
-                {{ newMessagesCount ? newMessagesCount + " New Messages" : "No New Messages" }}
-              </a>
-            </h5>
-          </div>
-        </div>
-      </div>
+<!--      <div class="col-3">-->
+<!--        <div class="card bg-twilight rounded link-box">-->
+<!--          <div class="card-header text-white fw-light">New Messages</div>-->
+<!--          <div class="card-body">-->
+<!--            <h5 class="card-title text-center text-white fw-light">-->
+<!--              <a class="text-white text-decoration-none" [routerLink]="['/enquiry']">-->
+<!--                {{ newMessagesCount ? newMessagesCount + " New Messages" : "No New Messages" }}-->
+<!--              </a>-->
+<!--            </h5>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
 
-      <div class="col-3">
-        <div class="card bg-twilight rounded link-box">
-          <div class="card-header text-white fw-light">Last 7 days Orders</div>
-          <div class="card-body">
-            <h5 class="card-title text-center text-white fw-light">
-              <a class="text-white text-decoration-none" [routerLink]="['/order']">
-                {{ last7dayOrdersCount ? last7dayOrdersCount + " Orders" : "No orders for last 7 days" }}
-              </a>
-            </h5>
-          </div>
-        </div>
-      </div>
+<!--      <div class="col-3">-->
+<!--        <div class="card bg-twilight rounded link-box">-->
+<!--          <div class="card-header text-white fw-light">Last 7 days Orders</div>-->
+<!--          <div class="card-body">-->
+<!--            <h5 class="card-title text-center text-white fw-light">-->
+<!--              <a class="text-white text-decoration-none" [routerLink]="['/order']">-->
+<!--                {{ last7dayOrdersCount ? last7dayOrdersCount + " Orders" : "No orders for last 7 days" }}-->
+<!--              </a>-->
+<!--            </h5>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
 
-      <div class="col-3">
-        <div class="card bg-twilight rounded link-box">
-          <div class="card-header text-white fw-light">Unshipped Orders</div>
-          <div class="card-body">
-            <h5 class="card-title text-center text-white fw-light">
-              <a class="text-white text-decoration-none" [routerLink]="['/order']">
-                {{ unshippedOrdersCount ? unshippedOrdersCount + " Orders" : "No Unshipped Orders" }}
-              </a>
-            </h5>
-          </div>
-        </div>
-      </div>
+<!--      <div class="col-3">-->
+<!--        <div class="card bg-twilight rounded link-box">-->
+<!--          <div class="card-header text-white fw-light">Unshipped Orders</div>-->
+<!--          <div class="card-body">-->
+<!--            <h5 class="card-title text-center text-white fw-light">-->
+<!--              <a class="text-white text-decoration-none" [routerLink]="['/order']">-->
+<!--                {{ unshippedOrdersCount ? unshippedOrdersCount + " Orders" : "No Unshipped Orders" }}-->
+<!--              </a>-->
+<!--            </h5>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
 
-      <div class="col-3">
-        <div class="card bg-twilight rounded link-box">
-          <div class="card-header text-white fw-light">Low stock Items</div>
-          <div class="card-body">
-            <h5 class="card-title text-center text-white fw-light">
-              <a class="text-white text-decoration-none" [routerLink]="['/inventory']">
-                {{ lowStockProducts ? lowStockProducts + " Products in low stock" : "No Products in low stock" }}
-              </a>
-            </h5>
-          </div>
-        </div>
-      </div>
-    </div>
+<!--      <div class="col-3">-->
+<!--        <div class="card bg-twilight rounded link-box">-->
+<!--          <div class="card-header text-white fw-light">Low stock Items</div>-->
+<!--          <div class="card-body">-->
+<!--            <h5 class="card-title text-center text-white fw-light">-->
+<!--              <a class="text-white text-decoration-none" [routerLink]="['/inventory']">-->
+<!--                {{ lowStockProducts ? lowStockProducts + " Products in low stock" : "No Products in low stock" }}-->
+<!--              </a>-->
+<!--            </h5>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
 
     <div class="container-fluid mt-4">
@@ -119,7 +119,6 @@
             [dataSource]="lowStockIngredients"
             [showBorders]="true"
             [paging]="{ pageSize: 10 }"
-            [height]="400"
           >
             <dxi-column dataField="ingredientName" caption="Ingredient"></dxi-column>
             <dxi-column dataField="currentStock" caption="Current Stock"></dxi-column>
