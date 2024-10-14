@@ -186,7 +186,7 @@ resource "aws_iam_instance_profile" "ecs_instance_profile" {
 resource "aws_instance" "ecs_container_instance" {
   count                   = 1  
   ami                     = data.aws_ami.ecs_optimized.id
-  instance_type           = "t2.medium" 
+  instance_type           = "t2.large" 
   vpc_security_group_ids  = [aws_security_group.ecs_security_group.id]
   subnet_id               = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
@@ -211,8 +211,8 @@ resource "aws_instance" "ecs_container_instance" {
 resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
   network_mode             = "bridge"  # Using bridge mode to allow containers to talk using container name
-  cpu                      = "1024"
-  memory                   = "2048"
+  cpu                      = "4096"
+  memory                   = "8192"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
   requires_compatibilities = ["EC2"]
@@ -221,8 +221,8 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
     {
       name      = "spicecraft-client-container"
       image     = "${aws_ecr_repository.spicecraft_client.repository_url}:latest"
-      cpu       = 256
-      memory    = 512
+      cpu       = 1024
+      memory    = 2048
       essential = true
       portMappings = [
         {
@@ -242,8 +242,8 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
     {
       name      = "spicecraft-server-container"
       image     = "${aws_ecr_repository.spicecraft_server.repository_url}:latest"
-      cpu       = 256
-      memory    = 512
+      cpu       = 1024
+      memory    = 2048
       essential = true
       portMappings = [
         {

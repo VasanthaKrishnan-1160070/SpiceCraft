@@ -11,6 +11,7 @@
     <PackageJsonScriptsPrestart Condition="$(PackageJsonScriptsPrestart) == ''">node aspnetcore-https</PackageJsonScriptsPrestart>
     <PackageJsonScriptsStartWindows Condition="$(PackageJsonScriptsStartWindows) == ''">ng serve --ssl --ssl-cert "%APPDATA%\ASP.NET\https\%npm_package_name%.pem" --ssl-key "%APPDATA%\ASP.NET\https\%npm_package_name%.key" --host=127.0.0.1</PackageJsonScriptsStartWindows>
     <PackageJsonScriptsStartDefault Condition="$(PackageJsonScriptsStartDefault) == ''">ng serve --ssl --ssl-cert "$HOME/.aspnet/https/${npm_package_name}.pem" --ssl-key "$HOME/.aspnet/https/${npm_package_name}.key" --host=127.0.0.1</PackageJsonScriptsStartDefault>
+    <PackageJsonScriptsProdBuild Condition="$(PackageJsonScriptsProdBuild) == ''">ng build --configuration production --aot --base-href /app/</PackageJsonScriptsProdBuild>
     <PackageJsonPrivate Condition="$(PackageJsonPrivate) == ''">true</PackageJsonPrivate>
     <PackageJsonDependenciesAngularAnimations Condition="$(PackageJsonDependenciesAngularAnimations) == ''">^18.1.0</PackageJsonDependenciesAngularAnimations>
     <PackageJsonDependenciesAngularCommon Condition="$(PackageJsonDependenciesAngularCommon) == ''">^18.1.0</PackageJsonDependenciesAngularCommon>
