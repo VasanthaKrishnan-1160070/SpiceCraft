@@ -51,7 +51,7 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-# Create ECS Task Definition for Fargate with EFS Mount
+# Create ECS Task Definition for Fargate
 resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
   network_mode             = "awsvpc"  # Required for Fargate
@@ -60,17 +60,6 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
   requires_compatibilities = ["FARGATE"]  # Fargate Compatibility
-
-  # Define EFS volume for Fargate
-  volume {
-    name = "uploads-volume"
-
-    efs_volume_configuration {
-      file_system_id     = aws_efs_file_system.spicecraft_efs.id  # Reference the EFS File System ID
-      transit_encryption = "ENABLED"  # Enable encryption in transit
-      root_directory     = "/"        # Mount the root directory or specify subfolders if needed
-    }
-  }
 
   container_definitions = jsonencode([
     {
@@ -83,13 +72,6 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
         {
           containerPort = 80
           protocol      = "tcp"
-        }
-      ]
-      mountPoints = [
-        {
-          sourceVolume  = "uploads-volume"
-          containerPath = "/uploads/items"
-          readOnly      = false
         }
       ]
       logConfiguration = {
@@ -111,18 +93,6 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
         {
           containerPort = 8080
           protocol      = "tcp"
-        }
-      ]
-      mountPoints = [
-        {
-          sourceVolume  = "uploads-volume"
-          containerPath = "/uploads/profiles"
-          readOnly      = false
-        },
-        {
-          sourceVolume  = "uploads-volume"
-          containerPath = "/uploads/common"
-          readOnly      = false
         }
       ]
       logConfiguration = {

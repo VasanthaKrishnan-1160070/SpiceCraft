@@ -6,16 +6,6 @@
   "memory": "2048",
   "executionRoleArn": "arn:aws:iam::051826709341:role/spiceCraftEcsTaskExecutionRole",
   "taskRoleArn": "arn:aws:iam::051826709341:role/spiceCraftEcsTaskRole",
-  "volumes": [
-    {
-      "name": "uploads-volume",
-      "efsVolumeConfiguration": {
-        "fileSystemId": "fs-12345678", 
-        "transitEncryption": "ENABLED",
-        "rootDirectory": "/"
-      }
-    }
-  ],
   "containerDefinitions": [
     {
       "name": "spicecraft-client-container",
@@ -27,13 +17,6 @@
         {
           "containerPort": 80,
           "protocol": "tcp"
-        }
-      ],
-      "mountPoints": [
-        {
-          "sourceVolume": "uploads-volume",
-          "containerPath": "/uploads/items",
-          "readOnly": false
         }
       ],
       "logConfiguration": {
@@ -55,18 +38,6 @@
         {
           "containerPort": 8080,
           "protocol": "tcp"
-        }
-      ],
-      "mountPoints": [
-        {
-          "sourceVolume": "uploads-volume",
-          "containerPath": "/uploads/profiles",
-          "readOnly": false
-        },
-        {
-          "sourceVolume": "uploads-volume",
-          "containerPath": "/uploads/common",
-          "readOnly": false
         }
       ],
       "logConfiguration": {
