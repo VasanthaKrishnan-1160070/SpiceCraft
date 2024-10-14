@@ -117,6 +117,7 @@ resource "aws_security_group" "ecs_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Allow inbound traffic to SQL Server from any IP address
   ingress {
     from_port   = 1433
     to_port     = 1433
@@ -220,8 +221,7 @@ resource "aws_ecs_service" "spicecraft_service" {
   task_definition = aws_ecs_task_definition.spicecraft_task.arn
   desired_count   = 1
   launch_type     = "EC2"
-  network_configuration {
-    security_groups = [aws_security_group.ecs_security_group.id]
-    subnets         = data.aws_subnets.default.ids
-  }
+
+  # Remove network configuration, since bridge mode does not require it for EC2
+  # (Fargate uses awsvpc and requires network configuration)
 }
