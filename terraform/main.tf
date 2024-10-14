@@ -158,6 +158,27 @@ resource "aws_instance" "sql_server_instance" {
   }
 }
 
+# Create EC2 Instance for ECS Cluster
+resource "aws_instance" "ecs_container_instance" {
+  count                   = 1  # Adjust count based on how many instances you need
+  ami                     = data.aws_ami.amzn2.id
+  instance_type           = "t2.medium"  # Ensure sufficient resources for your tasks
+  vpc_security_group_ids  = [aws_security_group.ecs_security_group.id]
+  subnet_id               = data.aws_subnets.default.ids[0]
+  associate_public_ip_address = true
+
+  user_data = <<-EOF
+    #!/bin/bash
+    echo ECS_CLUSTER=${aws_ecs_cluster.spicecraft.name} >> /etc/ecs/ecs.config
+    yum install -y aws-cli ecs-init
+    systemctl enable --now ecs
+  EOF
+
+  tags = {
+    Name = "ecs-container-instance"
+  }
+}
+
 # Create ECS Task Definition for EC2 Launch Type
 resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
