@@ -15,27 +15,6 @@ data "aws_subnets" "default" {
   }
 }
 
-# Fetch the ECS-optimized Amazon Linux 2 AMI
-data "aws_ami" "ecs_optimized" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-ecs-hvm-*-x86_64-ebs"]
-  }
-}
-
-# Fetch the Latest Amazon Linux 2 AMI
-data "aws_ami" "amzn2" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
-
 # Create CloudWatch Log Groups for ECS Containers
 resource "aws_cloudwatch_log_group" "spicecraft_client_logs" {
   name              = "/ecs/spicecraft-client-logs"
@@ -148,81 +127,65 @@ resource "aws_security_group" "ecs_security_group" {
   }
 }
 
-# Create IAM Role for ECS Container Instance
-resource "aws_iam_role" "ecs_instance_role" {
-  name = "spiceCraftEcsInstanceRole"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        },
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
+# Create Application Load Balancer
+resource "aws_lb" "spicecraft_alb" {
+  name               = "spicecraft-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.ecs_security_group.id]
+  subnets            = data.aws_subnets.default.ids
 
   tags = {
-    Name = "ecs_instance_role"
+    Name = "spicecraft-alb"
   }
 }
 
-# Attach policies to the ECS Container Instance Role
-resource "aws_iam_role_policy_attachment" "ecs_instance_policy" {
-  role       = aws_iam_role.ecs_instance_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
-}
+# Create Target Group for ALB
+resource "aws_lb_target_group" "spicecraft_tg" {
+  name     = "spicecraft-target-group"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = data.aws_vpc.default.id
+  target_type = "ip"
 
-# Create IAM Instance Profile for EC2
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "ecsInstanceProfile"
-  role = aws_iam_role.ecs_instance_role.name
-}
-
-# Create EC2 Instance for ECS Cluster and SQL Server Express
-resource "aws_instance" "ecs_container_instance" {
-  count                   = 1  
-  ami                     = data.aws_ami.ecs_optimized.id
-  instance_type           = "t2.large" 
-  vpc_security_group_ids  = [aws_security_group.ecs_security_group.id]
-  subnet_id               = data.aws_subnets.default.ids[0]
-  associate_public_ip_address = true
-
-  iam_instance_profile = aws_iam_instance_profile.ecs_instance_profile.name
-
-  user_data = <<-EOF
-    #!/bin/bash
-    echo ECS_CLUSTER=${aws_ecs_cluster.spicecraft.name} >> /etc/ecs/ecs.config
-    yum install -y ecs-init
-    systemctl enable --now ecs   
-  EOF
-
-  tags = {
-    Name = "ecs-container-instance"
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
   }
 }
 
+# Create Listener for ALB
+resource "aws_lb_listener" "spicecraft_listener" {
+  load_balancer_arn = aws_lb.spicecraft_alb.arn
+  port              = 80
+  protocol          = "HTTP"
 
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.spicecraft_tg.arn
+  }
+}
 
-# Create ECS Task Definition for EC2 Launch Type
+# Create ECS Task Definition for Fargate
 resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
-  network_mode             = "bridge"  # Using bridge mode to allow containers to talk using container name
-  cpu                      = "4096"
-  memory                   = "8192"
+  network_mode             = "awsvpc"  # Required for Fargate
+  cpu                      = "1024"
+  memory                   = "2048"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
-  requires_compatibilities = ["EC2"]
+  requires_compatibilities = ["FARGATE"]
 
   container_definitions = jsonencode([
     {
       name      = "spicecraft-client-container"
       image     = "${aws_ecr_repository.spicecraft_client.repository_url}:latest"
-      cpu       = 1024
-      memory    = 2048
+      cpu       = 256
+      memory    = 512
       essential = true
       portMappings = [
         {
@@ -242,8 +205,8 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
     {
       name      = "spicecraft-server-container"
       image     = "${aws_ecr_repository.spicecraft_server.repository_url}:latest"
-      cpu       = 1024
-      memory    = 2048
+      cpu       = 256
+      memory    = 512
       essential = true
       portMappings = [
         {
@@ -263,11 +226,20 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
   ])
 }
 
-# Create ECS Service to Run on EC2
+# Create ECS Service to Run on Fargate
 resource "aws_ecs_service" "spicecraft_service" {
   name            = "spicecraft-service"
   cluster         = aws_ecs_cluster.spicecraft.id
   task_definition = aws_ecs_task_definition.spicecraft_task.arn
   desired_count   = 1
-  launch_type     = "EC2"
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets         = data.aws_subnets.default.ids
+    security_groups = [aws_security_group.ecs_security_group.id]
+  }
+  load_balancer {
+    target_group_arn = aws_lb_target_group.spicecraft_tg.arn
+    container_name   = "spicecraft-client-container"
+    container_port   = 80
+  }
 }

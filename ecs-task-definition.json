@@ -1,22 +1,22 @@
+
 {
   "family": "spicecraft-task",
-  "networkMode": "bridge",
-  "requiresCompatibilities": ["EC2"],
-  "cpu": "4096",
-  "memory": "8192",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
   "executionRoleArn": "arn:aws:iam::051826709341:role/spiceCraftEcsTaskExecutionRole",
   "taskRoleArn": "arn:aws:iam::051826709341:role/spiceCraftEcsTaskRole",
   "containerDefinitions": [
     {
       "name": "spicecraft-client-container",
       "image": "051826709341.dkr.ecr.ap-southeast-2.amazonaws.com/spicecraft-client:latest",
-      "cpu": 1024,
-      "memory": 2048,
+      "cpu": 256,
+      "memory": 512,
       "essential": true,
       "portMappings": [
         {
           "containerPort": 80,
-          "hostPort": 0,
           "protocol": "tcp"
         }
       ],
@@ -32,13 +32,12 @@
     {
       "name": "spicecraft-server-container",
       "image": "051826709341.dkr.ecr.ap-southeast-2.amazonaws.com/spicecraft-server:latest",
-      "cpu": 1024,
-      "memory": 2048,
+      "cpu": 256,
+      "memory": 512,
       "essential": true,
       "portMappings": [
         {
           "containerPort": 8080,
-          "hostPort": 0, 
           "protocol": "tcp"
         }
       ],
