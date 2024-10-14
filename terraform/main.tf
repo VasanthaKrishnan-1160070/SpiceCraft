@@ -15,6 +15,17 @@ data "aws_subnets" "default" {
   }
 }
 
+# Fetch the ECS-optimized Amazon Linux 2 AMI
+data "aws_ami" "ecs_optimized" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-ecs-hvm-*-x86_64-ebs"]
+  }
+}
+
 # Fetch the Latest Amazon Linux 2 AMI
 data "aws_ami" "amzn2" {
   most_recent = true
@@ -139,9 +150,9 @@ resource "aws_security_group" "ecs_security_group" {
 
 # Create EC2 Instance for ECS Cluster and SQL Server Express
 resource "aws_instance" "ecs_container_instance" {
-  count                   = 1  # Adjust count based on how many instances you need
-  ami                     = data.aws_ami.amzn2.id
-  instance_type           = "t2.medium"  # Ensure sufficient resources for your tasks
+  count                   = 1  
+  ami                     = data.aws_ami.ecs_optimized.id
+  instance_type           = "t2.medium" 
   vpc_security_group_ids  = [aws_security_group.ecs_security_group.id]
   subnet_id               = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
@@ -159,7 +170,7 @@ resource "aws_instance" "ecs_container_instance" {
 
     # Configure SQL Server password
     /opt/mssql/bin/mssql-conf set-sa-password Admin123
-    
+
     systemctl enable --now mssql-server
   EOF
 
@@ -167,6 +178,7 @@ resource "aws_instance" "ecs_container_instance" {
     Name = "ecs-container-instance"
   }
 }
+
 
 # Create ECS Task Definition for EC2 Launch Type
 resource "aws_ecs_task_definition" "spicecraft_task" {
