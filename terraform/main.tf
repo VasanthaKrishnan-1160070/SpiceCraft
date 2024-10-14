@@ -197,13 +197,7 @@ resource "aws_instance" "ecs_container_instance" {
     #!/bin/bash
     echo ECS_CLUSTER=${aws_ecs_cluster.spicecraft.name} >> /etc/ecs/ecs.config
     yum install -y ecs-init
-    systemctl enable --now ecs
-
-    # Install SQL Server Express
-    curl -o /etc/yum.repos.d/mssql-server.repo https://packages.microsoft.com/config/rhel/7/mssql-server-2019.repo
-    ACCEPT_EULA=Y MSSQL_SA_PASSWORD=Admin123 yum install -y mssql-server
-    /opt/mssql/bin/mssql-conf set-sa-password -q -n
-    systemctl enable --now mssql-server
+    systemctl enable --now ecs   
   EOF
 
   tags = {
