@@ -2,6 +2,49 @@ provider "aws" {
   region = var.aws_region
 }
 
+# Fetch the Default VPC
+data "aws_vpc" "default" {
+  default = true
+}
+
+# Fetch the Default Subnets for the Default VPC
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+# Fetch the Latest Amazon Linux 2 AMI
+data "aws_ami" "amzn2" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
+# Create CloudWatch Log Groups for ECS Containers
+resource "aws_cloudwatch_log_group" "spicecraft_client_logs" {
+  name              = "/ecs/spicecraft-client-logs"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_group" "spicecraft_server_logs" {
+  name              = "/ecs/spicecraft-server-logs"
+  retention_in_days = 30
+}
+
+# Create ECR Repositories for Images
+resource "aws_ecr_repository" "spicecraft_client" {
+  name = "spicecraft-client"
+}
+
+resource "aws_ecr_repository" "spicecraft_server" {
+  name = "spicecraft-server"
+}
+
 # Create IAM Role for ECS Task Execution
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "spiceCraftEcsTaskExecutionRole"
@@ -51,15 +94,78 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-# Create ECS Task Definition for Fargate
+# Create ECS Cluster
+resource "aws_ecs_cluster" "spicecraft" {
+  name = "spicecraft-cluster"
+}
+
+# Create Security Group for ECS and SQL Server
+resource "aws_security_group" "ecs_security_group" {
+  vpc_id = data.aws_vpc.default.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "ecs_security_group"
+  }
+}
+
+# Create EC2 Instance for SQL Server Express
+resource "aws_instance" "sql_server_instance" {
+  ami                    = data.aws_ami.amzn2.id
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.ecs_security_group.id]
+  subnet_id              = data.aws_subnets.default.ids[0]
+  associate_public_ip_address = true
+
+  user_data = <<-EOF
+              #!/bin/bash
+              # Install MSSQL Server Express
+              curl -o sql_server.sh https://package-url-for-sql-server-install.sh
+              chmod +x sql_server.sh
+              ./sql_server.sh
+              EOF
+
+  tags = {
+    Name = "sql-server-instance"
+  }
+}
+
+# Create ECS Task Definition for EC2 Launch Type
 resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
-  network_mode             = "awsvpc"  # Required for Fargate
-  cpu                      = "1024"   # Example CPU configuration for Fargate
-  memory                   = "2048"   # Example Memory configuration for Fargate
+  network_mode             = "bridge"  # Using bridge mode to allow containers to talk using container name
+  cpu                      = "1024"
+  memory                   = "2048"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
-  requires_compatibilities = ["FARGATE"]  # Fargate Compatibility
+  requires_compatibilities = ["EC2"]
 
   container_definitions = jsonencode([
     {
@@ -105,4 +211,17 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
       }
     }
   ])
+}
+
+# Create ECS Service to Run on EC2
+resource "aws_ecs_service" "spicecraft_service" {
+  name            = "spicecraft-service"
+  cluster         = aws_ecs_cluster.spicecraft.id
+  task_definition = aws_ecs_task_definition.spicecraft_task.arn
+  desired_count   = 1
+  launch_type     = "EC2"
+  network_configuration {
+    security_groups = [aws_security_group.ecs_security_group.id]
+    subnets         = data.aws_subnets.default.ids
+  }
 }
