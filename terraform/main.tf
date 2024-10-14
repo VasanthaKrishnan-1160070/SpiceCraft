@@ -137,28 +137,7 @@ resource "aws_security_group" "ecs_security_group" {
   }
 }
 
-# Create EC2 Instance for SQL Server Express
-resource "aws_instance" "sql_server_instance" {
-  ami                    = data.aws_ami.amzn2.id
-  instance_type          = "t2.micro"
-  vpc_security_group_ids = [aws_security_group.ecs_security_group.id]
-  subnet_id              = data.aws_subnets.default.ids[0]
-  associate_public_ip_address = true
-
-  user_data = <<-EOF
-              #!/bin/bash
-              # Install MSSQL Server Express
-              curl -o sql_server.sh https://package-url-for-sql-server-install.sh
-              chmod +x sql_server.sh
-              ./sql_server.sh
-              EOF
-
-  tags = {
-    Name = "sql-server-instance"
-  }
-}
-
-# Create EC2 Instance for ECS Cluster
+# Create EC2 Instance for ECS Cluster and SQL Server Express
 resource "aws_instance" "ecs_container_instance" {
   count                   = 1  # Adjust count based on how many instances you need
   ami                     = data.aws_ami.amzn2.id
@@ -170,8 +149,18 @@ resource "aws_instance" "ecs_container_instance" {
   user_data = <<-EOF
     #!/bin/bash
     echo ECS_CLUSTER=${aws_ecs_cluster.spicecraft.name} >> /etc/ecs/ecs.config
-    yum install -y aws-cli ecs-init
+    yum install -y ecs-init
     systemctl enable --now ecs
+
+    # Install SQL Server Express
+    curl -o /etc/yum.repos.d/mssql-server.repo https://packages.microsoft.com/config/rhel/7/mssql-server-2019.repo
+    yum install -y mssql-server
+    /opt/mssql/bin/mssql-conf setup accept-eula
+
+    # Configure SQL Server password
+    /opt/mssql/bin/mssql-conf set-sa-password Admin123
+    
+    systemctl enable --now mssql-server
   EOF
 
   tags = {
@@ -242,7 +231,4 @@ resource "aws_ecs_service" "spicecraft_service" {
   task_definition = aws_ecs_task_definition.spicecraft_task.arn
   desired_count   = 1
   launch_type     = "EC2"
-
-  # Remove network configuration, since bridge mode does not require it for EC2
-  # (Fargate uses awsvpc and requires network configuration)
 }
