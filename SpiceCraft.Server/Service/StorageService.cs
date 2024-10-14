@@ -17,20 +17,26 @@ public class StorageService : IStorageService
     private readonly IAmazonS3 _s3Client;
     private readonly string _bucketName;
 
-    public StorageService(IAmazonS3 s3Client, IConfiguration configuration)
+    public StorageService(IAmazonS3 s3Client, string bucketName)
     {
-        var awsOptions = configuration.GetSection("AWS");
-        var region = awsOptions["Region"];
-        var accessKey = awsOptions["AccessKey"];
-        var secretKey = awsOptions["SecretKey"];
+        _s3Client = s3Client;
+        _bucketName = bucketName;
+    }
 
-        var config = new AmazonS3Config
+    // Constructor to use AWS Profile for local development
+    public StorageService(IConfiguration configuration, IHostEnvironment environment)
+    {
+        if (environment.IsDevelopment())
         {
-            RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(region)
-        };
-
-        _s3Client = new AmazonS3Client(accessKey, secretKey, config);
-        _bucketName = awsOptions["BucketName"];
+            var awsOptions = configuration.GetAWSOptions();
+            awsOptions.Profile = configuration["AWS:Profile"];
+            _s3Client = awsOptions.CreateServiceClient<IAmazonS3>();
+        }
+        else
+        {
+            _s3Client = new AmazonS3Client();
+        }
+        _bucketName = configuration["AWS:BucketName"];
     }
 
     public async Task UploadImageAsync(string key, IFormFile image)

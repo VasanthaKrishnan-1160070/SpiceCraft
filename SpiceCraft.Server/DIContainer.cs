@@ -128,7 +128,23 @@ namespace SpiceCraft.Server
             // Configure AWS services with options from appsettings.json
            // services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
 
-            services.AddScoped<IAmazonS3, AmazonS3Client>();
+           // Register the storage service conditionally based on environment
+           services.AddScoped<IStorageService>(sp =>
+           {
+               var env = sp.GetService<IHostEnvironment>();
+               var configuration = sp.GetService<IConfiguration>();
+
+               if (env.IsDevelopment())
+               {
+                   // Use constructor with AWS profile for local development
+                   return new StorageService(configuration, env);
+               }
+               else
+               {
+                   // Use constructor for production environment
+                   return new StorageService(sp.GetRequiredService<IAmazonS3>(), configuration["AWS:BucketName"]);
+               }
+           });
         }
     }
 }
