@@ -1,20 +1,3 @@
-USE master;
-
-IF EXISTS (SELECT name FROM sys.databases WHERE name = 'db_aae41b_spicecraft')
-BEGIN
-    -- Set the database to single-user mode
-    ALTER DATABASE db_aae41b_spicecraft SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    
-    -- Drop the database
-    DROP DATABASE db_aae41b_spicecraft;
-END
-ELSE
-BEGIN
-    PRINT 'Database db_aae41b_spicecraft does not exist.';
-END;
-
-create database db_aae41b_spicecraft;
-
 use db_aae41b_spicecraft;
 
 -- Create Tables

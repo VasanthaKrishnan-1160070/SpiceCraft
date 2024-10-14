@@ -148,6 +148,40 @@ resource "aws_security_group" "ecs_security_group" {
   }
 }
 
+# Create IAM Role for ECS Container Instance
+resource "aws_iam_role" "ecs_instance_role" {
+  name = "spiceCraftEcsInstanceRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "ecs_instance_role"
+  }
+}
+
+# Attach policies to the ECS Container Instance Role
+resource "aws_iam_role_policy_attachment" "ecs_instance_policy" {
+  role       = aws_iam_role.ecs_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+# Create IAM Instance Profile for EC2
+resource "aws_iam_instance_profile" "ecs_instance_profile" {
+  name = "ecsInstanceProfile"
+  role = aws_iam_role.ecs_instance_role.name
+}
+
 # Create EC2 Instance for ECS Cluster and SQL Server Express
 resource "aws_instance" "ecs_container_instance" {
   count                   = 1  
@@ -157,6 +191,8 @@ resource "aws_instance" "ecs_container_instance" {
   subnet_id               = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
 
+  iam_instance_profile = aws_iam_instance_profile.ecs_instance_profile.name
+
   user_data = <<-EOF
     #!/bin/bash
     echo ECS_CLUSTER=${aws_ecs_cluster.spicecraft.name} >> /etc/ecs/ecs.config
@@ -165,12 +201,8 @@ resource "aws_instance" "ecs_container_instance" {
 
     # Install SQL Server Express
     curl -o /etc/yum.repos.d/mssql-server.repo https://packages.microsoft.com/config/rhel/7/mssql-server-2019.repo
-    yum install -y mssql-server
-    /opt/mssql/bin/mssql-conf setup accept-eula
-
-    # Configure SQL Server password
-    /opt/mssql/bin/mssql-conf set-sa-password Admin123
-
+    ACCEPT_EULA=Y MSSQL_SA_PASSWORD=Admin123 yum install -y mssql-server
+    /opt/mssql/bin/mssql-conf set-sa-password -q -n
     systemctl enable --now mssql-server
   EOF
 
@@ -178,6 +210,7 @@ resource "aws_instance" "ecs_container_instance" {
     Name = "ecs-container-instance"
   }
 }
+
 
 
 # Create ECS Task Definition for EC2 Launch Type
