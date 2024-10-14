@@ -1,0 +1,119 @@
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches: [ "release" ]
+
+env:
+  AWS_REGION: ap-southeast-2                      # set this to preferred AWS region
+  ECR_REPOSITORY_CLIENT: spicecraft-client        # set this to Amazon ECR repository name for client
+  ECR_REPOSITORY_SERVER: spicecraft-server        # set this to Amazon ECR repository name for server
+  ECS_SERVICE: spicecraft-service                 # set this to Amazon ECS service name
+  ECS_CLUSTER: spicecraft-cluster                 # set this to Amazon ECS cluster name
+  ECS_TASK_DEFINITION: ecs-task-definition.json   # set this to the path to Amazon ECS task definition file
+  MSSQL_SA_PASSWORD: Admin123
+  IMAGE_TAG: latest # ${{ github.sha }}
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Enable Debug Logging
+      run: |
+        echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Delete all images from the ECR repositories
+      env:
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        AWS_REGION: ${{ env.AWS_REGION }}
+      run: |
+        echo "Deleting all images from ECR repository: ${{ env.ECR_REPOSITORY_CLIENT }}"
+        image_ids_client=$(aws ecr list-images --repository-name ${{ env.ECR_REPOSITORY_CLIENT }} --query 'imageIds[*]' --output json)
+        if [ "$image_ids_client" != "[]" ]; then
+          aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY_CLIENT }} --image-ids "$image_ids_client"
+        else
+          echo "No images to delete in ${{ env.ECR_REPOSITORY_CLIENT }}"
+        fi
+        
+        echo "Deleting all images from ECR repository: ${{ env.ECR_REPOSITORY_SERVER }}"
+        image_ids_server=$(aws ecr list-images --repository-name ${{ env.ECR_REPOSITORY_SERVER }} --query 'imageIds[*]' --output json)
+        if [ "$image_ids_server" != "[]" ]; then
+          aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY_SERVER }} --image-ids "$image_ids_server"
+        else
+          echo "No images to delete in ${{ env.ECR_REPOSITORY_SERVER }}"
+        fi
+        echo "Deleted all images."
+
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose  
+
+    - name: Build, tag, and push Docker images to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        AWS_REGION: ${{ env.AWS_REGION }}
+      run: |
+        docker-compose build --no-cache
+        echo "Tagging and pushing images..."
+        echo "Client Image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest"
+        echo "Server Image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest"       
+        docker tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:latest $ECR_REGISTRY/${{ env.ECR_REPOSITORY_CLIENT }}:${{ env.IMAGE_TAG }}
+        docker tag ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:latest $ECR_REGISTRY/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }}
+        echo "Tagged Client Image: $ECR_REGISTRY/${{ env.ECR_REPOSITORY_CLIENT }}:${{ env.IMAGE_TAG }}"
+        echo "Tagged Server Image: $ECR_REGISTRY/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }}"
+        docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_CLIENT }}:${{ env.IMAGE_TAG }}
+        docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }}
+        echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
+
+    - name: Print ECS Task Definition
+      run: |
+        echo "Printing ECS Task Definition for verification:"
+        cat ${{ env.ECS_TASK_DEFINITION }}
+
+    - name: Fill in the new image IDs in the Amazon ECS task definition
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}      
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        AWS_REGION: ${{ env.AWS_REGION }}
+      id: update-task-def
+      run: |
+        sed -i 's|:latest|:${{ env.IMAGE_TAG }}|g' ${{ env.ECS_TASK_DEFINITION }}
+        sed -i 's|\${AWS_ACCOUNT_ID}|${{ env.AWS_ACCOUNT_ID }}|g' ${{ env.ECS_TASK_DEFINITION }}
+        sed -i 's|\${AWS_REGION}|${{ env.AWS_REGION }}|g' ${{ env.ECS_TASK_DEFINITION }}
+        sed -i 's|\${IMAGE_TAG}|${{ env.IMAGE_TAG }}|g' ${{ env.ECS_TASK_DEFINITION }}
+        sed -i 's|\${MSSQL_SA_PASSWORD}|${{ env.MSSQL_SA_PASSWORD }}|g' ${{ env.ECS_TASK_DEFINITION }}
+
+    - name: Validate ECS Task Definition
+      run: |
+        echo "Validating ECS Task Definition after updates:"
+        cat ${{ env.ECS_TASK_DEFINITION }}
+
+    - name: Deploy updated task definition to Amazon ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: false
