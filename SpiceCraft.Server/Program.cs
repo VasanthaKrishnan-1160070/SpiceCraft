@@ -86,7 +86,7 @@ builder.Services.AddProjectServices(builder.Configuration);
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",
+    options.AddPolicy("AllowAll",
         builder => builder
             //.WithOrigins(allowedOrigins) // Specify the allowed origins
             .AllowAnyOrigin()
@@ -140,7 +140,7 @@ else
 
 app.UseRouting();
 // Apply CORS globally
-app.UseCors("AllowSpecificOrigin");
+app.UseCors("AllowAll");
 
 app.UseSwagger();
 app.UseSwaggerUI();
