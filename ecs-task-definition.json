@@ -2,6 +2,10 @@
 {
   "family": "spicecraft-task",
   "networkMode": "awsvpc",
+  "compatibilities": [
+    "EC2",
+    "FARGATE"
+  ],
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "1024",
   "memory": "2048",
@@ -17,6 +21,7 @@
       "portMappings": [
         {
           "containerPort": 80,
+          "hostPort": 80,
           "protocol": "tcp"
         }
       ],
@@ -38,6 +43,7 @@
       "portMappings": [
         {
           "containerPort": 8080,
+          "hostPort": 8080,
           "protocol": "tcp"
         }
       ],

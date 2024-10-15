@@ -1,3 +1,5 @@
+# Updated ECS Task Definition with Memory Reset to Original Values and ALB Integration
+
 provider "aws" {
   region = var.aws_region
 }
