@@ -49,6 +49,10 @@ msbuild.wrn
 /log
 /bin
 /obj
+/publish
+spicecraft_key_pair.pem
+key_pair
+key_pair.pub
 
 # dependencies
 /node_modules

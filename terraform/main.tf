@@ -91,9 +91,16 @@ resource "aws_ecs_cluster" "spicecraft" {
   name = "spicecraft-cluster"
 }
 
-# Create Security Group for ECS and SQL Server
-resource "aws_security_group" "ecs_security_group" {
+# Create Security Group for EC2 Instance
+resource "aws_security_group" "ec2_security_group" {
   vpc_id = data.aws_vpc.default.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   ingress {
     from_port   = 80
@@ -103,16 +110,15 @@ resource "aws_security_group" "ecs_security_group" {
   }
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Allow inbound traffic to SQL Server from any IP address
   ingress {
-    from_port   = 1433
-    to_port     = 1433
+    from_port   = 5000
+    to_port     = 5000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -125,7 +131,7 @@ resource "aws_security_group" "ecs_security_group" {
   }
 
   tags = {
-    Name = "ecs_security_group"
+    Name = "ec2_security_group"
   }
 }
 

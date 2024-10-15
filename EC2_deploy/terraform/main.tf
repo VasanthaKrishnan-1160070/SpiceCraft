@@ -1,7 +1,7 @@
 variable "aws_region" {
-  description = "AWS region"
+  description = "The AWS region to deploy resources in"
   type        = string
-  default = "ap-southeast-2"
+  default     = "ap-southeast-2"
 }
 
 provider "aws" {
@@ -70,14 +70,16 @@ resource "aws_security_group" "ec2_security_group" {
 }
 
 # Create EC2 Instance for Hosting Angular and .NET Core API
+# Add the key_name attribute to use an existing key pair
 resource "aws_instance" "web_server_instance" {
   ami                    = data.aws_ami.amzn2.id
   instance_type          = "t3.micro"
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
   subnet_id              = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
+  key_name               = "spicecraft_key_pair"  # Name of the existing key pair
 
-  user_data = <<-EOF
+   user_data = <<-EOF
     #!/bin/bash
     yum update -y
     amazon-linux-extras install nginx1 -y
@@ -87,6 +89,9 @@ resource "aws_instance" "web_server_instance" {
     # Install .NET SDK
     rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
     yum install -y dotnet-sdk-8.0
+
+    # Install EC2 Instance Connect
+    yum install -y ec2-instance-connect
 
     # Copy Angular and .NET Core API files (placeholder)
     mkdir -p /var/www/angular
