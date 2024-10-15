@@ -76,6 +76,45 @@ resource "aws_security_group" "ec2_security_group" {
   }
 }
 
+# Create IAM Role for EC2 Instance to Access Database
+resource "aws_iam_role" "ec2_instance_role" {
+  name = "ec2_instance_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "ec2_instance_role"
+  }
+}
+
+# Attach Policies to Allow EC2 Access to Database and External Connectivity
+resource "aws_iam_role_policy_attachment" "ec2_instance_policy_attachment" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_instance_external_db_access" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+}
+
+# Create IAM Instance Profile for EC2
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "ec2_instance_profile"
+  role = aws_iam_role.ec2_instance_role.name
+}
+
 # Create EC2 Instance for Hosting Angular and .NET Core API
 # Add the key_name attribute to use an existing key pair
 resource "aws_instance" "web_server_instance" {
@@ -85,6 +124,7 @@ resource "aws_instance" "web_server_instance" {
   subnet_id              = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
   key_name               = "spicecraft_key_pair"  # Name of the existing key pair
+  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
 
    user_data = <<-EOF
     #!/bin/bash
@@ -109,7 +149,20 @@ resource "aws_instance" "web_server_instance" {
     # You need to replace this with your actual deployment script to copy files to these directories
 
     # Configure Nginx
-    cat > /etc/nginx/nginx.conf << 'EOF2'
+cat > /etc/nginx/nginx.conf << 'EOF2'
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
     server {
         listen       80;
         server_name  localhost;
@@ -132,7 +185,9 @@ resource "aws_instance" "web_server_instance" {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
     }
-    EOF2
+}
+EOF2
+
 
     systemctl restart nginx
   EOF

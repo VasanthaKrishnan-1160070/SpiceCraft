@@ -4,8 +4,12 @@
 ANGULAR_BUILD_DIR="../../spicecraft.client/dist/spicecraft.client/browser"
 API_BUILD_DIR="../../SpiceCraft.Server/publish"
 EC2_USER="ec2-user"
-EC2_HOST="ec2-3-107-94-199.ap-southeast-2.compute.amazonaws.com"
+EC2_HOST="ec2-54-79-86-31.ap-southeast-2.compute.amazonaws.com"
 PEM_FILE="./spicecraft_key_pair.pem"
+
+echo "Creating directories and setting permissions on EC2..."
+ssh -i ${PEM_FILE} ${EC2_USER}@${EC2_HOST} "sudo mkdir -p /var/www/angular /var/www/api && sudo chmod -R 777 /var/www/angular /var/www/api"
+
 
 # Step 1: Build Angular Project
 echo "Building Angular Project..."
