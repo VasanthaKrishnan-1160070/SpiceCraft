@@ -29,12 +29,17 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   router: Router = inject(Router);
   activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   userService = inject(UserService);
+  private _authService = inject(AuthService);
   destroy$: Subject<void> = new Subject();
   isIntroPage: boolean = true;
   isAuthenticated: boolean = false;
   authService: AuthService = inject(AuthService);
   userType = 'client';
   firstName: string = '';
+  public isManager!: boolean;
+  public isStaff!: boolean;
+  public isAdmin!: boolean;
+  public isCustomer!:boolean;
 
   ngOnInit(): void {
     this.router.events.pipe(
@@ -53,6 +58,11 @@ export class LandingPageComponent implements OnInit, OnDestroy {
         }
       }
     });
+
+    this.isAdmin = this._authService.isUserAdmin();
+    this.isManager = this._authService.isUserManager();
+    this.isStaff = this._authService.isUserStaff();
+    this.isCustomer = this._authService.isUserCustomer();
   }
 
   checkIsIntroPage(currentRoute: string): void {

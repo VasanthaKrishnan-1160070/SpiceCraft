@@ -1,1 +1,9 @@
 
+
+.is-staff {
+  height: 100vh; min-width:250px;
+}
+
+.is-admin {
+  width: 296px;
+}

@@ -46,7 +46,7 @@
   }
   @else {
     <div class="bg-pale-green d-flex justify-content-start">
-      <div style="width:17%;"  class="navigation-content bg-royal-blue">
+      <div [ngClass]="{'is-staff': isStaff, 'is-admin': (isAdmin || isManager)}" class="navigation-content bg-royal-blue">
         <sc-side-navigation [userType]="userType" [firstName]="firstName"></sc-side-navigation>
       </div>
       <div class="w-100">

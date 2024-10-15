@@ -6,6 +6,7 @@ import {map, take, takeUntil} from "rxjs/operators";
 import {Subject} from "rxjs";
 import {NavigationPredictionModel} from "../../../core/model/ml/navigation/navigation-prediction.model";
 import {ResultDetailModel} from "../../../core/model/result-detail.model";
+import {AuthService} from "../../../core/service/auth.service";
 
 @Component({
   selector: 'sc-side-navigation',
@@ -23,10 +24,17 @@ export class SideNavigationComponent implements  OnInit, OnDestroy {
   private _userService: UserService = inject(UserService);
   private _destroy$: Subject<void> = new Subject<void>();
   private _refresh = signal<boolean>(false);
+  private _authService = inject(AuthService);
 
   private _startTime!: number;
   private _previousUrl!: string;
   private _clickCount = 0;
+
+  public isManager!: boolean;
+  public isStaff!: boolean;
+  public isAdmin!: boolean;
+  public isCustomer!:boolean;
+
 
   clientNavigationArray = [
     {name: 'Home', icon: 'fa-solid fa-house', routing: '/home'},
@@ -40,6 +48,13 @@ export class SideNavigationComponent implements  OnInit, OnDestroy {
    // {name: 'Returns', icon: 'fa-solid fa-arrow-rotate-left', routing: '/returns'},
     {name: 'Gift Card', icon: 'fa-solid fa-hand-holding-dollar', routing: '/gift-card'},
     {name: 'Logout', icon: 'fa-solid fa-right-from-bracket', routing: '/logout'},
+  ];
+
+  managerNavigations = [
+    {name: 'Dealers', icon: 'fa-regular fa-address-card', routing: '/b2b-dealer-list'},
+    {name: 'Staffs', icon: 'fa-solid fa-building-user', routing: '/b2b-staff-list'},
+    {name: 'Payments', icon: 'fa-solid fa-money-bill', routing: 'b2b-payment-list'},
+    {name: 'Reports', icon: 'fa-solid fa-file-lines', routing: '/b2b-report'},
   ];
 
   userType = input<string>('client');
@@ -61,6 +76,11 @@ export class SideNavigationComponent implements  OnInit, OnDestroy {
       this.listenForNavigationEvent(userId);
       // this.getNavigationPredictions(userId);
     }
+
+    this.isAdmin = this._authService.isUserAdmin();
+    this.isManager = this._authService.isUserManager();
+    this.isStaff = this._authService.isUserStaff();
+    this.isCustomer = this._authService.isUserCustomer();
   }
 
   private listenForNavigationEvent(userId: number) {
@@ -140,24 +160,32 @@ export class SideNavigationComponent implements  OnInit, OnDestroy {
      return this.clientNavigationArray
     }
     else {
-      return [
+      let internalNav = [
         {name: 'Home', icon: 'fa-solid fa-house', routing: '/home'},
         {name: 'Dashboard', icon: 'fa-solid fa-magnifying-glass-chart', routing: '/b2b-dashboard'},
         {name: 'My Profile', icon: 'fa-solid fa-hand-holding-dollar', routing: '/b2b-profile'},
         {name: 'Menu', icon: 'fa-solid fa-utensils', routing: '/item-list'},
-        {name: 'Dealers', icon: 'fa-regular fa-address-card', routing: '/b2b-dealer-list'},
-        {name: 'Staffs', icon: 'fa-solid fa-building-user', routing: '/b2b-staff-list'},
         {name: 'Customers', icon: 'fa-solid fa-users', routing: '/b2b-customer-list'},
         {name: 'Enquiry', icon: 'fa-solid fa-question', routing: '/b2b-enquiry-list'},
-        {name: 'Reports', icon: 'fa-solid fa-file-lines', routing: '/b2b-report'},
-        {name: 'Payments', icon: 'fa-solid fa-money-bill', routing: 'b2b-payment-list'},
         {name: 'Promotion', icon: 'fa-solid fa-hand-holding-dollar', routing: 'b2b-promotion-list'},
        // {name: 'Shipping', icon: 'fa-solid fa-hand-holding-dollar', routing: 'b2b-shipping'},
         {name: 'Orders', icon: 'fa-solid fa-box-open', routing: '/b2b-order-list'},
         {name: 'Inventory', icon: 'fa-solid fa-warehouse', routing: 'b2b-inventory'},
        // {name: 'Reset Password', icon: 'fa-solid fa-hand-holding-dollar', routing: 'b2b-reset-password'},
-        {name: 'Logout', icon: 'fa-solid fa-right-from-bracket', routing: '/logout'},
+
       ];
+
+      if (this.isManager || this.isAdmin) {
+        internalNav = [...internalNav, ...this.managerNavigations];
+      }
+
+      let logout = [
+        {name: 'Logout', icon: 'fa-solid fa-right-from-bracket', routing: '/logout'},
+      ]
+
+      internalNav = [...internalNav, ...logout];
+
+      return internalNav;
     }
   }
 
