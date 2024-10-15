@@ -93,6 +93,9 @@ resource "aws_instance" "web_server_instance" {
     # Install EC2 Instance Connect
     yum install -y ec2-instance-connect
 
+    # Install .NET Hosting Bundle
+    yum install -y aspnetcore-runtime-8.0
+
     # Copy Angular and .NET Core API files (placeholder)
     mkdir -p /var/www/angular
     mkdir -p /var/www/api

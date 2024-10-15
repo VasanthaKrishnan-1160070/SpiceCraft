@@ -49,7 +49,7 @@ msbuild.wrn
 /log
 /bin
 /obj
-/publish
+/SpiceCraft.Server/publish
 spicecraft_key_pair.pem
 key_pair
 key_pair.pub
