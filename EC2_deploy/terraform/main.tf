@@ -64,6 +64,13 @@ resource "aws_security_group" "ec2_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 5114
+    to_port     = 5114
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -133,66 +140,89 @@ resource "aws_instance" "web_server_instance" {
     systemctl start nginx
     systemctl enable nginx
 
-    # Install .NET SDK
-    rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
-    yum install -y dotnet-sdk-8.0
+    # Install .NET SDK and Hosting Bundle for .NET 8
+    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --install-dir /usr/share/dotnet
+    ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
     # Install EC2 Instance Connect
     yum install -y ec2-instance-connect
 
-    # Install .NET Hosting Bundle
-    yum install -y aspnetcore-runtime-8.0
-
-    # Copy Angular and .NET Core API files (placeholder)
+    # Create directories for Angular and .NET Core API files
     mkdir -p /var/www/angular
     mkdir -p /var/www/api
-    # You need to replace this with your actual deployment script to copy files to these directories
+    # Deployment script will copy files to these directories
 
     # Configure Nginx
-cat > /etc/nginx/nginx.conf << 'EOF2'
-user nginx;
-worker_processes auto;
-error_log /var/log/nginx/error.log;
-pid /run/nginx.pid;
+    cat > /etc/nginx/nginx.conf <<-EOF2
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log;
+    pid /run/nginx.pid;
 
-events {
-    worker_connections 1024;
-}
+    events {
+        worker_connections 1024;
+    }
 
-http {
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
 
-    server {
-        listen       80;
-        server_name  localhost;
+        server {
+            listen       80;
+            server_name  localhost;
 
-        location / {
-            root   /var/www/angular;
-            index  index.html index.htm;
-            try_files $uri $uri/ /index.html;
-        }
+            location / {
+                root   /var/www/angular;
+                index  index.html index.htm;
+                try_files \$uri \$uri/ /index.html;
+            }
 
-        location /api/ {
-            proxy_pass http://localhost:5000/;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection keep-alive;
-            proxy_set_header Host $host;
-            proxy_cache_bypass $http_upgrade;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
+            location /api {
+                proxy_pass http://localhost:5000;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade \$http_upgrade;
+                proxy_set_header Connection keep-alive;
+                proxy_set_header Host \$host;
+                proxy_cache_bypass \$http_upgrade;
+                proxy_set_header X-Real-IP \$remote_addr;
+                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto \$scheme;
+            }
         }
     }
-}
-EOF2
-
+    EOF2
 
     systemctl restart nginx
+
+    # Create systemd service for .NET Core API
+    cat > /etc/systemd/system/spicecraft-api.service <<-EOF3
+    [Unit]
+    Description=SpiceCraft .NET Core API
+    After=network.target
+
+    [Service]
+    WorkingDirectory=/var/www/api
+    ExecStart=/usr/bin/dotnet /var/www/api/SpiceCraft.Server.dll
+    Restart=always
+    RestartSec=10
+    SyslogIdentifier=spicecraft-api
+    User=ec2-user
+    Environment=ASPNETCORE_ENVIRONMENT=Production
+    Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+    [Install]
+    WantedBy=multi-user.target
+    EOF3
+
+    # Start and enable the .NET Core API service
+    systemctl daemon-reload
+    systemctl enable spicecraft-api.service
+    systemctl start spicecraft-api.service
   EOF
 
   tags = {
     Name = "web-server-instance"
   }
 }
+
+

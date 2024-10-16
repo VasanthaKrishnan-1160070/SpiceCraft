@@ -4,7 +4,7 @@
 ANGULAR_BUILD_DIR="../../spicecraft.client/dist/spicecraft.client/browser"
 API_BUILD_DIR="../../SpiceCraft.Server/publish"
 EC2_USER="ec2-user"
-EC2_HOST="ec2-54-79-86-31.ap-southeast-2.compute.amazonaws.com"
+EC2_HOST="ec2-54-206-237-126.ap-southeast-2.compute.amazonaws.com"
 PEM_FILE="./spicecraft_key_pair.pem"
 
 echo "Creating directories and setting permissions on EC2..."
@@ -37,6 +37,6 @@ echo "Number of files uploaded to /var/www/api: ${NUM_FILES_UPLOADED_API}"
 
 # Step 6: Restart Services on EC2
 echo "Restarting services on EC2..."
-ssh -i ${PEM_FILE} ${EC2_USER}@${EC2_HOST} "sudo systemctl restart nginx && sudo pkill -f dotnet || true && nohup dotnet /var/www/api/YourApi.dll &"
+ssh -i ${PEM_FILE} ${EC2_USER}@${EC2_HOST} "sudo systemctl restart nginx && sudo pkill -f dotnet || true && nohup dotnet /var/www/api/SpiceCraft.Server.dll &"
 
 echo "Deployment completed successfully."

@@ -25,6 +25,7 @@ import {CreateUpdateItemModel} from "../../../core/model/item/create-update-item
 import { ChangeDetectorRef } from '@angular/core';
 import {AuthService} from "../../../core/service/auth.service";
 import {TitleComponent} from "../../../shared/components/title/title.component";
+import {UserItemRatingComponent} from "../user-item-rating/user-item-rating.component";
 
 @Component({
   selector: 'sc-item-detail',
@@ -40,7 +41,8 @@ import {TitleComponent} from "../../../shared/components/title/title.component";
     DxSelectBoxModule,
     DxValidatorModule,
     DxGalleryModule,
-    TitleComponent
+    TitleComponent,
+    UserItemRatingComponent
   ],
   templateUrl: './item-detail.component.html',
   styleUrl: './item-detail.component.css'

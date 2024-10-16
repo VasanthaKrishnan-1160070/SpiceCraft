@@ -145,6 +145,10 @@ namespace SpiceCraft.Server
                    return new StorageService(sp.GetRequiredService<IAmazonS3>(), configuration["AWS:BucketName"]);
                }
            });
+
+
+            services.AddScoped<IUserItemRatingLogics, UserItemRatingLogics>();
+            services.AddScoped<IUserItemRatingRepository, UserItemRatingRepository>();
         }
     }
 }

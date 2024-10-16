@@ -382,7 +382,7 @@ create table UserActivityLog (
 create table UserItemInteraction (
  UserItemInteractionId int primary key identity(1,1),
  UserId int not null,
- Interaction int default(0),
+ Interaction int default(0)  check ( Interaction <= 5 ),
  CreatedAt datetime default getdate(),
  UpdatedAt datetime default getdate(),
  foreign key (UserId) references Users(UserId)
@@ -391,7 +391,7 @@ create table UserItemInteraction (
 create table UserItemRating (
   UserItemRating int primary key identity(1,1),
   UserId int not null,
-  Rating int default 1,
+  Rating int default 1 check ( Rating <= 5 ),
   ItemId int not null,
   RatingDescription varchar(250) null,
   CreatedAt datetime default getdate(),
