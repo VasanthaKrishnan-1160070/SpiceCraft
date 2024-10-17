@@ -32,6 +32,11 @@ data "aws_ami" "amzn2" {
   }
 }
 
+# Allocate Elastic IP
+resource "aws_eip" "web_server_eip" {
+  instance = aws_instance.web_server_instance.id
+}
+
 # Create Security Group for EC2 Instance
 resource "aws_security_group" "ec2_security_group" {
   vpc_id = data.aws_vpc.default.id
@@ -67,6 +72,13 @@ resource "aws_security_group" "ec2_security_group" {
   ingress {
     from_port   = 5114
     to_port     = 5114
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 1433
+    to_port     = 1433
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -116,24 +128,30 @@ resource "aws_iam_role_policy_attachment" "ec2_instance_external_db_access" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
 
+# Attach AmazonSSMManagedInstanceCore policy
+resource "aws_iam_role_policy_attachment" "ec2_instance_ssm" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 # Create IAM Instance Profile for EC2
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "ec2_instance_profile"
   role = aws_iam_role.ec2_instance_role.name
 }
 
-# Create EC2 Instance for Hosting Angular and .NET Core API
+# Create EC2 Instance for Hosting Angular, .NET Core API, and MSSQL
 # Add the key_name attribute to use an existing key pair
 resource "aws_instance" "web_server_instance" {
   ami                    = data.aws_ami.amzn2.id
-  instance_type          = "t3.micro"
+  instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
   subnet_id              = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
   key_name               = "spicecraft_key_pair"  # Name of the existing key pair
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
 
-   user_data = <<-EOF
+  user_data = <<-EOF
     #!/bin/bash
     yum update -y
     amazon-linux-extras install nginx1 -y
@@ -146,6 +164,15 @@ resource "aws_instance" "web_server_instance" {
 
     # Install EC2 Instance Connect
     yum install -y ec2-instance-connect
+
+    # Install MSSQL Server Express
+    curl -o /tmp/mssql_server.rpm -L https://packages.microsoft.com/config/rhel/7/prod.repo
+    yum localinstall -y /tmp/mssql_server.rpm
+    ACCEPT_EULA=Y yum install -y mssql-server
+    ACCEPT_EULA=Y MSSQL_SA_PASSWORD='Admin123'
+    /opt/mssql/bin/mssql-conf setup
+    systemctl enable mssql-server
+    systemctl start mssql-server
 
     # Create directories for Angular and .NET Core API files
     mkdir -p /var/www/angular
@@ -170,6 +197,31 @@ resource "aws_instance" "web_server_instance" {
         server {
             listen       80;
             server_name  localhost;
+
+            location / {
+                root   /var/www/angular;
+                index  index.html index.htm;
+                try_files \$uri \$uri/ /index.html;
+            }
+
+            location /api {
+                proxy_pass http://localhost:5000;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade \$http_upgrade;
+                proxy_set_header Connection keep-alive;
+                proxy_set_header Host \$host;
+                proxy_cache_bypass \$http_upgrade;
+                proxy_set_header X-Real-IP \$remote_addr;
+                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto \$scheme;
+            }
+        }
+
+        server {
+            listen              443 ssl;
+            server_name         localhost;
+            ssl_certificate     /etc/ssl/certs/nginx-selfsigned.crt;
+            ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
 
             location / {
                 root   /var/www/angular;
@@ -224,5 +276,3 @@ resource "aws_instance" "web_server_instance" {
     Name = "web-server-instance"
   }
 }
-
-
