@@ -149,6 +149,8 @@ namespace SpiceCraft.Server
 
             services.AddScoped<IUserItemRatingLogics, UserItemRatingLogics>();
             services.AddScoped<IUserItemRatingRepository, UserItemRatingRepository>();
+            services.AddScoped<IRecentlyViewedItemsLogics, RecentlyViewedItemsLogics>();
+            services.AddScoped<IRecentlyViewedItemsRepository, RecentlyViewedItemsRepository>();
         }
     }
 }

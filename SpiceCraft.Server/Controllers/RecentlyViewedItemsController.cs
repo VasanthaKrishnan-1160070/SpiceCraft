@@ -21,7 +21,7 @@ namespace SpiceCraft.Server.Controllers
         {
             var result = await _recentlyViewedItemsLogics.GetRecentlyViewedItemsAsync(userId);
             if (!result.IsSuccess) return NotFound(result.Message);
-            return Ok(result.Data);
+            return Ok(result);
         }
 
         [HttpPost("add")]

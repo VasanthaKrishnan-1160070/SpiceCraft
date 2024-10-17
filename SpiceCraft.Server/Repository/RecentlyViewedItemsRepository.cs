@@ -1,4 +1,5 @@
-﻿using SpiceCraft.Server.BusinessLogics.Interface;
+﻿using Microsoft.EntityFrameworkCore;
+using SpiceCraft.Server.BusinessLogics.Interface;
 using SpiceCraft.Server.Context;
 using SpiceCraft.Server.DTO.RecentlyViewed;
 using SpiceCraft.Server.Models;
@@ -16,7 +17,7 @@ namespace SpiceCraft.Server.Repository
 
         public async Task<List<RecentlyViewedItemDTO>> GetRecentlyViewedItemsAsync(int userId)
         {
-            return await _context.RecentlyViewed
+            return await _context.RecentlyVieweds
                 .Where(r => r.UserId == userId)
                 .OrderByDescending(r => r.CreatedAt)
                 .Select(r => new RecentlyViewedItemDTO
@@ -37,7 +38,7 @@ namespace SpiceCraft.Server.Repository
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
-            _context.RecentlyViewed.Add(entity);
+            _context.RecentlyVieweds.Add(entity);
             await _context.SaveChangesAsync();
         }
     }
