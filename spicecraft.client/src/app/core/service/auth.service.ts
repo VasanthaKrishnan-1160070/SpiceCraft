@@ -45,6 +45,10 @@ export class AuthService {
     return loggedInUser && loggedInUser.isActive;
   }
 
+  getCurrentUserId() {
+    return this._userService.getLoggedInUser()?.userId;
+  }
+
   getLoggedInUser() {
     return this._userService.getLoggedInUser();
   }

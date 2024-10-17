@@ -80,12 +80,13 @@ builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddProjectServices(builder.Configuration);
 
+
 // Add CORS services
 // Read the allowed origins from configuration
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",
+    options.AddPolicy("AllowAll",
         builder => builder
             //.WithOrigins(allowedOrigins) // Specify the allowed origins
             .AllowAnyOrigin()
@@ -118,28 +119,28 @@ else
     app.UseExceptionHandler("/Home/Error");
 }
 
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Items")),
-    RequestPath = "/uploads/items"
-});
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Profiles")),
-    RequestPath = "/uploads/profiles"
-});
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Profiles")),
-    RequestPath = "/uploads/common"
-});
+// app.UseStaticFiles(new StaticFileOptions
+// {
+//     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Items")),
+//     RequestPath = "/uploads/items"
+// });
+//
+// app.UseStaticFiles(new StaticFileOptions
+// {
+//     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Profiles")),
+//     RequestPath = "/uploads/profiles"
+// });
+//
+// app.UseStaticFiles(new StaticFileOptions
+// {
+//     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Profiles")),
+//     RequestPath = "/uploads/common"
+// });
 
 
 app.UseRouting();
 // Apply CORS globally
-app.UseCors("AllowSpecificOrigin");
+app.UseCors("AllowAll");
 
 app.UseSwagger();
 app.UseSwaggerUI();

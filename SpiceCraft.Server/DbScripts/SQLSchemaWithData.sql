@@ -1,21 +1,21 @@
 USE master;
 
-IF EXISTS (SELECT name FROM sys.databases WHERE name = 'SpiceCraft')
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'db_aae41b_spicecraft')
 BEGIN
     -- Set the database to single-user mode
-    ALTER DATABASE SpiceCraft SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    ALTER DATABASE db_aae41b_spicecraft SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
     
     -- Drop the database
-    DROP DATABASE SpiceCraft;
+    DROP DATABASE db_aae41b_spicecraft;
 END
 ELSE
 BEGIN
-    PRINT 'Database SpiceCraft does not exist.';
+    PRINT 'Database db_aae41b_spicecraft does not exist.';
 END;
 
-create database SpiceCraft;
+create database db_aae41b_spicecraft;
 
-use SpiceCraft;
+use db_aae41b_spicecraft;
 
 -- Create Tables
 create table Roles (
@@ -382,7 +382,7 @@ create table UserActivityLog (
 create table UserItemInteraction (
  UserItemInteractionId int primary key identity(1,1),
  UserId int not null,
- Interaction int default(0),
+ Interaction int default(0)  check ( Interaction <= 5 ),
  CreatedAt datetime default getdate(),
  UpdatedAt datetime default getdate(),
  foreign key (UserId) references Users(UserId)
@@ -391,7 +391,7 @@ create table UserItemInteraction (
 create table UserItemRating (
   UserItemRating int primary key identity(1,1),
   UserId int not null,
-  Rating int default 1,
+  Rating int default 1 check ( Rating <= 5 ),
   ItemId int not null,
   RatingDescription varchar(250) null,
   CreatedAt datetime default getdate(),

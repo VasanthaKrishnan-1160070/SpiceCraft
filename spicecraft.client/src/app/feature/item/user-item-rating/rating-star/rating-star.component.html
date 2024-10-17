@@ -1,0 +1,10 @@
+<div>
+  @for (item of [1, 2, 3, 4, 5]; track item){
+    @if (item <= currentRating && currentRating !== 0) {
+      <span (click)="ratingClick(item, item === 1)" [ngClass]="{ 'cursor-pointer': editable}" class="fa-solid fa-star rated-star p-1"></span>
+    }
+    @else {
+      <span (click)="ratingClick(item, false)" [ngClass]="{ 'cursor-pointer': editable}" class="fa-regular fa-star rated-star  p-1"></span>
+    }
+  }
+</div>

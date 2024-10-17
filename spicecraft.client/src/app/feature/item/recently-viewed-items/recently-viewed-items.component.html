@@ -1,0 +1,13 @@
+<div class="dx-carousel" *ngIf="recentlyViewedItems.length > 0">
+  <dx-carousel [dataSource]="recentlyViewedItems" [loop]="true">
+    <div *dxTemplate="let item of 'item'">
+      <div class="carousel-item">
+        <h5>{{ item.itemName }}</h5>
+        <p>Viewed on: {{ item.viewedAt | date }}</p>
+      </div>
+    </div>
+  </dx-carousel>
+</div>
+<div *ngIf="recentlyViewedItems.length === 0">
+  <p>No recently viewed items found.</p>
+</div>

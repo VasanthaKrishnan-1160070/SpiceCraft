@@ -1,10 +1,20 @@
+
 {
   "family": "spicecraft-task",
   "networkMode": "awsvpc",
+  "compatibilities": [
+    "EC2",
+    "FARGATE"
+  ],
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::051826709341:role/spiceCraftEcsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::051826709341:role/spiceCraftEcsTaskRole",
   "containerDefinitions": [
     {
       "name": "spicecraft-client-container",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-client:${IMAGE_TAG}",
+      "image": "051826709341.dkr.ecr.ap-southeast-2.amazonaws.com/spicecraft-client:latest",
       "cpu": 256,
       "memory": 512,
       "essential": true,
@@ -19,14 +29,14 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/spicecraft-client-logs",
-          "awslogs-region": "${AWS_REGION}",
+          "awslogs-region": "ap-southeast-2",
           "awslogs-stream-prefix": "spicecraft-client"
         }
       }
     },
     {
       "name": "spicecraft-server-container",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/spicecraft-server:${IMAGE_TAG}",
+      "image": "051826709341.dkr.ecr.ap-southeast-2.amazonaws.com/spicecraft-server:latest",
       "cpu": 256,
       "memory": 512,
       "essential": true,
@@ -41,53 +51,10 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/spicecraft-server-logs",
-          "awslogs-region": "${AWS_REGION}",
+          "awslogs-region": "ap-southeast-2",
           "awslogs-stream-prefix": "spicecraft-server"
         }
       }
-    },
-    {
-      "name": "mssql-container",
-      "image": "mcr.microsoft.com/mssql/server:2022:${IMAGE_TAG}",
-      "cpu": 512,
-      "memory": 1024,
-      "essential": true,
-      "portMappings": [
-        {
-          "containerPort": 1433,
-          "hostPort": 1433,
-          "protocol": "tcp"
-        }
-      ],
-      "environment": [
-        {
-          "name": "ACCEPT_EULA",
-          "value": "Y"
-        },
-        {
-          "name": "MSSQL_SA_PASSWORD",
-          "value": "${MSSQL_SA_PASSWORD}"
-        },
-        {
-          "name": "MSSQL_PID",
-          "value": "Developer"
-        }
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/mssql-logs",
-          "awslogs-region": "${AWS_REGION}",
-          "awslogs-stream-prefix": "mssql"
-        }
-      }
     }
-  ],
-  "requiresCompatibilities": [
-    "FARGATE"
-  ],
-  "cpu": "1024",
-  "memory": "2048",
-  "executionRoleArn": "arn:aws:iam::603763212525:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::603763212525:role/ecsTaskRole"
+  ]
 }

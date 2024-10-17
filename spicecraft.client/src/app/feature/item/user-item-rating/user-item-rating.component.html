@@ -1,0 +1,66 @@
+
+
+<!-- Displaying the list of ratings using Bootstrap structure -->
+<div class="card mt-3" *ngIf="ratings.length > 0" >
+  <div class="card-header d-flex align-items-center gap-3 justify-content-between ">
+    <h5>Ratings</h5>
+    <dx-button type="success" *ngIf="!currentUserRating" (onClick)="isAddRatingVisible = !isAddRatingVisible" text="Rate Your Experience"></dx-button>
+  </div>
+  <div class="card-body">
+    <div *ngFor="let rating of ratings" class="mb-3 d-flex gap-2 pb-3">
+        <div class="d-flex gap-2">
+          <sc-rating-star [(currentRating)]="rating.rating"></sc-rating-star>
+        </div>
+
+      <div style="max-width: 500px;" class="d-flex flex-column gap-1 flex-wrap">
+        <div class="mt-1 ml-3 d-flex flex-column flex-wrap">
+          <label class="ml-3  flex-grow-1" >{{rating?.firstName}} (<span class="rating-user"> {{rating?.userName}}</span>)</label>
+          <span class="ml-3 flex-shrink-1 flex-wrap">
+            {{ rating?.ratingDescription }}
+          </span>
+        </div>
+
+        <div class="flex-grow-1 flex-fill" *ngIf="currentUserRating && rating.userId === currentUserRating.userId">
+          <dx-button type="success" text="update" (onClick)="isAddRatingVisible = !isAddRatingVisible" ></dx-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<dx-popup
+  [(visible)]="isAddRatingVisible"
+  [(hideOnOutsideClick)]="isAddRatingVisible"
+  title="Add Your Rating"
+  [width]="500"
+  [height]="380"
+>
+
+  <div class="card">
+    <div class="card-body">
+
+      <!-- Rating field using DevExtreme Number Box inside Bootstrap form structure -->
+      <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label">Rating</label>
+        <div class="col-sm-10">
+          <sc-rating-star [editable]="true" [(currentRating)]="currentRating"></sc-rating-star>
+        </div>
+      </div>
+
+      <!-- Rating description using DevExtreme Text Area inside Bootstrap form structure -->
+      <div class="mb-3 row">
+        <label for="ratingDescription" class="col-sm-2 col-form-label">Description</label>
+        <div class="col-sm-10">
+          <dx-text-area [(value)]="ratingDescription" [maxLength]="200" id="ratingDescription" [height]="90" stylingMode="outlined" placeholder="Enter your review"></dx-text-area>
+        </div>
+      </div>
+
+      <!-- Submit button using DevExtreme Button -->
+      <div class="row">
+        <div class="col-sm-10 offset-sm-2">
+          <dx-button text="Submit Rating" type="success" stylingMode="contained" (onClick)="submitRating()"></dx-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dx-popup>

@@ -1,12 +1,15 @@
+# Updated ECS Task Definition with Memory Reset to Original Values and ALB Integration
+
 provider "aws" {
   region = var.aws_region
 }
 
-# Use the default VPC and its subnets
+# Fetch the Default VPC
 data "aws_vpc" "default" {
   default = true
 }
 
+# Fetch the Default Subnets for the Default VPC
 data "aws_subnets" "default" {
   filter {
     name   = "vpc-id"
@@ -14,17 +17,7 @@ data "aws_subnets" "default" {
   }
 }
 
-# Fetch the latest Amazon Linux 2 AMI
-data "aws_ami" "amzn2" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
-
-# Create CloudWatch Log Groups
+# Create CloudWatch Log Groups for ECS Containers
 resource "aws_cloudwatch_log_group" "spicecraft_client_logs" {
   name              = "/ecs/spicecraft-client-logs"
   retention_in_days = 30
@@ -35,33 +28,13 @@ resource "aws_cloudwatch_log_group" "spicecraft_server_logs" {
   retention_in_days = 30
 }
 
-# Create ECR Repositories
+# Create ECR Repositories for Images
 resource "aws_ecr_repository" "spicecraft_client" {
   name = "spicecraft-client"
-
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = {
-    Name = "spicecraft-client"
-  }
 }
 
 resource "aws_ecr_repository" "spicecraft_server" {
   name = "spicecraft-server"
-
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = {
-    Name = "spicecraft-server"
-  }
 }
 
 # Create IAM Role for ECS Task Execution
@@ -113,9 +86,21 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-# Create Security Group for EC2 instance and RDS
-resource "aws_security_group" "ecs_security_group" {
+# Create ECS Cluster
+resource "aws_ecs_cluster" "spicecraft" {
+  name = "spicecraft-cluster"
+}
+
+# Create Security Group for EC2 Instance
+resource "aws_security_group" "ec2_security_group" {
   vpc_id = data.aws_vpc.default.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   ingress {
     from_port   = 80
@@ -125,15 +110,15 @@ resource "aws_security_group" "ecs_security_group" {
   }
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port   = 1433
-    to_port     = 1433
+    from_port   = 5000
+    to_port     = 5000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -146,60 +131,73 @@ resource "aws_security_group" "ecs_security_group" {
   }
 
   tags = {
-    Name = "ecs_security_group"
+    Name = "ec2_security_group"
   }
 }
 
-# Create EC2 Instance for ECS Cluster
-resource "aws_instance" "ecs_instance" {
-  ami                         = data.aws_ami.amzn2.id  # Use the fetched Amazon Linux 2 AMI ID
-  instance_type               = "t2.micro"
-  iam_instance_profile        = aws_iam_instance_profile.ecs_instance_profile.name
-  vpc_security_group_ids      = [aws_security_group.ecs_security_group.id]
-  subnet_id                   = data.aws_subnets.default.ids[0]
-  associate_public_ip_address = true
-
-  user_data = <<-EOF
-              #!/bin/bash
-              echo ECS_CLUSTER=${aws_ecs_cluster.spicecraft.name} >> /etc/ecs/ecs.config
-              EOF
+# Create Application Load Balancer
+resource "aws_lb" "spicecraft_alb" {
+  name               = "spicecraft-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.ecs_security_group.id]
+  subnets            = data.aws_subnets.default.ids
 
   tags = {
-    Name = "spicecraft-ec2-instance"
+    Name = "spicecraft-alb"
   }
 }
 
-# Create IAM Instance Profile for EC2
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "ecsInstanceProfile"
-  role = aws_iam_role.ecs_task_execution_role.name
+# Create Target Group for ALB
+resource "aws_lb_target_group" "spicecraft_tg" {
+  name     = "spicecraft-target-group"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = data.aws_vpc.default.id
+  target_type = "ip"
+
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+  }
 }
 
-# Create ECS Cluster
-resource "aws_ecs_cluster" "spicecraft" {
-  name = "spicecraft-cluster"
+# Create Listener for ALB
+resource "aws_lb_listener" "spicecraft_listener" {
+  load_balancer_arn = aws_lb.spicecraft_alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.spicecraft_tg.arn
+  }
 }
 
-# Create ECS Task Definition
+# Create ECS Task Definition for Fargate
 resource "aws_ecs_task_definition" "spicecraft_task" {
   family                   = "spicecraft-task"
-  network_mode             = "bridge"
-  cpu                      = "256"
-  memory                   = "512"
+  network_mode             = "awsvpc"  # Required for Fargate
+  cpu                      = "1024"
+  memory                   = "2048"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
+  requires_compatibilities = ["FARGATE"]
 
   container_definitions = jsonencode([
     {
       name      = "spicecraft-client-container"
       image     = "${aws_ecr_repository.spicecraft_client.repository_url}:latest"
-      cpu       = 128
-      memory    = 256
+      cpu       = 256
+      memory    = 512
       essential = true
       portMappings = [
         {
           containerPort = 80
-          hostPort      = 80
           protocol      = "tcp"
         }
       ]
@@ -215,13 +213,12 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
     {
       name      = "spicecraft-server-container"
       image     = "${aws_ecr_repository.spicecraft_server.repository_url}:latest"
-      cpu       = 128
-      memory    = 256
+      cpu       = 256
+      memory    = 512
       essential = true
       portMappings = [
         {
           containerPort = 8080
-          hostPort      = 8080
           protocol      = "tcp"
         }
       ]
@@ -237,44 +234,20 @@ resource "aws_ecs_task_definition" "spicecraft_task" {
   ])
 }
 
-# Create ECS Service to run on EC2
+# Create ECS Service to Run on Fargate
 resource "aws_ecs_service" "spicecraft_service" {
   name            = "spicecraft-service"
   cluster         = aws_ecs_cluster.spicecraft.id
   task_definition = aws_ecs_task_definition.spicecraft_task.arn
   desired_count   = 1
-  launch_type     = "EC2"
-}
-
-# Create RDS instance for SQL Server Express
-resource "aws_db_instance" "spicecraft_db" {
-  allocated_storage    = 20
-  storage_type         = "gp2"
-  engine               = "sqlserver-ex"  
-  engine_version       = "15.00.4043.16.v1"  # Example version; adjust as needed
-  instance_class       = "db.t3.micro"
-  username             = var.mssql_username
-  password             = var.mssql_sa_password
-  parameter_group_name = "default.sqlserver-ex-15.0"
-  publicly_accessible  = true
-  vpc_security_group_ids = [aws_security_group.ecs_security_group.id]
-  db_subnet_group_name = aws_db_subnet_group.spicecraft_subnet_group.name
-
-  # Backup settings
-  backup_retention_period = 7
-  backup_window           = "03:00-06:00"
-
-  tags = {
-    Name = "spicecraft-sql-server-express"
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets         = data.aws_subnets.default.ids
+    security_groups = [aws_security_group.ecs_security_group.id]
   }
-}
-
-# Create DB Subnet Group for RDS
-resource "aws_db_subnet_group" "spicecraft_subnet_group" {
-  name       = "spicecraft-subnet-group"
-  subnet_ids = data.aws_subnets.default.ids
-
-  tags = {
-    Name = "spicecraft-subnet-group"
+  load_balancer {
+    target_group_arn = aws_lb_target_group.spicecraft_tg.arn
+    container_name   = "spicecraft-client-container"
+    container_port   = 80
   }
 }

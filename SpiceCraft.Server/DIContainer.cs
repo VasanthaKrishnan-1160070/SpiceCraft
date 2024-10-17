@@ -1,8 +1,13 @@
-﻿using SpiceCraft.Server.Repository.Interface;
+﻿using System.Configuration;
+using Amazon.S3;
+using SpiceCraft.Server.Repository.Interface;
 using SpiceCraft.Server.Repository;
 using SpiceCraft.Server.BusinessLogics.Interface;
 using SpiceCraft.Server.BusinessLogics;
 using SpiceCraft.Server.Helpers;
+using SpiceCraft.Server.Service;
+using SpiceCraft.Server.Service.Interface;
+using Amazon.Extensions.NETCore.Setup;
 
 namespace SpiceCraft.Server
 {
@@ -115,6 +120,37 @@ namespace SpiceCraft.Server
             services.AddScoped<ICurrentUser, CurrentUser>();
             
             services.AddScoped<IInventoryLogics, InventoryLogics>();
+            
+            services.AddScoped<IStorageService, StorageService>();
+            
+            services.AddScoped<IProductImageService, ProductImageService>();
+
+            // Configure AWS services with options from appsettings.json
+           // services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+
+           // Register the storage service conditionally based on environment
+           services.AddScoped<IStorageService>(sp =>
+           {
+               var env = sp.GetService<IHostEnvironment>();
+               var configuration = sp.GetService<IConfiguration>();
+
+               if (env.IsDevelopment())
+               {
+                   // Use constructor with AWS profile for local development
+                   return new StorageService(configuration, env);
+               }
+               else
+               {
+                   // Use constructor for production environment
+                   return new StorageService(sp.GetRequiredService<IAmazonS3>(), configuration["AWS:BucketName"]);
+               }
+           });
+
+
+            services.AddScoped<IUserItemRatingLogics, UserItemRatingLogics>();
+            services.AddScoped<IUserItemRatingRepository, UserItemRatingRepository>();
+            services.AddScoped<IRecentlyViewedItemsLogics, RecentlyViewedItemsLogics>();
+            services.AddScoped<IRecentlyViewedItemsRepository, RecentlyViewedItemsRepository>();
         }
     }
 }
