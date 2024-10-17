@@ -28,7 +28,7 @@ data "aws_ami" "amzn2" {
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+    values = ["al2023-ami-*-x86_64-gp2"]
   }
 }
 
@@ -197,31 +197,6 @@ resource "aws_instance" "web_server_instance" {
         server {
             listen       80;
             server_name  localhost;
-
-            location / {
-                root   /var/www/angular;
-                index  index.html index.htm;
-                try_files \$uri \$uri/ /index.html;
-            }
-
-            location /api {
-                proxy_pass http://localhost:5000;
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade \$http_upgrade;
-                proxy_set_header Connection keep-alive;
-                proxy_set_header Host \$host;
-                proxy_cache_bypass \$http_upgrade;
-                proxy_set_header X-Real-IP \$remote_addr;
-                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Proto \$scheme;
-            }
-        }
-
-        server {
-            listen              443 ssl;
-            server_name         localhost;
-            ssl_certificate     /etc/ssl/certs/nginx-selfsigned.crt;
-            ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
 
             location / {
                 root   /var/www/angular;
