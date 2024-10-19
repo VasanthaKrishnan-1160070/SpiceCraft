@@ -18,9 +18,7 @@ namespace SpiceCraft.Server.Repository
             _context = context;
         }
 
-        public IEnumerable<ProductCatalogItemDTO> FilterProduct(int userId, int categoryId = 0, int subCategoryId = 0,
-            string keyword = "", ProductFilterEnum filter = ProductFilterEnum.None,
-            ProductSortingEnum sorting = ProductSortingEnum.NameAToZ, bool includeRemovedProducts = false)
+        protected IQueryable<ProductCatalogItemDTO> GetProductQuery()
         {
             // Initial query for products
             var query = from p in _context.Items
@@ -81,6 +79,16 @@ namespace SpiceCraft.Server.Repository
                             ? "Yes"
                             : "No"
                 };
+
+            return query;
+        }
+
+        public IEnumerable<ProductCatalogItemDTO> FilterProduct(int userId, int categoryId = 0, int subCategoryId = 0,
+            string keyword = "", ProductFilterEnum filter = ProductFilterEnum.None,
+            ProductSortingEnum sorting = ProductSortingEnum.NameAToZ, bool includeRemovedProducts = false)
+        {
+            // Initial query for products
+            var query = GetProductQuery();
 
             // Filtering based on categoryId and subCategoryId
             if (categoryId > 0)

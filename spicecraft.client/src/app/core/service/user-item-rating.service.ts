@@ -4,6 +4,7 @@ import { UserItemRatingModel} from "../model/userItemRating/user-item-rating.mod
 import {Observable} from "rxjs";
 import {ResultDetailModel} from "../model/result-detail.model";
 import {UserItemRatingSummaryModel} from "../model/userItemRating/user-rating-summary.model";
+import { StarRatingSummaryModel } from '../model/userItemRating/star-rating-summary.model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,4 +28,8 @@ export class UserItemRatingService {
     return this._api.get<ResultDetailModel<UserItemRatingModel>>(`/rating/get-user-rating/${userId}/${itemId}`);
   }
 
+  getStarRatingsSummary(itemId: number): Observable<ResultDetailModel<StarRatingSummaryModel[]>> {
+    return this._api.get<ResultDetailModel<StarRatingSummaryModel[]>>(`/rating/ratings/${itemId}`);
+  }
 }
+

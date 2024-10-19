@@ -5,6 +5,7 @@ using SpiceCraft.Server.Models;
 using SpiceCraft.Server.Repository.Interface;
 using System.Collections.Generic;
 using System.Linq;
+using SpiceCraft.Server.ML.Models.SentitmentAnalysis;
 
 namespace SpiceCraft.Server.Repository
 {
@@ -74,6 +75,32 @@ namespace SpiceCraft.Server.Repository
 
             userItemRatingDTO.UserItemRatingId = rating.UserItemRating1;
             return userItemRatingDTO;
+        }
+        
+        public async Task<List<StarRatingSummaryDTO>> GetStarRatingsSummaryAsync(int itemId)
+        {
+            var ratings = await _context.UserItemRatings
+                .Where(r => r.ItemId == itemId)
+                .GroupBy(r => r.Rating)
+                .Select(g => new StarRatingSummaryDTO
+                {
+                    Stars = g.Key ?? 0,
+                    Count = g.Count()
+                }).ToListAsync();
+
+            return ratings;
+        }
+        
+        public async Task<List<RatingDescriptionData>> GetRatingDescriptionsAsync()
+        {
+            return await _context.UserItemRatings
+                .Where(r => !string.IsNullOrEmpty(r.RatingDescription))
+                .Select(r => new RatingDescriptionData
+                {
+                    RatingDescription = r.RatingDescription,
+                    Label = r.Rating >= 3  // ratings of 3 or higher are positive, others are negative
+                })
+                .ToListAsync();
         }
     }
 

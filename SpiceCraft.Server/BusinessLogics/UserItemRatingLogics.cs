@@ -35,6 +35,14 @@ namespace SpiceCraft.Server.BusinessLogics
             var result = await _userItemRatingRepository.GetItemRatingsAsync(itemId);
             return HelperFactory.Msg.Success(result);
         }
+        
+        public async Task<ResultDetail<List<StarRatingSummaryDTO>>> GetStarRatingsSummaryAsync(int itemId)
+        {
+            var result = await _userItemRatingRepository.GetStarRatingsSummaryAsync(itemId);
+            return result == null || result.Count == 0
+                ? HelperFactory.Msg.Error<List<StarRatingSummaryDTO>>("No ratings found")
+                : HelperFactory.Msg.Success(result);
+        }
     }
 
 }

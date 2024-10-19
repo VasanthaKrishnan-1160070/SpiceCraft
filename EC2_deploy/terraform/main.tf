@@ -28,7 +28,7 @@ data "aws_ami" "amzn2" {
 
   filter {
     name   = "name"
-    values = ["al2023-ami-*-x86_64-gp2"]
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
   }
 }
 
@@ -44,13 +44,6 @@ resource "aws_security_group" "ec2_security_group" {
   ingress {
     from_port   = 80
     to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -82,6 +75,8 @@ resource "aws_security_group" "ec2_security_group" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  
 
   egress {
     from_port   = 0
@@ -144,7 +139,7 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 # Add the key_name attribute to use an existing key pair
 resource "aws_instance" "web_server_instance" {
   ami                    = data.aws_ami.amzn2.id
-  instance_type          = "t2.micro"
+  instance_type = "t2.micro"
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
   subnet_id              = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
@@ -161,18 +156,18 @@ resource "aws_instance" "web_server_instance" {
     # Install .NET SDK and Hosting Bundle for .NET 8
     curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --install-dir /usr/share/dotnet
     ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+    export PATH=\$PATH:/root/.dotnet/tools
 
     # Install EC2 Instance Connect
     yum install -y ec2-instance-connect
 
     # Install MSSQL Server Express
-    curl -o /tmp/mssql_server.rpm -L https://packages.microsoft.com/config/rhel/7/prod.repo
-    yum localinstall -y /tmp/mssql_server.rpm
-    ACCEPT_EULA=Y yum install -y mssql-server
-    ACCEPT_EULA=Y MSSQL_SA_PASSWORD='Admin123'
-    /opt/mssql/bin/mssql-conf setup
-    systemctl enable mssql-server
-    systemctl start mssql-server
+    # curl -o /etc/yum.repos.d/mssql-server.repo https://packages.microsoft.com/config/rhel/9/mssql-server-2022.repo
+    # yum localinstall -y /tmp/mssql_server.rpm
+    # ACCEPT_EULA=Y yum install -y mssql-server
+    # ACCEPT_EULA=Y MSSQL_SA_PASSWORD='Admin123' /opt/mssql/bin/mssql-conf setup
+    # systemctl enable mssql-server
+    # systemctl start mssql-server
 
     # Create directories for Angular and .NET Core API files
     mkdir -p /var/www/angular
@@ -180,44 +175,47 @@ resource "aws_instance" "web_server_instance" {
     # Deployment script will copy files to these directories
 
     # Configure Nginx
-    cat > /etc/nginx/nginx.conf <<-EOF2
-    user nginx;
-    worker_processes auto;
-    error_log /var/log/nginx/error.log;
-    pid /run/nginx.pid;
+    sudo cat > /etc/nginx/nginx.conf <<-EOF2
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
 
-    events {
-        worker_connections 1024;
-    }
+events {
+    worker_connections 1024;
+}
 
-    http {
-        include /etc/nginx/mime.types;
-        default_type application/octet-stream;
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
 
-        server {
-            listen       80;
-            server_name  localhost;
+    sendfile on;
+    keepalive_timeout 65;
 
-            location / {
-                root   /var/www/angular;
-                index  index.html index.htm;
-                try_files \$uri \$uri/ /index.html;
-            }
+    server {
+        listen       80;
+        server_name  localhost;
 
-            location /api {
-                proxy_pass http://localhost:5000;
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade \$http_upgrade;
-                proxy_set_header Connection keep-alive;
-                proxy_set_header Host \$host;
-                proxy_cache_bypass \$http_upgrade;
-                proxy_set_header X-Real-IP \$remote_addr;
-                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Proto \$scheme;
-            }
+        location / {
+            root   /var/www/angular;
+            index  index.html index.htm;
+            try_files \$uri \$uri/ /index.html;
+        }
+
+        location /api {
+            proxy_pass http://localhost:5000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade \$http_upgrade;
+            proxy_set_header Connection keep-alive;
+            proxy_set_header Host \$host;
+            proxy_cache_bypass \$http_upgrade;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
         }
     }
-    EOF2
+}
+EOF2
 
     systemctl restart nginx
 

@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
 import {
   DxButtonModule, DxFileUploaderComponent,
   DxFileUploaderModule, DxFormComponent,
@@ -26,6 +26,12 @@ import { ChangeDetectorRef } from '@angular/core';
 import {AuthService} from "../../../core/service/auth.service";
 import {TitleComponent} from "../../../shared/components/title/title.component";
 import {UserItemRatingComponent} from "../user-item-rating/user-item-rating.component";
+import {CarouselComponent} from "../../../shared/components/carousel/carousel.component";
+import {RecentlyViewedItemsComponent} from "../recently-viewed-items/recently-viewed-items.component";
+import {RecentlyViewedItemService} from "../../../core/service/recently-viewed-item.service";
+import {RecentlyViewedItemModel} from "../../../core/model/recentlyViewed/RecentlyViewedItemModel";
+import {CartService} from "../../../core/service/cart.service";
+import {AddToCartComponent} from "../add-to-cart/add-to-cart.component";
 
 @Component({
   selector: 'sc-item-detail',
@@ -42,7 +48,10 @@ import {UserItemRatingComponent} from "../user-item-rating/user-item-rating.comp
     DxValidatorModule,
     DxGalleryModule,
     TitleComponent,
-    UserItemRatingComponent
+    UserItemRatingComponent,
+    CarouselComponent,
+    RecentlyViewedItemsComponent,
+    AddToCartComponent
   ],
   templateUrl: './item-detail.component.html',
   styleUrl: './item-detail.component.css'
@@ -65,6 +74,7 @@ export class ItemDetailComponent implements  OnInit, OnDestroy{
   private _destroy$: Subject<void> = new Subject<void>();
   private _cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
   private _authService = inject(AuthService);
+  private _cartService = inject(CartService);
 
   selectedFiles: File[] = [];
   allImages: any[] = [];
@@ -84,6 +94,7 @@ export class ItemDetailComponent implements  OnInit, OnDestroy{
   isCustomer = this._authService.isUserCustomer();
   categoryName!: string;
   subCategoryName!: string;
+  public itemIdToAddToCart = signal(0);
 
 
 
@@ -124,6 +135,11 @@ export class ItemDetailComponent implements  OnInit, OnDestroy{
           this.subCategoryName = subCategory ? subCategory.categoryName : 'N/A';
         }
       )
+  }
+
+  public onAddToCartClick(itemId: number) {
+    this.itemIdToAddToCart.set(itemId);
+    this._cartService.showCartDialog();
   }
 
   onImageUpload(event: any) {

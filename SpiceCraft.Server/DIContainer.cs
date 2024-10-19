@@ -8,6 +8,9 @@ using SpiceCraft.Server.Helpers;
 using SpiceCraft.Server.Service;
 using SpiceCraft.Server.Service.Interface;
 using Amazon.Extensions.NETCore.Setup;
+using SpiceCraft.Server.ML.Interface;
+using SpiceCraft.Server.ML.RatingSentiment;
+using SpiceCraft.Server.ML.Recommendation;
 
 namespace SpiceCraft.Server
 {
@@ -151,6 +154,13 @@ namespace SpiceCraft.Server
             services.AddScoped<IUserItemRatingRepository, UserItemRatingRepository>();
             services.AddScoped<IRecentlyViewedItemsLogics, RecentlyViewedItemsLogics>();
             services.AddScoped<IRecentlyViewedItemsRepository, RecentlyViewedItemsRepository>();
+            services.AddScoped<ICustomerDashboardLogics, CustomerDashboardLogics>();
+            services.AddScoped<ICustomerDashboardRepository, CustomerDashboardRepository>();
+            services.AddScoped<ISentimentMLService, SentimentMLService>();
+            services.AddScoped<IRecommendationMLService, RecommendationMLService>();
+            services.AddScoped<ISentimentAnalysisLogics, SentimentAnalysisLogics>();
+            services.AddScoped<IRecommendationRepository, RecommendationRepository>();
+            services.AddScoped<IRecommendationLogics, RecommendationLogics>();
         }
     }
 }

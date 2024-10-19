@@ -1,10 +1,11 @@
 ﻿using SpiceCraft.Server.BusinessLogics.Interface;
+using SpiceCraft.Server.DTO.Product;
 using SpiceCraft.Server.DTO.RecentlyViewed;
 using SpiceCraft.Server.Helpers;
 
 namespace SpiceCraft.Server.BusinessLogics
 {
-    public class RecentlyViewedItemsLogics
+    public class RecentlyViewedItemsLogics : IRecentlyViewedItemsLogics
     {
         private readonly IRecentlyViewedItemsRepository _recentlyViewedItemsRepository;
 
@@ -13,11 +14,11 @@ namespace SpiceCraft.Server.BusinessLogics
             _recentlyViewedItemsRepository = recentlyViewedItemsRepository;
         }
 
-        public async Task<ResultDetail<List<RecentlyViewedItemDTO>>> GetRecentlyViewedItemsAsync(int userId)
+        public async Task<ResultDetail<List<ProductCatalogItemDTO>>> GetRecentlyViewedItemsAsync(int userId, int maxCount = 5)
         {
-            var result = await _recentlyViewedItemsRepository.GetRecentlyViewedItemsAsync(userId);
+            var result = await _recentlyViewedItemsRepository.GetRecentlyViewedItemsAsync(userId, maxCount);
             return result == null || result.Count == 0
-                ? HelperFactory.Msg.Error<List<RecentlyViewedItemDTO>>("No recently viewed items found")
+                ? HelperFactory.Msg.Error<List<ProductCatalogItemDTO>>("No recently viewed items found")
                 : HelperFactory.Msg.Success(result);
         }
 

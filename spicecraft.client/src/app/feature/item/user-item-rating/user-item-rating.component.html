@@ -1,27 +1,59 @@
 
-
+<sc-title  title="Ratings"></sc-title>
 <!-- Displaying the list of ratings using Bootstrap structure -->
-<div class="card mt-3" *ngIf="ratings.length > 0" >
+<div class="card mt-3" >
   <div class="card-header d-flex align-items-center gap-3 justify-content-between ">
     <h5>Ratings</h5>
-    <dx-button type="success" *ngIf="!currentUserRating" (onClick)="isAddRatingVisible = !isAddRatingVisible" text="Rate Your Experience"></dx-button>
+    <dx-button type="success" *ngIf="!currentUserRating && !isInternalUser" (onClick)="isAddRatingVisible = !isAddRatingVisible" text="Rate Your Experience"></dx-button>
   </div>
   <div class="card-body">
-    <div *ngFor="let rating of ratings" class="mb-3 d-flex gap-2 pb-3">
+
+    <div>
+      <div class="card mb-5">
+        <div class="card-body border-opacity-75">
+          <div class="d-flex align-items-center pt-3 pb-3 gap-2">
+            <span class="fw-bold fs-4 dx-theme-accent-as-text-color">{{this.avgRatings}}</span>
+            <sc-rating-star [(currentRating)]="this.totalRatings"></sc-rating-star>
+            @if(this.totalRatings) {
+              <span class="fs-5">{{this.averageRatingText}}</span>
+            } @else {
+              <span class="fs-5"> ( No Reviews )</span>
+            }
+          </div>
+
+          <div *ngFor="let rating of starRatings" class="row align-items-center mb-2">
+            <div class="col-2">{{ rating.stars }} star</div>
+            <div class="col-8">
+              <dx-progress-bar
+                [value]="rating.percentage"
+                [statusFormat]="statusFormat"
+                [showStatus]="false"
+              ></dx-progress-bar>
+            </div>
+            <div class="col-2">{{ rating.count }} Reviews</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+       <h3 class="text-center">Customer Reviews</h3>
+      <div *ngFor="let rating of ratings" class="mb-3 d-flex gap-2 pb-3">
         <div class="d-flex gap-2">
           <sc-rating-star [(currentRating)]="rating.rating"></sc-rating-star>
         </div>
 
-      <div style="max-width: 500px;" class="d-flex flex-column gap-1 flex-wrap">
-        <div class="mt-1 ml-3 d-flex flex-column flex-wrap">
-          <label class="ml-3  flex-grow-1" >{{rating?.firstName}} (<span class="rating-user"> {{rating?.userName}}</span>)</label>
-          <span class="ml-3 flex-shrink-1 flex-wrap">
+        <div style="max-width: 500px;" class="d-flex flex-column gap-1 flex-wrap">
+          <div class="mt-1 ml-3 d-flex flex-column flex-wrap">
+            <div class="d-flex flex-grow-1 gap-2">
+              <label class="ml-3" >{{rating?.firstName}} (<span class="rating-user"> {{rating?.userName}}</span>)</label>
+              <div title="Update your review" *ngIf="(currentUserRating && rating.userId === currentUserRating?.userId && !isInternalUser) || isAdmin">
+                <span class="cursor-pointer text-warning" (click)="onEditReview(rating.userId)"><i class="fs-5 fa-solid fa-square-pen"></i></span>
+              </div>
+            </div>
+            <span class="ml-3 flex-shrink-1 flex-wrap">
             {{ rating?.ratingDescription }}
-          </span>
-        </div>
-
-        <div class="flex-grow-1 flex-fill" *ngIf="currentUserRating && rating.userId === currentUserRating.userId">
-          <dx-button type="success" text="update" (onClick)="isAddRatingVisible = !isAddRatingVisible" ></dx-button>
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -43,7 +75,7 @@
       <div class="mb-3 row">
         <label class="col-sm-2 col-form-label">Rating</label>
         <div class="col-sm-10">
-          <sc-rating-star [editable]="true" [(currentRating)]="currentRating"></sc-rating-star>
+          <sc-rating-star [editable]="(userId === currentUserRating?.userId || !currentUserRating) && !isInternalUser" [(currentRating)]="currentRating"></sc-rating-star>
         </div>
       </div>
 

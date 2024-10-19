@@ -1,21 +1,57 @@
 USE master;
 
-IF EXISTS (SELECT name FROM sys.databases WHERE name = 'db_aae41b_spicecraft')
+-- for production
+--IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'db_aae41b_spicecraft')
+--BEGIN
+--     create database db_aae41b_spicecraft;
+--END
+--use db_aae41b_spicecraft;
+
+
+-- for developement
+IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'SpiceCraft')
 BEGIN
-    -- Set the database to single-user mode
-    ALTER DATABASE db_aae41b_spicecraft SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    
-    -- Drop the database
-    DROP DATABASE db_aae41b_spicecraft;
+     create database SpiceCraft;
 END
-ELSE
-BEGIN
-    PRINT 'Database db_aae41b_spicecraft does not exist.';
-END;
+use SpiceCraft;
 
-create database db_aae41b_spicecraft;
-
-use db_aae41b_spicecraft;
+-- Drop tables in reverse order of dependencies
+IF OBJECT_ID('RecentlyViewed', 'U') IS NOT NULL DROP TABLE RecentlyViewed;
+IF OBJECT_ID('UserItemRating', 'U') IS NOT NULL DROP TABLE UserItemRating;
+IF OBJECT_ID('UserItemInteraction', 'U') IS NOT NULL DROP TABLE UserItemInteraction;
+IF OBJECT_ID('UserActivityLog', 'U') IS NOT NULL DROP TABLE UserActivityLog;
+IF OBJECT_ID('Subscriptions', 'U') IS NOT NULL DROP TABLE Subscriptions;
+IF OBJECT_ID('Notification', 'U') IS NOT NULL DROP TABLE Notification;
+IF OBJECT_ID('UserAddresses', 'U') IS NOT NULL DROP TABLE UserAddresses;
+IF OBJECT_ID('ItemImages', 'U') IS NOT NULL DROP TABLE ItemImages;
+IF OBJECT_ID('CustomerGiftCard', 'U') IS NOT NULL DROP TABLE CustomerGiftCard;
+IF OBJECT_ID('GiftCards', 'U') IS NOT NULL DROP TABLE GiftCards;
+IF OBJECT_ID('Payments', 'U') IS NOT NULL DROP TABLE Payments;
+IF OBJECT_ID('Messages', 'U') IS NOT NULL DROP TABLE Messages;
+IF OBJECT_ID('Enquiry', 'U') IS NOT NULL DROP TABLE Enquiry;
+IF OBJECT_ID('EnquiryType', 'U') IS NOT NULL DROP TABLE EnquiryType;
+IF OBJECT_ID('Invoices', 'U') IS NOT NULL DROP TABLE Invoices;
+IF OBJECT_ID('CustomerRewards', 'U') IS NOT NULL DROP TABLE CustomerRewards;
+IF OBJECT_ID('Rewards', 'U') IS NOT NULL DROP TABLE Rewards;
+IF OBJECT_ID('PromotionBulkItems', 'U') IS NOT NULL DROP TABLE PromotionBulkItems;
+IF OBJECT_ID('PromotionComboItems', 'U') IS NOT NULL DROP TABLE PromotionComboItems;
+IF OBJECT_ID('PromotionCategories', 'U') IS NOT NULL DROP TABLE PromotionCategories;
+IF OBJECT_ID('PromotionItems', 'U') IS NOT NULL DROP TABLE PromotionItems;
+IF OBJECT_ID('Inventory', 'U') IS NOT NULL DROP TABLE Inventory;
+IF OBJECT_ID('ItemIngredients', 'U') IS NOT NULL DROP TABLE ItemIngredients;
+IF OBJECT_ID('Ingredients', 'U') IS NOT NULL DROP TABLE Ingredients;
+IF OBJECT_ID('CartItems', 'U') IS NOT NULL DROP TABLE CartItems;
+IF OBJECT_ID('ShoppingCarts', 'U') IS NOT NULL DROP TABLE ShoppingCarts;
+IF OBJECT_ID('OrderDetails', 'U') IS NOT NULL DROP TABLE OrderDetails;
+IF OBJECT_ID('Orders', 'U') IS NOT NULL DROP TABLE Orders;
+IF OBJECT_ID('Items', 'U') IS NOT NULL DROP TABLE Items;
+IF OBJECT_ID('ItemCategories', 'U') IS NOT NULL DROP TABLE ItemCategories;
+IF OBJECT_ID('PaymentSchedules', 'U') IS NOT NULL DROP TABLE PaymentSchedules;
+IF OBJECT_ID('CorporateClients', 'U') IS NOT NULL DROP TABLE CorporateClients;
+IF OBJECT_ID('UsersCredential', 'U') IS NOT NULL DROP TABLE UsersCredential;
+IF OBJECT_ID('Users', 'U') IS NOT NULL DROP TABLE Users;
+IF OBJECT_ID('ShippingOptions', 'U') IS NOT NULL DROP TABLE ShippingOptions;
+IF OBJECT_ID('Roles', 'U') IS NOT NULL DROP TABLE Roles;
 
 -- Create Tables
 create table Roles (
@@ -404,6 +440,7 @@ create table RecentlyViewed (
     RecentlyViewedId int primary key identity(1,1),
     UserId int not null,
     ItemId int not null,
+	ViewCount int not null default 1,
     CreatedAt datetime default getdate(),
     UpdatedAt datetime default getdate()
     foreign key (UserId) references Users(UserId),
@@ -1788,6 +1825,28 @@ INSERT INTO Inventory (IngredientId, CurrentStock, LowStockThreshold, CreatedAt,
 (38, 10, 3, GETDATE(), GETDATE()),    -- Vanilla Extract
 (39, 40, 15, GETDATE(), GETDATE()),   -- Almonds
 (40, 20, 5, GETDATE(), GETDATE());    -- Coconut Milk
+
+-- Insert random data into UserItemInteraction table
+INSERT INTO UserItemInteraction (UserId, Interaction, CreatedAt, UpdatedAt)
+SELECT u.UserId, FLOOR(RAND(CHECKSUM(NEWID())) * 5 + 1) AS Interaction, GETDATE(), GETDATE()
+FROM Users u
+CROSS JOIN Items i
+WHERE RAND(CHECKSUM(NEWID())) < 0.5;  -- 50% chance of creating an interaction
+
+-- Insert random data into UserItemRating table
+INSERT INTO UserItemRating (UserId, Rating, ItemId, RatingDescription, CreatedAt, UpdatedAt)
+SELECT u.UserId, FLOOR(RAND(CHECKSUM(NEWID())) * 5 + 1) AS Rating, i.ItemId, 'Sample rating description', GETDATE(), GETDATE()
+FROM Users u
+CROSS JOIN Items i
+WHERE RAND(CHECKSUM(NEWID())) < 0.4;  -- 40% chance of creating a rating
+
+-- Insert random data into RecentlyViewed table
+INSERT INTO RecentlyViewed (UserId, ItemId, ViewCount, CreatedAt, UpdatedAt)
+SELECT u.UserId, i.ItemId, FLOOR(RAND(CHECKSUM(NEWID())) * 10 + 1) AS ViewCount, GETDATE(), GETDATE()
+FROM Users u
+CROSS JOIN Items i
+WHERE RAND(CHECKSUM(NEWID())) < 0.6;  -- 60% chance of adding to recently viewed
+
 
 
 update Items

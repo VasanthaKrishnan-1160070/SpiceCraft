@@ -39,5 +39,12 @@ namespace SpiceCraft.Server.Controllers
             var result = await _userItemRatingLogics.GetItemRatingsAsync(itemId);
             return Ok(result);
         }
+        
+        [HttpGet("ratings/{itemId}")]
+        public async Task<IActionResult> GetStarRatingsSummary(int itemId)
+        {
+            var result = await _userItemRatingLogics.GetStarRatingsSummaryAsync(itemId);
+            return Ok(result);
+        }
     }
 }

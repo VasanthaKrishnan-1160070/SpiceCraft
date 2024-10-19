@@ -1,5 +1,49 @@
 
-<div class="p-4">
+<div class="p-4 pb-2">
   <sc-title [title]="'Dashboard'"></sc-title>
 </div>
+<div>
+  <div class="container">
+    <!-- Welcome Message -->
+    <p class="display-6 text-center fs-3 text-bg-success rounded py-2">
+      <img *ngIf="profileImage" class="dashboard-profile-img" [src]="profileImage" />
+      Welcome {{ currentUserName }}, Have a good day
+    </p>
 
+    <div class="dashboard-cards" *ngIf="dashboardData">
+      <div class="card card-blue">
+        <h3>Today's Orders</h3>
+        <p>{{ dashboardData.totalOrders }}</p>
+      </div>
+
+      <div class="card card-yellow">
+        <h3>Orders to Be Shipped</h3>
+        <p>{{ dashboardData.shippedOrders }}</p>
+      </div>
+
+      <div class="card card-green">
+        <h3>Gift Card Balance</h3>
+        <p>{{ dashboardData.giftCardBalance | currency }}</p>
+      </div>
+
+      <div class="card card-red">
+        <h3 class="card-title">Items in Cart</h3>
+        <p>{{ dashboardData.cartItemsCount }}</p>
+      </div>
+
+      <div class="card card-orange">
+        <h3>Unread Notifications</h3>
+        <p>{{ dashboardData.unreadNotifications }}</p>
+      </div>
+
+      <div class="card card-blue">
+        <h3>Cancelled Orders</h3>
+        <p>{{ dashboardData.cancelledOrders }}</p>
+      </div>
+    </div>
+
+    <div class="mt-5">
+      <sc-recommended-items></sc-recommended-items>
+    </div>
+  </div>
+</div>

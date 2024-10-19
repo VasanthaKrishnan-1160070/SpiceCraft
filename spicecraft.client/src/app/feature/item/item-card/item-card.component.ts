@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnDestroy, Output} from '@angular/core';
 import {ItemSummaryModel} from "../../../core/model/item/item-summary-item.model";
 import {MenuItemModel} from "../../../core/model/item/menu-item.model";
 import {RouterLink} from "@angular/router";
@@ -10,6 +10,10 @@ import {AuthService} from "../../../core/service/auth.service";
 import {ItemService} from "../../../core/service/item.service";
 import DevExpress from "devextreme";
 import notify from 'devextreme/ui/notify';
+import {RecentlyViewedItemModel} from "../../../core/model/recentlyViewed/RecentlyViewedItemModel";
+import {take, takeUntil} from "rxjs/operators";
+import {RecentlyViewedItemService} from "../../../core/service/recently-viewed-item.service";
+import {Subject} from "rxjs";
 
 @Component({
   selector: 'sc-item-card',
@@ -27,16 +31,19 @@ import notify from 'devextreme/ui/notify';
   templateUrl: './item-card.component.html',
   styleUrl: './item-card.component.css'
 })
-export class ItemCardComponent {
+export class ItemCardComponent implements OnDestroy {
   @Input() menuItem!: MenuItemModel;
   @Input() showAddToCart: boolean = false;
   @Input() productSizes: Array<{key: string, value: string}> = [];
   @Input() productColors: Array<{key: string, value: string}> = [];
   @Output() addToCart: EventEmitter<number> = new EventEmitter<number>();
+  @Output() itemClicked: EventEmitter<number> = new EventEmitter<number>();
 
   private _userService = inject(UserService);
   private _authService = inject(AuthService);
   private _itemService = inject(ItemService);
+  private _destroy$ = new Subject<void>();
+  private _recentlyViewed = inject(RecentlyViewedItemService);
 
   quantity: number = 1;
   selectedSize: string = 'L';
@@ -83,6 +90,23 @@ export class ItemCardComponent {
     this.addToCart.emit(this.menuItem.itemId);
   }
 
+  menuItemClicked(itemId: number) {
+    this.addRecentlyViewedItem(itemId);
+  }
+
+  addRecentlyViewedItem(itemId: number) {
+    const recentlyViewed: RecentlyViewedItemModel = {
+      itemId: itemId,
+      userId: this._userService.getCurrentUserId(),
+      viewedAt: new Date()
+    }
+
+    this._recentlyViewed.addRecentlyViewedItem(recentlyViewed).pipe(
+      take(1),
+      takeUntil(this._destroy$)
+    ).subscribe();
+  }
+
   removeProductFromListing(itemId: number): void {
     // Implement the logic to remove the product from the listing
     console.log(`Removing product with id: ${itemId}`);
@@ -104,5 +128,9 @@ export class ItemCardComponent {
       }
     );
 
+  }
+
+  ngOnDestroy() {
+    this._destroy$.next();
   }
 }

@@ -101,5 +101,4 @@ export class B2bDashboardComponent implements OnInit {
         this.lowStockIngredients = s.data;
       })
   }
-
 }

@@ -1,25 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SpiceCraft.Server.BusinessLogics;
+using SpiceCraft.Server.BusinessLogics.Interface;
 using SpiceCraft.Server.DTO.RecentlyViewed;
 
 namespace SpiceCraft.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RecentlyViewedItemsController : ControllerBase
+    public class RecentlyViewedItemsController(IRecentlyViewedItemsLogics recentlyViewedItemsLogics) : ControllerBase
     {
-        private readonly RecentlyViewedItemsLogics _recentlyViewedItemsLogics;
-
-        public RecentlyViewedItemsController(RecentlyViewedItemsLogics recentlyViewedItemsLogics)
-        {
-            _recentlyViewedItemsLogics = recentlyViewedItemsLogics;
-        }
-
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetRecentlyViewedItems(int userId)
         {
-            var result = await _recentlyViewedItemsLogics.GetRecentlyViewedItemsAsync(userId);
+            var result = await recentlyViewedItemsLogics.GetRecentlyViewedItemsAsync(userId);
             if (!result.IsSuccess) return NotFound(result.Message);
             return Ok(result);
         }
@@ -27,7 +21,7 @@ namespace SpiceCraft.Server.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> AddRecentlyViewedItem([FromBody] RecentlyViewedItemDTO item)
         {
-            var result = await _recentlyViewedItemsLogics.AddRecentlyViewedItemAsync(item);
+            var result = await recentlyViewedItemsLogics.AddRecentlyViewedItemAsync(item);
             if (!result.IsSuccess) return BadRequest(result.Message);
             return Ok(result);
         }
