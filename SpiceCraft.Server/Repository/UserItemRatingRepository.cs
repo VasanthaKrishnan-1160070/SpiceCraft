@@ -28,7 +28,9 @@ namespace SpiceCraft.Server.Repository
                 UserId = rating.UserId,
                 ItemId = rating.ItemId,
                 Rating = rating.Rating ?? 0,
-                RatingDescription = rating.RatingDescription  
+                RatingDescription = rating.RatingDescription,
+                IsNegativeReview = rating.IsNegativeReview,
+                ImprovementDescription = rating.ImprovementDescription,
             };
         }
 

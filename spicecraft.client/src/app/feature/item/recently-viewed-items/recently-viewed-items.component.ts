@@ -6,13 +6,15 @@ import {take, takeUntil} from "rxjs/operators";
 import {CarouselComponent} from "../../../shared/components/carousel/carousel.component";
 import {MenuItemModel} from "../../../core/model/item/menu-item.model";
 import {UserService} from "../../../core/service/user.service";
+import {TitleComponent} from "../../../shared/components/title/title.component";
 
 @Component({
   selector: 'sc-recently-viewed-items',
   standalone: true,
-    imports: [
-        CarouselComponent
-    ],
+  imports: [
+    CarouselComponent,
+    TitleComponent
+  ],
   templateUrl: './recently-viewed-items.component.html',
   styleUrl: './recently-viewed-items.component.css'
 })

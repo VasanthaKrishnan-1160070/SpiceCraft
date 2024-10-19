@@ -1,19 +1,19 @@
 USE master;
 
 -- for production
---IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'db_aae41b_spicecraft')
---BEGIN
---     create database db_aae41b_spicecraft;
---END
---use db_aae41b_spicecraft;
+IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'db_aae41b_spicecraft')
+BEGIN
+     create database db_aae41b_spicecraft;
+END
+use db_aae41b_spicecraft;
 
 
 -- for developement
-IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'SpiceCraft')
-BEGIN
-     create database SpiceCraft;
-END
-use SpiceCraft;
+--IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'SpiceCraft')
+--BEGIN
+--     create database SpiceCraft;
+--END
+--use SpiceCraft;
 
 -- Drop tables in reverse order of dependencies
 IF OBJECT_ID('RecentlyViewed', 'U') IS NOT NULL DROP TABLE RecentlyViewed;
@@ -219,7 +219,7 @@ create table ItemIngredients (
   ItemId int not null,
   IngredientId int not null,
   Size varchar(100) check (ItemIngredients.Size in ('Small', 'Medium', 'Large')) default 'Medium', -- QuantityNeeded varies based on size as well
-  QuantityNeeded int not null default 1, -- quantity needed to make the item ( example 2 onions needed for that item )
+  QuantityNeeded int not null default 1, -- Ingredients quantity needed to make the item ( example 2 onions needed for that item )
   CreatedAt datetime default getdate(),
   UpdatedAt datetime default getdate(),
   foreign key (ItemId) references Items(ItemId),
@@ -430,6 +430,8 @@ create table UserItemRating (
   Rating int default 1 check ( Rating <= 5 ),
   ItemId int not null,
   RatingDescription varchar(250) null,
+  ImprovementDescription varchar(250) null,
+  IsNegativeReview bit default 0,
   CreatedAt datetime default getdate(),
   UpdatedAt datetime default getdate(),
   foreign key (UserId) references Users(UserId),
@@ -1846,8 +1848,6 @@ SELECT u.UserId, i.ItemId, FLOOR(RAND(CHECKSUM(NEWID())) * 10 + 1) AS ViewCount,
 FROM Users u
 CROSS JOIN Items i
 WHERE RAND(CHECKSUM(NEWID())) < 0.6;  -- 60% chance of adding to recently viewed
-
-
 
 update Items
  set Description = 'Indulge in our mouthwatering creation, carefully crafted to offer the perfect blend of bold flavors and wholesome goodness. Tender pieces of protein are marinated in a special blend of spices, wrapped in a warm, fluffy tortilla or bun. Each bite bursts with vibrant flavors, complemented by a crisp mix of fresh vegetables.

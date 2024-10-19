@@ -11,10 +11,8 @@ import {RecentlyViewedItemModel} from "../model/recentlyViewed/RecentlyViewedIte
 export class RecommendationService {
   private _api = inject(WebAPIService);
 
-
-
   trainRecommendationModel(userId: number): Observable<ResultDetailModel<MenuItemModel[]>> {
-    return this._api.get<ResultDetailModel<MenuItemModel[]>>(`/recommendation/train`);
+    return this._api.post<ResultDetailModel<MenuItemModel[]>>(`/recommendation/train`, {});
   }
 
   getRecommendedItems(userId: number, noOfRecords: number = 10): Observable<MenuItemModel[]> {

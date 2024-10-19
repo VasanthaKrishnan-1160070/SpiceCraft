@@ -29,21 +29,32 @@ public class RecommendationMLService : IRecommendationMLService
     {
         IDataView dataView = _mlContext.Data.LoadFromEnumerable(trainingData);
 
-        var pipeline = _mlContext.Recommendation().Trainers.MatrixFactorization(new MatrixFactorizationTrainer.Options
+        // Map UserId and ItemId to KeyType (to ensure correct cardinality)
+        var dataProcessPipeline = _mlContext.Transforms.Conversion.MapValueToKey(outputColumnName: "UserIdEncoded", inputColumnName: nameof(UserItemData.UserId))
+            .Append(_mlContext.Transforms.Conversion.MapValueToKey(outputColumnName: "ItemIdEncoded", inputColumnName: nameof(UserItemData.ItemId)));
+
+        // Define the Matrix Factorization Trainer options
+        var trainer = _mlContext.Recommendation().Trainers.MatrixFactorization(new MatrixFactorizationTrainer.Options
         {
-            MatrixColumnIndexColumnName = nameof(UserItemData.UserId),
-            MatrixRowIndexColumnName = nameof(UserItemData.ItemId),
-            LabelColumnName = nameof(UserItemData.Label),
+            MatrixColumnIndexColumnName = "UserIdEncoded",  // Use the encoded UserId
+            MatrixRowIndexColumnName = "ItemIdEncoded",     // Use the encoded ItemId
+            LabelColumnName = nameof(UserItemData.Label),   // Rating or Label column
             NumberOfIterations = 20,
             ApproximationRank = 100
         });
 
-        _model = pipeline.Fit(dataView);
+        // Create the full pipeline by combining the transformations and the trainer
+        var trainingPipeline = dataProcessPipeline.Append(trainer);
+
+        // Train the model
+        _model = trainingPipeline.Fit(dataView);
 
         // After training, save the model to a file for future use
         SaveModel(_modelPath);
+    
         return _model;
     }
+
 
     // Make predictions for recommended items
     // Predict recommendation score for a user-item pair

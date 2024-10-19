@@ -29,8 +29,8 @@ public class SentimentAnalysisController : ControllerBase
     }
 
     // POST: api/SentimentAnalysis/analyze
-    [HttpPost("analyze")]
-    public async Task<IActionResult> AnalyzeSentiment([FromBody] string ratingDescription)
+    [HttpGet("analyze/{ratingDescription}")]
+    public async Task<IActionResult> AnalyzeSentiment(string ratingDescription)
     {
         if (string.IsNullOrEmpty(ratingDescription))
         {

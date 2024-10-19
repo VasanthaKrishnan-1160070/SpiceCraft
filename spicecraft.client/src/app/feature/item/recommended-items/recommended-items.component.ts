@@ -33,7 +33,7 @@ export class RecommendedItemsComponent implements OnInit, OnDestroy {
   }
 
   loadRecentlyViewedItems(userId: number): void {
-    this._recommendedService.getRecommendedItems(userId).pipe(
+    this._recommendedService.getRecommendedItems(userId, 5).pipe(
       take(1),
       takeUntil(this._destroy$)
     )

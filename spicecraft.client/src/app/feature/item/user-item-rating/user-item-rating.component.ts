@@ -16,6 +16,8 @@ import {RatingStarComponent} from "./rating-star/rating-star.component";
 import {UserItemRatingSummaryModel} from "../../../core/model/userItemRating/user-rating-summary.model";
 import {TitleComponent} from "../../../shared/components/title/title.component";
 import {StarRatingSummaryModel} from "../../../core/model/userItemRating/star-rating-summary.model";
+import {SentimentAnalysisService} from "../../../core/service/sentiment-analysis.service";
+import {SentimentPredictionModel} from "../../../core/model/sentimentAnalysis/sentiment-prediction.model";
 
 @Component({
   selector: 'sc-user-item-rating',
@@ -48,8 +50,11 @@ export class UserItemRatingComponent implements  OnDestroy{
   isAdmin: boolean = false;
   isInternalUser: boolean = false;
   reviewUserId = 0;
+  requiresImprovement = false;
+  improvementDescription = '';
   private _authService: AuthService = inject(AuthService);
   private _ratingService = inject(UserItemRatingService);
+  private _sentimentAnalysisService = inject(SentimentAnalysisService);
   private _destroy$ = new Subject<void>();
 
   ngOnInit(): void {
@@ -80,14 +85,32 @@ export class UserItemRatingComponent implements  OnDestroy{
       userId: this.getUserId(),
       itemId: this.itemId,
       rating: this.currentRating,
-      ratingDescription: this.ratingDescription
+      ratingDescription: this.ratingDescription,
+      improvementDescription: this.improvementDescription
     };
 
     this._ratingService.rateItem(ratingData).subscribe(() => {
       this.isAddRatingVisible = false;
       this.reviewUserId = 0;
+      this.requiresImprovement = false;
       this.load(); // Reload ratings after submission
     });
+  }
+
+  onDescriptionFocusOut() {
+    const description = this.ratingDescription;
+    if (description && description?.trim().length > 0) {
+      this._sentimentAnalysisService.analyseDescription(description).pipe(
+        take(1),
+        takeUntil(this._destroy$)
+      )
+        .subscribe((result: SentimentPredictionModel) => {
+          this.requiresImprovement = !result.predictedLabel;
+        });
+    }
+    else {
+      this.requiresImprovement = false;
+    }
   }
 
   getUserId() {

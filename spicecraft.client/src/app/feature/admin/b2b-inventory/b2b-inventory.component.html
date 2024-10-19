@@ -1,3 +1,26 @@
-<div class="p-4">
-  <sc-title [title]="'Inventory'"></sc-title>
+<div class="ms-5 me-5">
+  <dx-tab-panel
+    [dataSource]="inventoryTabs"
+    [selectedIndex]="0"
+    [itemTitleTemplate]="'title'"
+    [animationEnabled]="true"
+    [swipeEnabled]="true"
+    [loop]="true"
+  >
+    <!-- Ingredients Inventory -->
+    <div *dxTemplate="let data of 'ingredientsInventory'">
+      <div class="p-4">
+        <sc-b2b-ingredient-iventory></sc-b2b-ingredient-iventory>
+      </div>
+    </div>
+
+    <!-- Items Inventory -->
+    <div *dxTemplate="let data of 'itemsInventory'">
+      <div class="p-4">
+       <sc-b2b-inventory-list></sc-b2b-inventory-list>
+      </div>
+    </div>
+
+  </dx-tab-panel>
 </div>
+

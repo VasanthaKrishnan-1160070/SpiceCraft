@@ -65,31 +65,38 @@
   [(hideOnOutsideClick)]="isAddRatingVisible"
   title="Add Your Rating"
   [width]="500"
-  [height]="380"
+  [height]="500"
 >
 
   <div class="card">
     <div class="card-body">
 
       <!-- Rating field using DevExtreme Number Box inside Bootstrap form structure -->
-      <div class="mb-3 row">
-        <label class="col-sm-2 col-form-label">Rating</label>
-        <div class="col-sm-10">
+      <div class="mb-3">
+        <label class="form-label">Rating</label>
+        <div>
           <sc-rating-star [editable]="(userId === currentUserRating?.userId || !currentUserRating) && !isInternalUser" [(currentRating)]="currentRating"></sc-rating-star>
         </div>
       </div>
 
       <!-- Rating description using DevExtreme Text Area inside Bootstrap form structure -->
-      <div class="mb-3 row">
-        <label for="ratingDescription" class="col-sm-2 col-form-label">Description</label>
-        <div class="col-sm-10">
-          <dx-text-area [(value)]="ratingDescription" [maxLength]="200" id="ratingDescription" [height]="90" stylingMode="outlined" placeholder="Enter your review"></dx-text-area>
+      <div class="mb-3">
+        <label for="ratingDescription" class="form-label">Description</label>
+        <div>
+          <dx-text-area [ngClass]="{ 'border border-danger border-2' : requiresImprovement, 'border border-success border-2' : !requiresImprovement }" [(value)]="ratingDescription" (onFocusOut)="onDescriptionFocusOut()" [maxLength]="200" id="ratingDescription" [height]="90" stylingMode="outlined" placeholder="Enter your review"></dx-text-area>
+        </div>
+      </div>
+
+      <div *ngIf="requiresImprovement" class="mb-3 row">
+        <label for="ratingDescription" class="form-label">Tell us how we could have improved ?</label>
+        <div>
+          <dx-text-area [(value)]="improvementDescription" [maxLength]="200" id="waysToImprove" [height]="90" stylingMode="outlined" placeholder="Tell us how we could have improved"></dx-text-area>
         </div>
       </div>
 
       <!-- Submit button using DevExtreme Button -->
-      <div class="row">
-        <div class="col-sm-10 offset-sm-2">
+      <div>
+        <div>
           <dx-button text="Submit Rating" type="success" stylingMode="contained" (onClick)="submitRating()"></dx-button>
         </div>
       </div>

@@ -79,7 +79,7 @@ const routes: Routes = [
   { path: 'b2b-report', component: B2bReportComponent },
   { path: 'b2b-shipping', component: B2bShippingComponent },
   { path: 'b2b-order-list', component: B2bOrderComponent },
-  { path: 'b2b-inventory', component: B2bInventoryListComponent },
+  { path: 'b2b-inventory', component: B2bInventoryComponent },
   { path: 'b2b-promotion-list', component: B2bPromotionComponent},
   { path: 'b2b-reset-password', component: B2bResetPasswordComponent },
   { path: 'create-staff/:roleId/:title', component: AddProfileComponent},

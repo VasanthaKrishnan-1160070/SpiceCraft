@@ -42,10 +42,59 @@ namespace SpiceCraft.Server.Repository
                             group new { ii, inv } by ii.ItemId
                             into inventoryGroup
                             select inventoryGroup.Min(g => g.inv.LowStockThreshold / g.ii.QuantityNeeded))
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+
+                    // Updated ingredients information here
+                    Ingredients = (from ii in _context.ItemIngredients
+                        join ing in _context.Ingredients on ii.IngredientId equals ing.IngredientId
+                        join inv in _context.Inventories on ii.IngredientId equals inv.IngredientId
+                        where ii.ItemId == p.ItemId
+                        select new IngredientDTO
+                        {
+                            IngredientId = ing.IngredientId,
+                            IngredientName = ing.IngredientName,
+                            CurrentStock = inv.CurrentStock,
+                            ReorderLevel = inv.LowStockThreshold,
+                            Unit = ing.Unit,
+                            ItemsPerUnit = ing.ItemsPerUnit,
+                            QuantityNeeded = ii.QuantityNeeded
+                        }).ToList()
                 };
 
             return products.ToList();
+        }
+
+
+        // Method to fetch the inventory details
+        public async Task<IEnumerable<IngredientInventoryDTO>> GetInventory()
+        {
+            var inventory = from inv in _context.Inventories
+                join ing in _context.Ingredients on inv.IngredientId equals ing.IngredientId
+                select new IngredientInventoryDTO
+                {
+                    IngredientId = ing.IngredientId,
+                    IngredientName = ing.IngredientName,
+                    Unit = ing.Unit,
+                    ItemsPerUnit = ing.ItemsPerUnit,
+                    NumberOfUnits = Math.Round((double)inv.CurrentStock / ing.ItemsPerUnit, 1),
+                    CurrentStock = inv.CurrentStock,
+                    ReorderLevel = inv.LowStockThreshold
+                };
+
+            var result = await inventory.ToListAsync();
+            return result;
+        }
+        
+        // Method to update the CurrentStock of an ingredient
+        public void UpdateInventoryStock(int ingredientId, int newStock)
+        {
+            var inventory = _context.Inventories.FirstOrDefault(i => i.IngredientId == ingredientId);
+            if (inventory != null)
+            {
+                inventory.CurrentStock = newStock;
+                inventory.UpdatedAt = DateTime.Now;
+                _context.SaveChanges();
+            }
         }
 
         // Get the current stock for a given product ID

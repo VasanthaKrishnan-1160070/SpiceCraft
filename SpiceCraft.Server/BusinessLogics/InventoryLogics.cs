@@ -85,4 +85,22 @@ public class InventoryLogics : IInventoryLogics
 
         return HelperFactory.Msg.Success(ingredients);
     }
+    
+    // Get the inventory details
+    public async Task<ResultDetail<IEnumerable<IngredientInventoryDTO>>> GetInventory()
+    {
+        var result = await _inventoryRepository.GetInventory();
+        if (result == null || !result.Any())
+        {
+            return HelperFactory.Msg.Error<IEnumerable<IngredientInventoryDTO>>("No inventory items found.");
+        }
+
+        return HelperFactory.Msg.Success(result);
+    }
+
+    // Update the inventory stock
+    public void UpdateInventoryStock(int ingredientId, int newStock)
+    {
+        _inventoryRepository.UpdateInventoryStock(ingredientId, newStock);
+    }
 }

@@ -8,5 +8,7 @@
         public string ProductPrice { get; set; }
         public int AvailableStock { get; set; }
         public int MinimumRequiredStock { get; set; }
+        
+        public List<IngredientDTO> Ingredients { get; set; }
     }
 }

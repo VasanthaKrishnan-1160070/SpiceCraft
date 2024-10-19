@@ -1,4 +1,6 @@
+
 @if (recentlyViewedItems.length > 0) {
+  <sc-title title="Recently Viewed"></sc-title>
   <div>
     <sc-carousel [menuItems]="recentlyViewedItems" (addToCart)="onAddToCart($event)" ></sc-carousel>
   </div>

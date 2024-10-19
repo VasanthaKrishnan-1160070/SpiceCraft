@@ -11,5 +11,9 @@ namespace SpiceCraft.Server.Repository.Interface
         bool InsertProductToInventory(int productId, int currentStock, int lowStockThreshold);
         int DecrementProductStock(int productId, int quantity);
         Task<List<IngredientDTO>> GetLowStockIngredientsAsync();
+
+        Task<IEnumerable<IngredientInventoryDTO>> GetInventory();
+
+        void UpdateInventoryStock(int ingredientId, int newStock);
     }
 }

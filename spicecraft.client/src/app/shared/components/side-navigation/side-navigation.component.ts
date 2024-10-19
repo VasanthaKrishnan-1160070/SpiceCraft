@@ -6,6 +6,7 @@ import {map, take, takeUntil} from "rxjs/operators";
 import {Subject} from "rxjs";
 import {NavigationPredictionModel} from "../../../core/model/ml/navigation/navigation-prediction.model";
 import {ResultDetailModel} from "../../../core/model/result-detail.model";
+import {AuthService} from "../../../core/service/auth.service";
 
 @Component({
   selector: 'sc-side-navigation',
@@ -21,12 +22,15 @@ export class SideNavigationComponent implements  OnInit, OnDestroy {
   private _navigationService: NavigationService = inject(NavigationService);
   private _router = inject(Router);
   private _userService: UserService = inject(UserService);
+  private _authService: AuthService = inject(AuthService);
   private _destroy$: Subject<void> = new Subject<void>();
   private _refresh = signal<boolean>(false);
 
   private _startTime!: number;
   private _previousUrl!: string;
   private _clickCount = 0;
+
+  public currentRole = this._authService.getCurrentUserRole()
 
   clientNavigationArray = [
     {name: 'Home', icon: 'fa-solid fa-house', routing: '/home'},

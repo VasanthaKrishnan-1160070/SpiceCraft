@@ -16,9 +16,6 @@ public class RecommendationLogics : IRecommendationLogics
     {
         var trainingData = await _recommendationRepository.ExtractTrainingDataAsync();
         _mlService.TrainModel(trainingData);
-
-        // Optionally, save the model
-        _mlService.SaveModel("recommendation_model.zip");
     }
 
     public RecommendationLogics(IRecommendationRepository recommendationRepository, IRecommendationMLService mlService)
