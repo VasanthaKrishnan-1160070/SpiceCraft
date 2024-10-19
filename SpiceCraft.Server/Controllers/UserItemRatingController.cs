@@ -25,7 +25,7 @@ namespace SpiceCraft.Server.Controllers
             return BadRequest(result.Message);
         }
 
-        [HttpGet("get-user-rating/{userId}/{itemId}")]
+        [HttpGet("get-user-rating/{userId}/itemId/{itemId}")]
         public async Task<IActionResult> GetUserRating(int userId, int itemId)
         {
             var result = await _userItemRatingLogics.GetUserItemRatingAsync(userId, itemId);

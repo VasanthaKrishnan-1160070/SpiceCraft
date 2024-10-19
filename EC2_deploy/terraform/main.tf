@@ -178,17 +178,18 @@ resource "aws_db_instance" "spicecraft_rds" {
 }
 
 
-# Create EC2 Instance
+# Create EC2 Instance for Hosting Angular and .NET Core API
+# Add the key_name attribute to use an existing key pair
 resource "aws_instance" "web_server_instance" {
   ami                    = data.aws_ami.amzn2.id
-  instance_type          = "t2.micro"
+  instance_type          = "t3.micro"
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
   subnet_id              = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
   key_name               = "spicecraft_key_pair"  # Name of the existing key pair
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
 
-  user_data = <<-EOF
+   user_data = <<-EOF
     #!/bin/bash
     yum update -y
     amazon-linux-extras install nginx1 -y
@@ -209,46 +210,43 @@ resource "aws_instance" "web_server_instance" {
 
     # Configure Nginx
     cat > /etc/nginx/nginx.conf <<-EOF2
-user nginx;
-worker_processes auto;
-error_log /var/log/nginx/error.log;
-pid /run/nginx.pid;
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log;
+    pid /run/nginx.pid;
 
-events {
-    worker_connections 1024;
-}
+    events {
+        worker_connections 1024;
+    }
 
-http {
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
 
-    sendfile on;
-    keepalive_timeout 65;
+        server {
+            listen       80;
+            server_name  localhost;
 
-    server {
-        listen       80;
-        server_name  localhost;
+            location / {
+                root   /var/www/angular;
+                index  index.html index.htm;
+                try_files \$uri \$uri/ /index.html;
+            }
 
-        location / {
-            root   /var/www/angular;
-            index  index.html index.htm;
-            try_files \$uri \$uri/ /index.html;
-        }
-
-        location /api {
-            proxy_pass http://localhost:5000;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade \$http_upgrade;
-            proxy_set_header Connection keep-alive;
-            proxy_set_header Host \$host;
-            proxy_cache_bypass \$http_upgrade;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto \$scheme;
+            location /api {
+                proxy_pass http://localhost:5000;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade \$http_upgrade;
+                proxy_set_header Connection keep-alive;
+                proxy_set_header Host \$host;
+                proxy_cache_bypass \$http_upgrade;
+                proxy_set_header X-Real-IP \$remote_addr;
+                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto \$scheme;
+            }
         }
     }
-}
-EOF2
+    EOF2
 
     systemctl restart nginx
 

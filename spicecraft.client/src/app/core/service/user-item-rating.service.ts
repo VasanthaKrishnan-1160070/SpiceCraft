@@ -25,7 +25,7 @@ export class UserItemRatingService {
 
   // Get a user's rating for an item
   getUserItemRating(userId: number, itemId: number): Observable<ResultDetailModel<UserItemRatingModel>> {
-    return this._api.get<ResultDetailModel<UserItemRatingModel>>(`/rating/get-user-rating/${userId}/${itemId}`);
+    return this._api.get<ResultDetailModel<UserItemRatingModel>>(`/rating/get-user-rating/${userId}/itemId/${itemId}`);
   }
 
   getStarRatingsSummary(itemId: number): Observable<ResultDetailModel<StarRatingSummaryModel[]>> {
