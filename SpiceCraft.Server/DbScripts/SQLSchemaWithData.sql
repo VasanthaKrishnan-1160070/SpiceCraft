@@ -1,19 +1,19 @@
 USE master;
-
+go
 -- for production
-IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'db_aae41b_spicecraft')
-BEGIN
-     create database db_aae41b_spicecraft;
-END
-use db_aae41b_spicecraft;
+--IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'db_aae41b_spicecraft')
+--BEGIN
+--     create database db_aae41b_spicecraft;
+--END
+--use db_aae41b_spicecraft;
 
 
 -- for developement
---IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'SpiceCraft')
---BEGIN
---     create database SpiceCraft;
---END
---use SpiceCraft;
+IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'SpiceCraft')
+BEGIN
+     create database SpiceCraft;
+END
+use SpiceCraft;
 
 -- Drop tables in reverse order of dependencies
 IF OBJECT_ID('RecentlyViewed', 'U') IS NOT NULL DROP TABLE RecentlyViewed;

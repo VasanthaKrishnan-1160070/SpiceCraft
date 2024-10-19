@@ -1,3 +1,4 @@
+# Define AWS region
 variable "aws_region" {
   description = "The AWS region to deploy resources in"
   type        = string
@@ -32,18 +33,20 @@ data "aws_ami" "amzn2" {
   }
 }
 
-# Allocate Elastic IP
-resource "aws_eip" "web_server_eip" {
-  instance = aws_instance.web_server_instance.id
-}
-
-# Create Security Group for EC2 Instance
+# Create Security Group for EC2 Instance and RDS
 resource "aws_security_group" "ec2_security_group" {
   vpc_id = data.aws_vpc.default.id
 
   ingress {
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -63,20 +66,11 @@ resource "aws_security_group" "ec2_security_group" {
   }
 
   ingress {
-    from_port   = 5114
-    to_port     = 5114
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 1433
+    from_port   = 1433  # MSSQL default port
     to_port     = 1433
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]  # Allows connection to RDS from anywhere, modify for your needs
   }
-
-  
 
   egress {
     from_port   = 0
@@ -90,7 +84,7 @@ resource "aws_security_group" "ec2_security_group" {
   }
 }
 
-# Create IAM Role for EC2 Instance to Access Database
+# Create IAM Role for EC2 Instance
 resource "aws_iam_role" "ec2_instance_role" {
   name = "ec2_instance_role"
 
@@ -112,21 +106,16 @@ resource "aws_iam_role" "ec2_instance_role" {
   }
 }
 
-# Attach Policies to Allow EC2 Access to Database and External Connectivity
-resource "aws_iam_role_policy_attachment" "ec2_instance_policy_attachment" {
+# Attach Policies to allow S3 access
+resource "aws_iam_role_policy_attachment" "ec2_instance_policy_s3_access" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+# Allow EC2 instance to access RDS (you can add more policies if needed)
+resource "aws_iam_role_policy_attachment" "ec2_instance_policy_rds_access" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "ec2_instance_external_db_access" {
-  role       = aws_iam_role.ec2_instance_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
-}
-
-# Attach AmazonSSMManagedInstanceCore policy
-resource "aws_iam_role_policy_attachment" "ec2_instance_ssm" {
-  role       = aws_iam_role.ec2_instance_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 # Create IAM Instance Profile for EC2
@@ -135,11 +124,64 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.ec2_instance_role.name
 }
 
-# Create EC2 Instance for Hosting Angular, .NET Core API, and MSSQL
-# Add the key_name attribute to use an existing key pair
+# Create S3 Buckets for SpiceCraft
+resource "aws_s3_bucket" "spicecraft" {
+  bucket = "spicecraft"
+  acl    = "private"
+}
+
+# Create sub-buckets inside SpiceCraft
+resource "aws_s3_bucket_object" "items_bucket" {
+  bucket = aws_s3_bucket.spicecraft.bucket
+  key    = "items/"
+}
+
+resource "aws_s3_bucket_object" "profiles_bucket" {
+  bucket = aws_s3_bucket.spicecraft.bucket
+  key    = "profiles/"
+}
+
+resource "aws_s3_bucket_object" "common_bucket" {
+  bucket = aws_s3_bucket.spicecraft.bucket
+  key    = "common/"
+}
+
+# Create a DB Subnet Group for RDS
+resource "aws_db_subnet_group" "spicecraft_rds_subnet_group" {
+  name       = "spicecraft-rds-subnet-group"
+  subnet_ids = data.aws_subnets.default.ids
+
+  tags = {
+    Name = "spicecraft-rds-subnet-group"
+  }
+}
+
+# Create RDS MSSQL Server Express Edition - Free Tier
+resource "aws_db_instance" "spicecraft_rds" {
+  allocated_storage    = 20   # Free tier allows up to 20GB
+  storage_type         = "gp2"  # General-purpose SSD, required for free tier
+  db_subnet_group_name = aws_db_subnet_group.spicecraft_rds_subnet_group.name  # Use the subnet group
+  engine               = "sqlserver-ex"
+  engine_version       = "15.00.4043.16.v1"  # Specific version for free tier MSSQL Express
+  instance_class       = "db.t3.micro"  # Free tier eligible instance class 
+  username             = "admin"  # Customize the username
+  password             = "Admin123"  # Customize the password
+  port                 = 1433
+  publicly_accessible  = true
+  skip_final_snapshot  = true  # Avoids charges for a snapshot upon deletion
+  delete_automated_backups = true
+  vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
+
+  tags = {
+    Name = "spicecraft-rds"
+  }
+}
+
+
+# Create EC2 Instance
 resource "aws_instance" "web_server_instance" {
   ami                    = data.aws_ami.amzn2.id
-  instance_type = "t2.micro"
+  instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
   subnet_id              = data.aws_subnets.default.ids[0]
   associate_public_ip_address = true
@@ -156,18 +198,9 @@ resource "aws_instance" "web_server_instance" {
     # Install .NET SDK and Hosting Bundle for .NET 8
     curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --install-dir /usr/share/dotnet
     ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
-    export PATH=\$PATH:/root/.dotnet/tools
 
     # Install EC2 Instance Connect
     yum install -y ec2-instance-connect
-
-    # Install MSSQL Server Express
-    # curl -o /etc/yum.repos.d/mssql-server.repo https://packages.microsoft.com/config/rhel/9/mssql-server-2022.repo
-    # yum localinstall -y /tmp/mssql_server.rpm
-    # ACCEPT_EULA=Y yum install -y mssql-server
-    # ACCEPT_EULA=Y MSSQL_SA_PASSWORD='Admin123' /opt/mssql/bin/mssql-conf setup
-    # systemctl enable mssql-server
-    # systemctl start mssql-server
 
     # Create directories for Angular and .NET Core API files
     mkdir -p /var/www/angular
@@ -175,7 +208,7 @@ resource "aws_instance" "web_server_instance" {
     # Deployment script will copy files to these directories
 
     # Configure Nginx
-    sudo cat > /etc/nginx/nginx.conf <<-EOF2
+    cat > /etc/nginx/nginx.conf <<-EOF2
 user nginx;
 worker_processes auto;
 error_log /var/log/nginx/error.log;
@@ -247,5 +280,95 @@ EOF2
 
   tags = {
     Name = "web-server-instance"
+  }
+}
+
+# Create Application Load Balancer
+resource "aws_lb" "spicecraft_lb" {
+  name               = "spicecraft-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.ec2_security_group.id]
+  subnets            = data.aws_subnets.default.ids
+
+  tags = {
+    Name = "spicecraft-lb"
+  }
+}
+
+# Create Target Group
+resource "aws_lb_target_group" "spicecraft_target_group" {
+  name        = "spicecraft-target-group"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = data.aws_vpc.default.id
+  target_type = "instance"
+
+  health_check {
+    path                = "/"
+    port                = "80"
+    protocol            = "HTTP"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+  }
+
+  tags = {
+    Name = "spicecraft-target-group"
+  }
+}
+
+# Attach EC2 Instance to Target Group
+resource "aws_lb_target_group_attachment" "spicecraft_attachment" {
+  target_group_arn = aws_lb_target_group.spicecraft_target_group.arn
+  target_id        = aws_instance.web_server_instance.id
+  port             = 80
+}
+
+# Create Load Balancer Listener
+resource "aws_lb_listener" "spicecraft_listener" {
+  load_balancer_arn = aws_lb.spicecraft_lb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.spicecraft_target_group.arn
+  }
+}
+
+# Create a Route 53 Hosted Zone for vidhyamohan.com
+resource "aws_route53_zone" "spicecraft_hosted_zone" {
+  name = "vidhyamohan.com"
+
+  tags = {
+    Name = "spicecraft-hosted-zone"
+  }
+}
+
+# Create Route 53 A Record to point to the Load Balancer
+resource "aws_route53_record" "spicecraft_a_record" {
+  zone_id = aws_route53_zone.spicecraft_hosted_zone.zone_id
+  name    = "www"  # Creates 'www.vidhyamohan.com'
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.spicecraft_lb.dns_name
+    zone_id                = aws_lb.spicecraft_lb.zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create Route 53 A Record for root domain
+resource "aws_route53_record" "spicecraft_root_a_record" {
+  zone_id = aws_route53_zone.spicecraft_hosted_zone.zone_id
+  name    = "vidhyamohan.com"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.spicecraft_lb.dns_name
+    zone_id                = aws_lb.spicecraft_lb.zone_id
+    evaluate_target_health = false
   }
 }
