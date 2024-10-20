@@ -7,7 +7,7 @@ import {Subject} from "rxjs";
 import {NavigationPredictionModel} from "../../../core/model/ml/navigation/navigation-prediction.model";
 import {ResultDetailModel} from "../../../core/model/result-detail.model";
 import {AuthService} from "../../../core/service/auth.service";
-import {AuthService} from "../../../core/service/auth.service";
+
 
 @Component({
   selector: 'sc-side-navigation',
