@@ -36,11 +36,11 @@ NUM_FILES_UPLOADED_API=$(ssh -i ${PEM_FILE} ${EC2_USER}@${EC2_HOST} "find /var/w
 echo "Number of files uploaded to /var/www/api: ${NUM_FILES_UPLOADED_API}"
 
 # Step 6: Optionally upload the contents of the Upload directory if you want to include existing files
-if [ -d "${UPLOAD_DIR}" ]; then
-  echo "Uploading Upload folder contents to EC2..."
-  scp -i ${PEM_FILE} -r ${UPLOAD_DIR}/* ${EC2_USER}@${EC2_HOST}:/var/www/api/upload
-  echo "Uploaded contents of the Upload folder."
-fi
+# if [ -d "${UPLOAD_DIR}" ]; then
+#   echo "Uploading Upload folder contents to EC2..."
+#   scp -i ${PEM_FILE} -r ${UPLOAD_DIR}/* ${EC2_USER}@${EC2_HOST}:/var/www/api/upload
+#   echo "Uploaded contents of the Upload folder."
+# fi
 
 # Step 7: Restart Services on EC2
 echo "Restarting services on EC2..."

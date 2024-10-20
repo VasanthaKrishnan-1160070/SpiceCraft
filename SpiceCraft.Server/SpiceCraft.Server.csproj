@@ -39,4 +39,10 @@
     <Folder Include="Helpers\Response\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
+  <ItemGroup>
+  <!-- Include the Uploads folder in the publish directory -->
+  <None Update="Uploads\**\*">
+    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+  </None>
+</ItemGroup>
 </Project>

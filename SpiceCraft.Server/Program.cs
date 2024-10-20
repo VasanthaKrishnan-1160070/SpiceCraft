@@ -119,7 +119,7 @@ else
 {
     app.UseExceptionHandler("/Home/Error");
 }
-
+//
 // Configure static files for 'Items' folder
 app.UseStaticFiles(new StaticFileOptions
 {
