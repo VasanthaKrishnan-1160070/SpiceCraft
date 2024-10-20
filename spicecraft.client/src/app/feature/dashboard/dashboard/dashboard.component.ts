@@ -27,6 +27,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public currentUserName!: string;
   public dashboardData: CustomerDashboardModel | null = null;
   public userId = 0;
+  public isInternalUser = false;
 
   private _authService: AuthService = inject(AuthService);
   private _userService: UserService = inject(UserService);
@@ -35,6 +36,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.userId = this._authService.getCurrentUserId();
+    this.isInternalUser = this._authService.isInternalUser();
     this.currentUserName = this._userService.getUserFirstName();
     this.loadDashboardData(this.userId);
   }

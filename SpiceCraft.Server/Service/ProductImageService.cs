@@ -23,26 +23,36 @@ public class ProductImageService : IProductImageService
 
         foreach (var img in uploadedImages)
         {
-            string baseFileName = Path.GetFileNameWithoutExtension(img.FileName);
-            string ext = Path.GetExtension(img.FileName);
-            if (!string.IsNullOrEmpty(ext))
+            try
             {
-                string imgCode = $"{itemId}_{nextImageIndex}{ext}";
-                string imgName = baseFileName;
-
-                imgDetails.Add(new ProductImageDto()
+                string baseFileName = Path.GetFileNameWithoutExtension(img.FileName);
+                string ext = Path.GetExtension(img.FileName);
+                if (!string.IsNullOrEmpty(ext))
                 {
-                    ImageCode = imgCode,
-                    ImageName = imgName,
-                    ImageIndex = nextImageIndex,
-                    IsMain = img.FileName == mainImageCode,
-                    ItemId = itemId
-                });
+                    string imgCode = $"{itemId}_{nextImageIndex}{ext}";
+                    string imgName = baseFileName;
 
-                // Upload the file to S3
-                await _storageService.UploadImageAsync($"items/{imgCode}", img);
+                    imgDetails.Add(new ProductImageDto()
+                    {
+                        ImageCode = imgCode,
+                        ImageName = imgName,
+                        ImageIndex = nextImageIndex,
+                        IsMain = img.FileName == mainImageCode,
+                        ItemId = itemId
+                    });
 
-                nextImageIndex++;
+                    // Upload the file to S3
+                    // Convert IFormFile to MemoryStream without saving to disk
+                    // Directly pass the IFormFile to StorageService without handling MemoryStream conversion here
+                    await _storageService.UploadImageAsync($"items/{imgCode}", img, true);
+
+                    nextImageIndex++;
+                }
+            }
+            
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error uploading image: {ex.Message}");
             }
         }
 

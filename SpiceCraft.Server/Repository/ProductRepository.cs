@@ -56,8 +56,8 @@ namespace SpiceCraft.Server.Repository
                     BulkDiscountRate = pbp != null ? pbp.DiscountRate : 0,
                     BulkDiscountRequiredQuantity = pbp != null ? pbp.RequiredQuantity : 0,
                     ComboName = pcp != null ? pcp.ComboName : "",
-                    DiscountPrice = p.Price *
-                                    (1 - ((pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0)) / 100)),
+                    DiscountPrice = Math.Round( p.Price *
+                                    (1 - ((pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0)) / 100)), 2),
                     IsInSale = (pp != null || prc != null) ? "Yes" : "No",
                     IsLowStock = (from ii in _context.ItemIngredients
                             join inv in _context.Inventories on ii.IngredientId equals inv.IngredientId

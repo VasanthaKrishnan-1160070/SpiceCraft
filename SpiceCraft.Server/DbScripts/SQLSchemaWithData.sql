@@ -1828,31 +1828,79 @@ INSERT INTO Inventory (IngredientId, CurrentStock, LowStockThreshold, CreatedAt,
 (39, 40, 15, GETDATE(), GETDATE()),   -- Almonds
 (40, 20, 5, GETDATE(), GETDATE());    -- Coconut Milk
 
--- Insert random data into UserItemInteraction table
-INSERT INTO UserItemInteraction (UserId, Interaction, CreatedAt, UpdatedAt)
-SELECT u.UserId, FLOOR(RAND(CHECKSUM(NEWID())) * 5 + 1) AS Interaction, GETDATE(), GETDATE()
-FROM Users u
-CROSS JOIN Items i
-WHERE RAND(CHECKSUM(NEWID())) < 0.5;  -- 50% chance of creating an interaction
 
--- Insert random data into UserItemRating table
-INSERT INTO UserItemRating (UserId, Rating, ItemId, RatingDescription, CreatedAt, UpdatedAt)
-SELECT u.UserId, FLOOR(RAND(CHECKSUM(NEWID())) * 5 + 1) AS Rating, i.ItemId, 'Sample rating description', GETDATE(), GETDATE()
-FROM Users u
-CROSS JOIN Items i
-WHERE RAND(CHECKSUM(NEWID())) < 0.4;  -- 40% chance of creating a rating
 
--- Insert random data into RecentlyViewed table
+-- Insert 1 review per user for each item (mix of positive, neutral, and negative reviews)
+INSERT INTO UserItemRating (UserId, Rating, ItemId, RatingDescription, ImprovementDescription, IsNegativeReview, CreatedAt, UpdatedAt)
+SELECT u.UserId, 
+       r.Rating,  -- Assign ratings (positive, neutral, negative)
+       i.ItemId,
+       CASE 
+           WHEN r.Rating = 5 THEN 'Amazing taste, will order again!'
+           WHEN r.Rating = 4 THEN 'Tasty but could use a bit more flavor.'
+           WHEN r.Rating = 3 THEN 'Good but nothing special.'
+           WHEN r.Rating = 2 THEN 'The dish was a bit disappointing, needs improvement.'
+           WHEN r.Rating = 1 THEN 'Not enjoyable, would not order again.'
+       END AS RatingDescription,
+       CASE 
+           WHEN r.Rating IN (2, 1) THEN 'Needs significant improvement in flavor and texture.'
+           ELSE NULL
+       END AS ImprovementDescription,  -- Improvement suggestions for lower ratings
+       CASE 
+           WHEN r.Rating IN (2, 1) THEN 1  -- Mark as a negative review for ratings 1 and 2
+           ELSE 0  -- Not a negative review for ratings 3, 4, 5
+       END AS IsNegativeReview,
+       GETDATE() AS CreatedAt, 
+       GETDATE() AS UpdatedAt
+FROM (VALUES (4), (5), (8), (9), (14), (15), (18), (19)) u(UserId)  -- User IDs
+CROSS JOIN Items i  -- All items
+CROSS APPLY (
+    -- Assign 1 rating per user per item (mix of positive, neutral, and negative)
+    SELECT TOP 1 r.Rating
+    FROM (VALUES 
+        (5), (4), (3), (2), (1)  -- Ratings from 5 to 1
+    ) r(Rating)
+    ORDER BY NEWID()  -- Randomize the rating for each user-item pair
+) r
+ORDER BY u.UserId, i.ItemId;  -- Ensure consistent ordering by user and item
+
+
+
+
+
+
+
+-- Insert data into RecentlyViewed table for users 1 to 20, each user with at least 10 recently viewed items
 INSERT INTO RecentlyViewed (UserId, ItemId, ViewCount, CreatedAt, UpdatedAt)
-SELECT u.UserId, i.ItemId, FLOOR(RAND(CHECKSUM(NEWID())) * 10 + 1) AS ViewCount, GETDATE(), GETDATE()
-FROM Users u
-CROSS JOIN Items i
-WHERE RAND(CHECKSUM(NEWID())) < 0.6;  -- 60% chance of adding to recently viewed
+SELECT u.UserId, 
+       i.ItemId, 
+       FLOOR(RAND(CHECKSUM(NEWID())) * 10 + 1) AS ViewCount,  -- Random ViewCount between 1 and 10
+       GETDATE() AS CreatedAt,
+       GETDATE() AS UpdatedAt
+FROM (VALUES 
+    (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), 
+    (11), (12), (13), (14), (15), (16), (17), (18), (19), (20)
+) u(UserId)
+CROSS JOIN (
+    -- Similarity is added here by grouping items from specific categories
+    SELECT ItemId FROM Items WHERE CategoryId IN (8, 9, 10, 11, 12, 13, 14, 15) -- Select main categories
+    UNION ALL
+    SELECT ItemId FROM Items WHERE CategoryId IN (16, 17, 18, 19) -- Select some drink and dessert categories
+) i
+WHERE ABS(CHECKSUM(NEWID())) % 100 < 50;  -- 50% chance of assigning each item to a user
 
-update Items
- set Description = 'Indulge in our mouthwatering creation, carefully crafted to offer the perfect blend of bold flavors and wholesome goodness. Tender pieces of protein are marinated in a special blend of spices, wrapped in a warm, fluffy tortilla or bun. Each bite bursts with vibrant flavors, complemented by a crisp mix of fresh vegetables.
-
-A drizzle of our signature sauce adds a touch of creamy heat, perfectly balanced by the crunch of the veggies. To enhance the richness, a sprinkle of shredded cheese completes the experience, making every bite satisfying and full of texture.
-
-Whether you''re craving something with a kick or simply looking for a hearty, fulfilling meal, this dish is made with the freshest ingredients to deliver quality you can taste. It''s perfect for lunch, dinner, or whenever you''re in the mood for something comforting and flavorful.'
-where itemId > 0;
+-- Add a few specific similar items for all users (e.g., top popular items)
+INSERT INTO RecentlyViewed (UserId, ItemId, ViewCount, CreatedAt, UpdatedAt)
+SELECT u.UserId, 
+       i.ItemId, 
+       FLOOR(RAND(CHECKSUM(NEWID())) * 5 + 1) AS ViewCount,  -- Random ViewCount between 1 and 5 for similar items
+       GETDATE() AS CreatedAt,
+       GETDATE() AS UpdatedAt
+FROM (VALUES 
+    (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), 
+    (11), (12), (13), (14), (15), (16), (17), (18), (19), (20)
+) u(UserId)
+CROSS JOIN (
+    -- Specific popular items for similarity (use specific popular items)
+    SELECT ItemId FROM Items WHERE ItemName IN ('Butter Chicken', 'Tacos', 'Falafel', 'Mango Lassi', 'Baklava')
+) i;
