@@ -183,7 +183,6 @@ resource "aws_db_instance" "spicecraft_rds" {
   }
 }
 
-
 # Create EC2 Instance for Hosting Angular and .NET Core API
 # Add the key_name attribute to use an existing key pair
 resource "aws_instance" "web_server_instance" {
@@ -330,8 +329,8 @@ resource "aws_lb_target_group_attachment" "spicecraft_attachment" {
   port             = 80
 }
 
-# Create Load Balancer Listener
-resource "aws_lb_listener" "spicecraft_listener" {
+# Create HTTP Listener (port 80) for the Load Balancer
+resource "aws_lb_listener" "spicecraft_http_listener" {
   load_balancer_arn = aws_lb.spicecraft_lb.arn
   port              = 80
   protocol          = "HTTP"
@@ -347,10 +346,8 @@ resource "aws_lb_listener" "spicecraft_https_listener" {
   load_balancer_arn = aws_lb.spicecraft_lb.arn
   port              = 443
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"  
-
-  # or if using the fetched ACM certificate, uncomment the line below and comment the one above
-   certificate_arn   = data.aws_acm_certificate.spicecraft_cert.arn
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = data.aws_acm_certificate.spicecraft_cert.arn
 
   default_action {
     type             = "forward"
