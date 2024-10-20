@@ -18,9 +18,7 @@ namespace SpiceCraft.Server.Repository
             _context = context;
         }
 
-        public IEnumerable<ProductCatalogItemDTO> FilterProduct(int userId, int categoryId = 0, int subCategoryId = 0,
-            string keyword = "", ProductFilterEnum filter = ProductFilterEnum.None,
-            ProductSortingEnum sorting = ProductSortingEnum.NameAToZ, bool includeRemovedProducts = false)
+        protected IQueryable<ProductCatalogItemDTO> GetProductQuery()
         {
             // Initial query for products
             var query = from p in _context.Items
@@ -58,8 +56,8 @@ namespace SpiceCraft.Server.Repository
                     BulkDiscountRate = pbp != null ? pbp.DiscountRate : 0,
                     BulkDiscountRequiredQuantity = pbp != null ? pbp.RequiredQuantity : 0,
                     ComboName = pcp != null ? pcp.ComboName : "",
-                    DiscountPrice = p.Price *
-                                    (1 - ((pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0)) / 100)),
+                    DiscountPrice = Math.Round( p.Price *
+                                    (1 - ((pp != null ? pp.DiscountRate : (prc != null ? prc.DiscountRate : 0)) / 100)), 2),
                     IsInSale = (pp != null || prc != null) ? "Yes" : "No",
                     IsLowStock = (from ii in _context.ItemIngredients
                             join inv in _context.Inventories on ii.IngredientId equals inv.IngredientId
@@ -81,6 +79,16 @@ namespace SpiceCraft.Server.Repository
                             ? "Yes"
                             : "No"
                 };
+
+            return query;
+        }
+
+        public IEnumerable<ProductCatalogItemDTO> FilterProduct(int userId, int categoryId = 0, int subCategoryId = 0,
+            string keyword = "", ProductFilterEnum filter = ProductFilterEnum.None,
+            ProductSortingEnum sorting = ProductSortingEnum.NameAToZ, bool includeRemovedProducts = false)
+        {
+            // Initial query for products
+            var query = GetProductQuery();
 
             // Filtering based on categoryId and subCategoryId
             if (categoryId > 0)

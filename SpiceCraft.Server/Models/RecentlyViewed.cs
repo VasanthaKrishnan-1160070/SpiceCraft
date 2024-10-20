@@ -11,6 +11,8 @@ public partial class RecentlyViewed
 
     public int ItemId { get; set; }
 
+    public int ViewCount { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }

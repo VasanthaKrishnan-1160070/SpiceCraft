@@ -60,7 +60,7 @@ public class NavigationLogics
             {
                 UserId = userId,
                 NavigationItem = navigationItem,
-                Routing = routing,  // Assuming you have a method to get the route
+                Routing = routing, 
                 TimeSpent = timeSpent,
                 ClickCount = 1,
                 SessionId = sessionId,

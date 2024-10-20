@@ -2,7 +2,8 @@
   <div class="min-vh-100 d-flex flex-column side-navigation">
     <div class="mb-3 d-flex flex-column p-5 side-nav-header">
       <i class="fa-solid fa-user fa-4x text-pale-grey align-self-center"></i>
-      <p class="align-self-center fs-5 mt-3 text-light">{{firstName()}}</p>
+      <span class="align-self-center fs-5 mt-3 text-light">{{firstName()}}</span>
+      <span class="align-self-center text-light">(Customer)</span>
     </div>
 
     <div class="d-flex flex-column justify-content-start">
@@ -22,7 +23,11 @@
   <div class="side-navigation">
     <div class="mb-3 d-flex flex-column p-3 bg-royal-blue-green">
       <i class="fa-solid fa-user fa-4x text-pale-grey align-self-center"></i>
-      <p class="align-self-center fs-5 mt-3 text-light">{{firstName()}}</p>
+      <span class="align-self-center fs-5 mt-3 text-light">
+        {{firstName()}}
+      </span>
+      <span class="align-self-center text-light">({{currentRole}})</span>
+
     </div>
 
     <div class="d-flex flex-column justify-content-start">

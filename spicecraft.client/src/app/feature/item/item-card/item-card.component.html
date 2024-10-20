@@ -12,7 +12,7 @@
 
   <div class="d-flex flex-column p-3">
     <!-- Image with link -->
-    <a *ngIf="isUserAuthenticated" [routerLink]="['/item-detail', menuItem.itemId]">
+    <a *ngIf="isUserAuthenticated" (click)="menuItemClicked(menuItem.itemId)" [routerLink]="['/item-detail', menuItem.itemId]">
       <img class="img img-fluid img-thumbnail pest-img-list" [src]="productImage" />
     </a>
     <img *ngIf="!isUserAuthenticated" class="img img-fluid pest-img-list" [src]="productImage" />

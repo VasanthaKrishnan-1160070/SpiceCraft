@@ -1,35 +1,51 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, EventEmitter, inject, OnDestroy, OnInit, Output} from '@angular/core';
 import {RecentlyViewedItemModel} from "../../../core/model/recentlyViewed/RecentlyViewedItemModel";
 import {RecentlyViewedItemService} from "../../../core/service/recently-viewed-item.service";
 import {Subject} from "rxjs";
 import {take, takeUntil} from "rxjs/operators";
+import {CarouselComponent} from "../../../shared/components/carousel/carousel.component";
+import {MenuItemModel} from "../../../core/model/item/menu-item.model";
+import {UserService} from "../../../core/service/user.service";
+import {TitleComponent} from "../../../shared/components/title/title.component";
 
 @Component({
   selector: 'sc-recently-viewed-items',
   standalone: true,
-  imports: [],
+  imports: [
+    CarouselComponent,
+    TitleComponent
+  ],
   templateUrl: './recently-viewed-items.component.html',
   styleUrl: './recently-viewed-items.component.css'
 })
 export class RecentlyViewedItemsComponent implements OnInit, OnDestroy {
-  recentlyViewedItems: RecentlyViewedItemModel[] = [];
-  userId: number = 1; // Set to the currently logged-in user
+  @Output() addToCart = new EventEmitter<number>();
+  recentlyViewedItems: MenuItemModel[] = [];
+  private _userService: UserService = inject(UserService);
+  userId: number = 0; // Set to the currently logged-in user
   private _destroy$: Subject<void> = new Subject<void>();
 
   constructor(private recentlyViewedItemService: RecentlyViewedItemService) {}
 
   ngOnInit(): void {
+    this.userId = this._userService.getCurrentUserId();
     this.loadRecentlyViewedItems();
   }
 
   loadRecentlyViewedItems(): void {
-    this.recentlyViewedItemService.getRecentlyViewedItems(this.userId).pipe(
+    const userId = this._userService.getCurrentUserId();
+    this.recentlyViewedItemService.getRecentlyViewedItems(userId).pipe(
       take(1),
       takeUntil(this._destroy$)
     )
-        .subscribe( result =>
-      this.recentlyViewedItems = result.data as RecentlyViewedItemModel[]
-    );
+    .subscribe( result => {
+      const data = result.data as MenuItemModel[];
+      this.recentlyViewedItems = data?.length > 3 ? data : [];
+    });
+  }
+
+  onAddToCart(itemId: number) {
+    this.addToCart.emit(itemId);
   }
 
   ngOnDestroy() {

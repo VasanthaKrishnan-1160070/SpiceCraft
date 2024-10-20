@@ -15,6 +15,7 @@ namespace SpiceCraft.Server.Controllers
         public async Task<IEnumerable<CategoryDTO>> Get()
         {
             return await context.ItemCategories
+                           .Where(w => w.ParentCategoryId == null) 
                            .Select(c => new CategoryDTO
                            {
                                CategoryId = c.CategoryId,

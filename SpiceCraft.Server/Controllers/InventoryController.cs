@@ -79,4 +79,20 @@ public class InventoryController(IInventoryLogics inventoryLogics) : ControllerB
         }
         return NotFound(result.Message);
     }
+    
+    // API to fetch the inventory data
+    [HttpGet("ingredient-inventory")]
+    public async Task<IActionResult> GetInventory()
+    {
+        var inventory = await inventoryLogics.GetInventory();
+        return Ok(inventory);
+    }
+
+    // API to update the current stock of an ingredient
+    [HttpPost("update-ingredient-stock")]
+    public IActionResult UpdateStock([FromBody] UpdateStockDTO updateStockDTO)
+    {
+        inventoryLogics.UpdateInventoryStock(updateStockDTO.IngredientId, updateStockDTO.NewStock);
+        return Ok(new { Message = "Stock updated successfully" });
+    }
 }

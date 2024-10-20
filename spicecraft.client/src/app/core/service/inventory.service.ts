@@ -5,7 +5,10 @@ import {ResultDetailModel} from "../model/result-detail.model";
 import {ProductInventoryModel} from "../model/inventory/product-inventory.model";
 import {StockUpdateModel} from "../model/inventory/stock-update.model";
 import {WebAPIService} from "./webAPI.service";
-import {IngredientDTO} from "../model/inventory/ingredeients.model";
+import {IngredientsModel} from "../model/inventory/ingredeients.model";
+import {IngredientInventoryModel} from "../model/inventory/ingredient-inventory.model";
+import {UpdateStockModel} from "../model/inventory/update-stock.model";
+
 
 
 @Injectable({
@@ -40,7 +43,15 @@ export class InventoryService {
   }
 
   // for dashboards
-  getLowStockIngredients(): Observable<ResultDetailModel<IngredientDTO[]>> {
-    return this._api.get<ResultDetailModel<IngredientDTO[]>>(`/inventory/low-stock`);
+  getLowStockIngredients(): Observable<ResultDetailModel<IngredientsModel[]>> {
+    return this._api.get<ResultDetailModel<IngredientsModel[]>>(`/inventory/low-stock`);
+  }
+
+  getInventory(): Observable<ResultDetailModel<IngredientInventoryModel[]>> {
+    return this._api.get<ResultDetailModel<IngredientInventoryModel[]>>(`/inventory/ingredient-inventory`);
+  }
+
+  updateStock(updateStockDTO: UpdateStockModel): Observable<any> {
+    return this._api.post(`/inventory/update-ingredient-stock`, updateStockDTO);
   }
 }

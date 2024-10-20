@@ -7,6 +7,7 @@ import {Subject} from "rxjs";
 import {NavigationPredictionModel} from "../../../core/model/ml/navigation/navigation-prediction.model";
 import {ResultDetailModel} from "../../../core/model/result-detail.model";
 import {AuthService} from "../../../core/service/auth.service";
+import {AuthService} from "../../../core/service/auth.service";
 
 @Component({
   selector: 'sc-side-navigation',
@@ -22,9 +23,10 @@ export class SideNavigationComponent implements  OnInit, OnDestroy {
   private _navigationService: NavigationService = inject(NavigationService);
   private _router = inject(Router);
   private _userService: UserService = inject(UserService);
+  private _authService: AuthService = inject(AuthService);
   private _destroy$: Subject<void> = new Subject<void>();
   private _refresh = signal<boolean>(false);
-  private _authService = inject(AuthService);
+
 
   private _startTime!: number;
   private _previousUrl!: string;
@@ -34,6 +36,8 @@ export class SideNavigationComponent implements  OnInit, OnDestroy {
   public isStaff!: boolean;
   public isAdmin!: boolean;
   public isCustomer!:boolean;
+
+  public currentRole = this._authService.getCurrentUserRole();
 
 
   clientNavigationArray = [

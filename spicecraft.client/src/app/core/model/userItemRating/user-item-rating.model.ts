@@ -4,6 +4,7 @@ export interface UserItemRatingModel {
   itemId: number;
   rating: number;
   ratingDescription: string;
+  improvementDescription?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

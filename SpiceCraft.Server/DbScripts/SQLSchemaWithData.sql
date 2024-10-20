@@ -1,21 +1,57 @@
 USE master;
+go
+-- for production
+--IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'db_aae41b_spicecraft')
+--BEGIN
+--     create database db_aae41b_spicecraft;
+--END
+--use db_aae41b_spicecraft;
 
-IF EXISTS (SELECT name FROM sys.databases WHERE name = 'db_aae41b_spicecraft')
+
+-- for developement
+IF not EXISTS (SELECT name FROM sys.databases WHERE name = 'SpiceCraft')
 BEGIN
-    -- Set the database to single-user mode
-    ALTER DATABASE db_aae41b_spicecraft SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    
-    -- Drop the database
-    DROP DATABASE db_aae41b_spicecraft;
+     create database SpiceCraft;
 END
-ELSE
-BEGIN
-    PRINT 'Database db_aae41b_spicecraft does not exist.';
-END;
+use SpiceCraft;
 
-create database db_aae41b_spicecraft;
-
-use db_aae41b_spicecraft;
+-- Drop tables in reverse order of dependencies
+IF OBJECT_ID('RecentlyViewed', 'U') IS NOT NULL DROP TABLE RecentlyViewed;
+IF OBJECT_ID('UserItemRating', 'U') IS NOT NULL DROP TABLE UserItemRating;
+IF OBJECT_ID('UserItemInteraction', 'U') IS NOT NULL DROP TABLE UserItemInteraction;
+IF OBJECT_ID('UserActivityLog', 'U') IS NOT NULL DROP TABLE UserActivityLog;
+IF OBJECT_ID('Subscriptions', 'U') IS NOT NULL DROP TABLE Subscriptions;
+IF OBJECT_ID('Notification', 'U') IS NOT NULL DROP TABLE Notification;
+IF OBJECT_ID('UserAddresses', 'U') IS NOT NULL DROP TABLE UserAddresses;
+IF OBJECT_ID('ItemImages', 'U') IS NOT NULL DROP TABLE ItemImages;
+IF OBJECT_ID('CustomerGiftCard', 'U') IS NOT NULL DROP TABLE CustomerGiftCard;
+IF OBJECT_ID('GiftCards', 'U') IS NOT NULL DROP TABLE GiftCards;
+IF OBJECT_ID('Payments', 'U') IS NOT NULL DROP TABLE Payments;
+IF OBJECT_ID('Messages', 'U') IS NOT NULL DROP TABLE Messages;
+IF OBJECT_ID('Enquiry', 'U') IS NOT NULL DROP TABLE Enquiry;
+IF OBJECT_ID('EnquiryType', 'U') IS NOT NULL DROP TABLE EnquiryType;
+IF OBJECT_ID('Invoices', 'U') IS NOT NULL DROP TABLE Invoices;
+IF OBJECT_ID('CustomerRewards', 'U') IS NOT NULL DROP TABLE CustomerRewards;
+IF OBJECT_ID('Rewards', 'U') IS NOT NULL DROP TABLE Rewards;
+IF OBJECT_ID('PromotionBulkItems', 'U') IS NOT NULL DROP TABLE PromotionBulkItems;
+IF OBJECT_ID('PromotionComboItems', 'U') IS NOT NULL DROP TABLE PromotionComboItems;
+IF OBJECT_ID('PromotionCategories', 'U') IS NOT NULL DROP TABLE PromotionCategories;
+IF OBJECT_ID('PromotionItems', 'U') IS NOT NULL DROP TABLE PromotionItems;
+IF OBJECT_ID('Inventory', 'U') IS NOT NULL DROP TABLE Inventory;
+IF OBJECT_ID('ItemIngredients', 'U') IS NOT NULL DROP TABLE ItemIngredients;
+IF OBJECT_ID('Ingredients', 'U') IS NOT NULL DROP TABLE Ingredients;
+IF OBJECT_ID('CartItems', 'U') IS NOT NULL DROP TABLE CartItems;
+IF OBJECT_ID('ShoppingCarts', 'U') IS NOT NULL DROP TABLE ShoppingCarts;
+IF OBJECT_ID('OrderDetails', 'U') IS NOT NULL DROP TABLE OrderDetails;
+IF OBJECT_ID('Orders', 'U') IS NOT NULL DROP TABLE Orders;
+IF OBJECT_ID('Items', 'U') IS NOT NULL DROP TABLE Items;
+IF OBJECT_ID('ItemCategories', 'U') IS NOT NULL DROP TABLE ItemCategories;
+IF OBJECT_ID('PaymentSchedules', 'U') IS NOT NULL DROP TABLE PaymentSchedules;
+IF OBJECT_ID('CorporateClients', 'U') IS NOT NULL DROP TABLE CorporateClients;
+IF OBJECT_ID('UsersCredential', 'U') IS NOT NULL DROP TABLE UsersCredential;
+IF OBJECT_ID('Users', 'U') IS NOT NULL DROP TABLE Users;
+IF OBJECT_ID('ShippingOptions', 'U') IS NOT NULL DROP TABLE ShippingOptions;
+IF OBJECT_ID('Roles', 'U') IS NOT NULL DROP TABLE Roles;
 
 -- Create Tables
 create table Roles (
@@ -183,7 +219,7 @@ create table ItemIngredients (
   ItemId int not null,
   IngredientId int not null,
   Size varchar(100) check (ItemIngredients.Size in ('Small', 'Medium', 'Large')) default 'Medium', -- QuantityNeeded varies based on size as well
-  QuantityNeeded int not null default 1, -- quantity needed to make the item ( example 2 onions needed for that item )
+  QuantityNeeded int not null default 1, -- Ingredients quantity needed to make the item ( example 2 onions needed for that item )
   CreatedAt datetime default getdate(),
   UpdatedAt datetime default getdate(),
   foreign key (ItemId) references Items(ItemId),
@@ -394,6 +430,8 @@ create table UserItemRating (
   Rating int default 1 check ( Rating <= 5 ),
   ItemId int not null,
   RatingDescription varchar(250) null,
+  ImprovementDescription varchar(250) null,
+  IsNegativeReview bit default 0,
   CreatedAt datetime default getdate(),
   UpdatedAt datetime default getdate(),
   foreign key (UserId) references Users(UserId),
@@ -404,6 +442,7 @@ create table RecentlyViewed (
     RecentlyViewedId int primary key identity(1,1),
     UserId int not null,
     ItemId int not null,
+	ViewCount int not null default 1,
     CreatedAt datetime default getdate(),
     UpdatedAt datetime default getdate()
     foreign key (UserId) references Users(UserId),
@@ -628,75 +667,75 @@ DECLARE @CurrentDate4 DATE = GETDATE();
 -- Insert Orders with dates ranging from 20 days back from the current date
 INSERT INTO Orders (UserId, OrderDate, ShippingOptionId, TotalCost, OrderStatus) VALUES 
 (1, DATEADD(DAY, -365, @CurrentDate4), 1, 60.00, 'Shipped'),
-(2, DATEADD(DAY, -360, @CurrentDate4), 2, 90.00, 'Prepared'),
-(3, DATEADD(DAY, -355, @CurrentDate4), 3, 55.00, 'Cancelled'),
+(2, DATEADD(DAY, -360, @CurrentDate4), 2, 90.00, 'Shipped'),
+(3, DATEADD(DAY, -355, @CurrentDate4), 3, 55.00, 'Shipped'),
 (4, DATEADD(DAY, -350, @CurrentDate4), 1, 80.00, 'Shipped'),
-(5, DATEADD(DAY, -345, @CurrentDate4), 2, 75.00, 'Prepared'),
+(5, DATEADD(DAY, -345, @CurrentDate4), 2, 75.00, 'Shipped'),
 (6, DATEADD(DAY, -340, @CurrentDate4), 3, 95.00, 'Shipped'),
-(7, DATEADD(DAY, -335, @CurrentDate4), 1, 85.00, 'Cancelled'),
-(8, DATEADD(DAY, -330, @CurrentDate4), 2, 65.00, 'Prepared'),
+(7, DATEADD(DAY, -335, @CurrentDate4), 1, 85.00, 'Shipped'),
+(8, DATEADD(DAY, -330, @CurrentDate4), 2, 65.00, 'Shipped'),
 (9, DATEADD(DAY, -325, @CurrentDate4), 3, 70.00, 'Shipped'),
-(10, DATEADD(DAY, -320, @CurrentDate4), 1, 60.00, 'Cancelled'),
-(11, DATEADD(DAY, -315, @CurrentDate4), 2, 90.00, 'Prepared'),
+(10, DATEADD(DAY, -320, @CurrentDate4), 1, 60.00, 'Shipped'),
+(11, DATEADD(DAY, -315, @CurrentDate4), 2, 90.00, 'Shipped'),
 (12, DATEADD(DAY, -310, @CurrentDate4), 3, 55.00, 'Shipped'),
-(13, DATEADD(DAY, -305, @CurrentDate4), 1, 75.00, 'Cancelled'),
+(13, DATEADD(DAY, -305, @CurrentDate4), 1, 75.00, 'Shipped'),
 (14, DATEADD(DAY, -300, @CurrentDate4), 2, 65.00, 'Shipped'),
-(15, DATEADD(DAY, -295, @CurrentDate4), 3, 80.00, 'Cancelled'),
-(16, DATEADD(DAY, -290, @CurrentDate4), 1, 60.00, 'Prepared'),
+(15, DATEADD(DAY, -295, @CurrentDate4), 3, 80.00, 'Shipped'),
+(16, DATEADD(DAY, -290, @CurrentDate4), 1, 60.00, 'Shipped'),
 (17, DATEADD(DAY, -285, @CurrentDate4), 2, 95.00, 'Shipped'),
-(18, DATEADD(DAY, -280, @CurrentDate4), 3, 70.00, 'Cancelled'),
-(19, DATEADD(DAY, -275, @CurrentDate4), 1, 85.00, 'Prepared'),
+(18, DATEADD(DAY, -280, @CurrentDate4), 3, 70.00, 'Shipped'),
+(19, DATEADD(DAY, -275, @CurrentDate4), 1, 85.00, 'Shipped'),
 (20, DATEADD(DAY, -270, @CurrentDate4), 2, 90.00, 'Shipped'),
-(1, DATEADD(DAY, -265, @CurrentDate4), 1, 55.00, 'Cancelled'),
+(1, DATEADD(DAY, -265, @CurrentDate4), 1, 55.00, 'Shipped'),
 (2, DATEADD(DAY, -260, @CurrentDate4), 2, 75.00, 'Shipped'),
-(3, DATEADD(DAY, -255, @CurrentDate4), 3, 60.00, 'Prepared'),
-(4, DATEADD(DAY, -250, @CurrentDate4), 1, 90.00, 'Cancelled'),
+(3, DATEADD(DAY, -255, @CurrentDate4), 3, 60.00, 'Shipped'),
+(4, DATEADD(DAY, -250, @CurrentDate4), 1, 90.00, 'Shipped'),
 (5, DATEADD(DAY, -245, @CurrentDate4), 2, 65.00, 'Shipped'),
-(6, DATEADD(DAY, -240, @CurrentDate4), 3, 80.00, 'Prepared'),
+(6, DATEADD(DAY, -240, @CurrentDate4), 3, 80.00, 'Shipped'),
 (7, DATEADD(DAY, -235, @CurrentDate4), 1, 85.00, 'Shipped'),
-(8, DATEADD(DAY, -230, @CurrentDate4), 2, 60.00, 'Prepared'),
+(8, DATEADD(DAY, -230, @CurrentDate4), 2, 60.00, 'Shipped'),
 (9, DATEADD(DAY, -225, @CurrentDate4), 3, 95.00, 'Shipped'),
-(10, DATEADD(DAY, -220, @CurrentDate4), 1, 75.00, 'Cancelled'),
+(10, DATEADD(DAY, -220, @CurrentDate4), 1, 75.00, 'Shipped'),
 (11, DATEADD(DAY, -215, @CurrentDate4), 2, 70.00, 'Shipped'),
-(12, DATEADD(DAY, -210, @CurrentDate4), 3, 85.00, 'Prepared'),
+(12, DATEADD(DAY, -210, @CurrentDate4), 3, 85.00, 'Shipped'),
 (13, DATEADD(DAY, -205, @CurrentDate4), 1, 90.00, 'Shipped'),
-(14, DATEADD(DAY, -200, @CurrentDate4), 2, 60.00, 'Cancelled'),
+(14, DATEADD(DAY, -200, @CurrentDate4), 2, 60.00, 'Shipped'),
 (15, DATEADD(DAY, -195, @CurrentDate4), 3, 95.00, 'Shipped'),
-(16, DATEADD(DAY, -190, @CurrentDate4), 1, 70.00, 'Prepared'),
+(16, DATEADD(DAY, -190, @CurrentDate4), 1, 70.00, 'Shipped'),
 (17, DATEADD(DAY, -185, @CurrentDate4), 2, 85.00, 'Shipped'),
-(18, DATEADD(DAY, -180, @CurrentDate4), 3, 75.00, 'Cancelled'),
+(18, DATEADD(DAY, -180, @CurrentDate4), 3, 75.00, 'Shipped'),
 (19, DATEADD(DAY, -175, @CurrentDate4), 1, 80.00, 'Shipped'),
-(20, DATEADD(DAY, -170, @CurrentDate4), 2, 60.00, 'Prepared'),
+(20, DATEADD(DAY, -170, @CurrentDate4), 2, 60.00, 'Shipped'),
 (1, DATEADD(DAY, -165, @CurrentDate4), 1, 95.00, 'Shipped'),
-(2, DATEADD(DAY, -160, @CurrentDate4), 2, 85.00, 'Cancelled'),
-(3, DATEADD(DAY, -155, @CurrentDate4), 3, 75.00, 'Prepared'),
+(2, DATEADD(DAY, -160, @CurrentDate4), 2, 85.00, 'Shipped'),
+(3, DATEADD(DAY, -155, @CurrentDate4), 3, 75.00, 'Shipped'),
 (4, DATEADD(DAY, -150, @CurrentDate4), 1, 90.00, 'Shipped'),
-(5, DATEADD(DAY, -145, @CurrentDate4), 2, 60.00, 'Cancelled'),
+(5, DATEADD(DAY, -145, @CurrentDate4), 2, 60.00, 'Shipped'),
 (6, DATEADD(DAY, -140, @CurrentDate4), 3, 80.00, 'Shipped'),
-(7, DATEADD(DAY, -135, @CurrentDate4), 1, 95.00, 'Prepared'),
+(7, DATEADD(DAY, -135, @CurrentDate4), 1, 95.00, 'Shipped'),
 (8, DATEADD(DAY, -130, @CurrentDate4), 2, 70.00, 'Shipped'),
-(9, DATEADD(DAY, -125, @CurrentDate4), 3, 85.00, 'Cancelled'),
+(9, DATEADD(DAY, -125, @CurrentDate4), 3, 85.00, 'Shipped'),
 (10, DATEADD(DAY, -120, @CurrentDate4), 1, 60.00, 'Shipped'),
-(11, DATEADD(DAY, -115, @CurrentDate4), 2, 90.00, 'Prepared'),
-(12, DATEADD(DAY, -110, @CurrentDate4), 3, 95.00, 'Cancelled'),
+(11, DATEADD(DAY, -115, @CurrentDate4), 2, 90.00, 'Shipped'),
+(12, DATEADD(DAY, -110, @CurrentDate4), 3, 95.00, 'Shipped'),
 (13, DATEADD(DAY, -105, @CurrentDate4), 1, 75.00, 'Shipped'),
-(14, DATEADD(DAY, -100, @CurrentDate4), 2, 65.00, 'Prepared'),
+(14, DATEADD(DAY, -100, @CurrentDate4), 2, 65.00, 'Shipped'),
 (15, DATEADD(DAY, -95, @CurrentDate4), 3, 80.00, 'Shipped'),
 (1, '2023-10-12', 1, 60.00, 'Shipped'),
-(2, '2023-11-15', 2, 80.00, 'Cancelled'),
-(3, '2023-12-20', 3, 90.00, 'Prepared'),
-(4, '2024-01-22', 1, 110.00, 'Ready For Pickup'),
-(5, '2024-02-25', 2, 100.00, 'Returned'),
+(2, '2023-11-15', 2, 80.00, 'Shipped'),
+(3, '2023-12-20', 3, 90.00, 'Shipped'),
+(4, '2024-01-22', 1, 110.00, 'Shipped'),
+(5, '2024-02-25', 2, 100.00, 'Shipped'),
 (6, '2024-03-03', 3, 70.00, 'Shipped'),
-(7, '2024-04-18', 1, 55.00, 'Cancelled'),
-(8, '2024-05-12', 2, 120.00, 'Prepared'),
+(7, '2024-04-18', 1, 55.00, 'Shipped'),
+(8, '2024-05-12', 2, 120.00, 'Shipped'),
 (9, '2024-06-14', 3, 130.00, 'Shipped'),
-(10, '2024-07-20', 1, 90.00, 'Returned'),
-(11, '2024-08-10', 2, 95.00, 'Prepared'),
+(10, '2024-07-20', 1, 90.00, 'Shipped'),
+(11, '2024-08-10', 2, 95.00, 'Shipped'),
 (12, '2024-09-05', 3, 85.00, 'Shipped'),
-(13, '2024-09-29', 1, 115.00, 'Ready For Pickup'),
-(14, '2024-10-01', 2, 105.00, 'Returned'),
-(15, '2024-10-02', 3, 125.00, 'Cancelled');
+(13, '2024-09-29', 1, 115.00, 'Shipped'),
+(14, '2024-10-01', 2, 105.00, 'Shipped'),
+(15, '2024-10-02', 3, 125.00, 'Shipped');
 
 
 
@@ -992,14 +1031,14 @@ DECLARE @CurrentDate2 DATE = GETDATE();
 INSERT INTO Payments (UserId, OrderId, PaymentMethod, Amount, PaymentStatus, PaymentDate) VALUES
 (1, 1, 'credit card', 60.00, 'Completed', DATEADD(DAY, -365, GETDATE())),
 (2, 2, 'gift card', 90.00, 'Completed', DATEADD(DAY, -360, GETDATE())),
-(3, 3, 'credit card', 55.00, 'Pending', DATEADD(DAY, -355, GETDATE())),
-(4, 4, 'client credit', 80.00, 'Failed', DATEADD(DAY, -350, GETDATE())),
+(3, 3, 'credit card', 55.00, 'Completed', DATEADD(DAY, -355, GETDATE())),
+(4, 4, 'client credit', 80.00, 'Completed', DATEADD(DAY, -350, GETDATE())),
 (5, 5, 'credit card', 75.00, 'Completed', DATEADD(DAY, -345, GETDATE())),
 (6, 6, 'credit card', 95.00, 'Completed', DATEADD(DAY, -340, GETDATE())),
 (7, 7, 'credit card and gift card', 85.00, 'Completed', DATEADD(DAY, -335, GETDATE())),
-(8, 8, 'gift card', 65.00, 'Pending', DATEADD(DAY, -330, GETDATE())),
+(8, 8, 'gift card', 65.00, 'Completed', DATEADD(DAY, -330, GETDATE())),
 (9, 9, 'credit card', 70.00, 'Completed', DATEADD(DAY, -325, GETDATE())),
-(10, 10, 'client credit', 60.00, 'Failed', DATEADD(DAY, -320, GETDATE())),
+(10, 10, 'client credit', 60.00, 'Completed', DATEADD(DAY, -320, GETDATE())),
 (11, 11, 'credit card', 90.00, 'Completed', DATEADD(DAY, -315, GETDATE())),
 (12, 12, 'credit card', 55.00, 'Completed', DATEADD(DAY, -310, GETDATE())),
 (13, 13, 'gift card', 75.00, 'Completed', DATEADD(DAY, -305, GETDATE())),
@@ -1007,15 +1046,15 @@ INSERT INTO Payments (UserId, OrderId, PaymentMethod, Amount, PaymentStatus, Pay
 (15, 15, 'credit card', 80.00, 'Completed', DATEADD(DAY, -295, GETDATE())),
 (16, 16, 'credit card', 70.00, 'Completed', DATEADD(DAY, -290, GETDATE())),
 (17, 17, 'credit card', 85.00, 'Completed', DATEADD(DAY, -285, GETDATE())),
-(18, 18, 'credit card', 75.00, 'Pending', DATEADD(DAY, -280, GETDATE())),
+(18, 18, 'credit card', 75.00, 'Completed', DATEADD(DAY, -280, GETDATE())),
 (19, 19, 'client credit', 80.00, 'Completed', DATEADD(DAY, -275, GETDATE())),
 (20, 20, 'credit card', 60.00, 'Completed', DATEADD(DAY, -270, GETDATE())),
 (1, 21, 'credit card', 90.00, 'Completed', DATEADD(DAY, -265, GETDATE())),
 (2, 22, 'gift card', 75.00, 'Completed', DATEADD(DAY, -260, GETDATE())),
-(3, 23, 'credit card', 65.00, 'Pending', DATEADD(DAY, -255, GETDATE())),
+(3, 23, 'credit card', 65.00, 'Completed', DATEADD(DAY, -255, GETDATE())),
 (4, 24, 'credit card', 95.00, 'Completed', DATEADD(DAY, -250, GETDATE())),
 (5, 25, 'credit card', 85.00, 'Completed', DATEADD(DAY, -245, GETDATE())),
-(6, 26, 'client credit', 55.00, 'Failed', DATEADD(DAY, -240, GETDATE())),
+(6, 26, 'client credit', 55.00, 'Completed', DATEADD(DAY, -240, GETDATE())),
 (7, 27, 'credit card', 65.00, 'Completed', DATEADD(DAY, -235, GETDATE())),
 (8, 28, 'gift card', 50.00, 'Completed', DATEADD(DAY, -230, GETDATE())),
 (9, 29, 'credit card', 90.00, 'Completed', DATEADD(DAY, -225, GETDATE())),
@@ -1030,10 +1069,10 @@ INSERT INTO Payments (UserId, OrderId, PaymentMethod, Amount, PaymentStatus, Pay
 (18, 38, 'credit card', 55.00, 'Completed', DATEADD(DAY, -180, GETDATE())),
 (19, 39, 'credit card', 90.00, 'Completed', DATEADD(DAY, -175, GETDATE())),
 (20, 40, 'gift card', 80.00, 'Completed', DATEADD(DAY, -170, GETDATE())),
-(1, 41, 'credit card', 60.00, 'Pending', DATEADD(DAY, -165, GETDATE())),
+(1, 41, 'credit card', 60.00, 'Completed', DATEADD(DAY, -165, GETDATE())),
 (2, 42, 'credit card', 75.00, 'Completed', DATEADD(DAY, -160, GETDATE())),
 (3, 43, 'credit card', 65.00, 'Completed', DATEADD(DAY, -155, GETDATE())),
-(4, 44, 'client credit', 70.00, 'Failed', DATEADD(DAY, -150, GETDATE())),
+(4, 44, 'client credit', 70.00, 'Completed', DATEADD(DAY, -150, GETDATE())),
 (5, 45, 'credit card', 85.00, 'Completed', DATEADD(DAY, -145, GETDATE())),
 (6, 46, 'credit card', 55.00, 'Completed', DATEADD(DAY, -140, GETDATE())),
 (7, 47, 'credit card', 100.00, 'Completed', DATEADD(DAY, -135, GETDATE())),
@@ -1790,10 +1829,78 @@ INSERT INTO Inventory (IngredientId, CurrentStock, LowStockThreshold, CreatedAt,
 (40, 20, 5, GETDATE(), GETDATE());    -- Coconut Milk
 
 
-update Items
- set Description = 'Indulge in our mouthwatering creation, carefully crafted to offer the perfect blend of bold flavors and wholesome goodness. Tender pieces of protein are marinated in a special blend of spices, wrapped in a warm, fluffy tortilla or bun. Each bite bursts with vibrant flavors, complemented by a crisp mix of fresh vegetables.
 
-A drizzle of our signature sauce adds a touch of creamy heat, perfectly balanced by the crunch of the veggies. To enhance the richness, a sprinkle of shredded cheese completes the experience, making every bite satisfying and full of texture.
+-- Insert one review per user per item, and ensure that each item has ratings 1, 2, 3, 4, and 5
+INSERT INTO UserItemRating (UserId, Rating, ItemId, RatingDescription, ImprovementDescription, IsNegativeReview, CreatedAt, UpdatedAt)
+SELECT u.UserId, 
+       r.Rating,  -- Assign ratings 1, 2, 3, 4, 5 for each item
+       i.ItemId,
+       CASE 
+           WHEN r.Rating = 5 THEN 'Amazing taste, will order again!'
+           WHEN r.Rating = 4 THEN 'Tasty but could use a bit more flavor.'
+           WHEN r.Rating = 3 THEN 'Good but nothing special.'
+           WHEN r.Rating = 2 THEN 'The dish was a bit disappointing, needs improvement.'
+           WHEN r.Rating = 1 THEN 'Not enjoyable, would not order again.'
+       END AS RatingDescription,
+       CASE 
+           WHEN r.Rating IN (2, 1) THEN 'Needs significant improvement in flavor and texture.'
+           ELSE NULL
+       END AS ImprovementDescription,  -- Improvement suggestions for lower ratings
+       CASE 
+           WHEN r.Rating IN (2, 1) THEN 1  -- Mark as a negative review for ratings 1 and 2
+           ELSE 0  -- Not a negative review for ratings 3, 4, 5
+       END AS IsNegativeReview,
+       GETDATE() AS CreatedAt, 
+       GETDATE() AS UpdatedAt
+FROM (
+    VALUES (4), (5), (8), (9), (14), (15), (18), (19)  -- 8 Users
+) u(UserId)
+CROSS JOIN Items i
+CROSS APPLY (
+    -- Assign ratings 1, 2, 3, 4, 5 for each item
+    SELECT Rating
+    FROM (VALUES (5), (4), (3), (2), (1)) r(Rating)
+    WHERE r.Rating = ((u.UserId + i.ItemId) % 5 + 1)  -- Ensure each item gets all 5 ratings
+) r;
 
-Whether you''re craving something with a kick or simply looking for a hearty, fulfilling meal, this dish is made with the freshest ingredients to deliver quality you can taste. It''s perfect for lunch, dinner, or whenever you''re in the mood for something comforting and flavorful.'
-where itemId > 0;
+
+
+
+
+
+
+
+-- Insert data into RecentlyViewed table for users 1 to 20, each user with at least 10 recently viewed items
+INSERT INTO RecentlyViewed (UserId, ItemId, ViewCount, CreatedAt, UpdatedAt)
+SELECT u.UserId, 
+       i.ItemId, 
+       FLOOR(RAND(CHECKSUM(NEWID())) * 10 + 1) AS ViewCount,  -- Random ViewCount between 1 and 10
+       GETDATE() AS CreatedAt,
+       GETDATE() AS UpdatedAt
+FROM (VALUES 
+    (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), 
+    (11), (12), (13), (14), (15), (16), (17), (18), (19), (20)
+) u(UserId)
+CROSS JOIN (
+    -- Similarity is added here by grouping items from specific categories
+    SELECT ItemId FROM Items WHERE CategoryId IN (8, 9, 10, 11, 12, 13, 14, 15) -- Select main categories
+    UNION ALL
+    SELECT ItemId FROM Items WHERE CategoryId IN (16, 17, 18, 19) -- Select some drink and dessert categories
+) i
+WHERE ABS(CHECKSUM(NEWID())) % 100 < 50;  -- 50% chance of assigning each item to a user
+
+-- Add a few specific similar items for all users (e.g., top popular items)
+INSERT INTO RecentlyViewed (UserId, ItemId, ViewCount, CreatedAt, UpdatedAt)
+SELECT u.UserId, 
+       i.ItemId, 
+       FLOOR(RAND(CHECKSUM(NEWID())) * 5 + 1) AS ViewCount,  -- Random ViewCount between 1 and 5 for similar items
+       GETDATE() AS CreatedAt,
+       GETDATE() AS UpdatedAt
+FROM (VALUES 
+    (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), 
+    (11), (12), (13), (14), (15), (16), (17), (18), (19), (20)
+) u(UserId)
+CROSS JOIN (
+    -- Specific popular items for similarity (use specific popular items)
+    SELECT ItemId FROM Items WHERE ItemName IN ('Butter Chicken', 'Tacos', 'Falafel', 'Mango Lassi', 'Baklava')
+) i;

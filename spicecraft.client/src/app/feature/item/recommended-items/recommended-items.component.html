@@ -1,0 +1,8 @@
+<div>
+  @if (recommendedItems.length > 0) {
+    <sc-title  title="Recommended for you"></sc-title>
+    <div>
+      <sc-carousel [menuItems]="recommendedItems" [canShowAddToCart]="false" (addToCart)="onAddToCart($event)" ></sc-carousel>
+    </div>
+  }
+</div>

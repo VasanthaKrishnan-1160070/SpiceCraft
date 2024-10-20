@@ -4,7 +4,7 @@
 ANGULAR_BUILD_DIR="../../spicecraft.client/dist/spicecraft.client/browser"
 API_BUILD_DIR="../../SpiceCraft.Server/publish"
 EC2_USER="ec2-user"
-EC2_HOST="ec2-54-206-237-126.ap-southeast-2.compute.amazonaws.com"
+EC2_HOST="ec2-3-26-190-8.ap-southeast-2.compute.amazonaws.com"
 PEM_FILE="./spicecraft_key_pair.pem"
 
 echo "Creating directories and setting permissions on EC2..."

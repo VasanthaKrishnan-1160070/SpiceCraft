@@ -3,6 +3,7 @@ using SpiceCraft.Server.DTO.Product;
 using SpiceCraft.Server.Helpers;
 using SpiceCraft.Server.Helpers.Request;
 using SpiceCraft.Server.Repository.Interface;
+using SpiceCraft.Server.Service.Interface;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SpiceCraft.Server.BusinessLogics
@@ -10,7 +11,8 @@ namespace SpiceCraft.Server.BusinessLogics
     public class ProductLogics(
         IProductRepository productRepository,
         //  IInventoryRepository inventoryRepository,
-        ICurrentUser currentUser
+        ICurrentUser currentUser,
+        IProductImageService _productImageService
         ) : IProductLogics
     {
         public ResultDetail<IEnumerable<ProductCatalogItemDTO>> FilterProduct(ProductFilterRequest filter)
@@ -69,12 +71,13 @@ namespace SpiceCraft.Server.BusinessLogics
             var details = CreateUpdateProduct(createUpdateItem.ItemSummary);
             if (details.ItemId != 0)
             {
-                
                 // Now we create the product inventory
                 // inventoryRepository.InsertProductToInventory(Convert.ToInt32(productDetails["product_id"]));
 
                 // Now we save the images
-                SaveProductImages(details.ItemId, createUpdateItem.MainImageName, uploadedImages, createUpdateItem?.RemovedImages?.ToList());
+                 SaveProductImages(details.ItemId, createUpdateItem.MainImageName, uploadedImages, createUpdateItem?.RemovedImages?.ToList());
+                 // _productImageService.SaveProductImagesAsync(details.ItemId, createUpdateItem.MainImageName,
+                 //    uploadedImages, createUpdateItem?.RemovedImages?.ToList());
                 return HelperFactory.Msg.Success(true);
             }
             return HelperFactory.Msg.Error<bool>("Failed to save product images.");

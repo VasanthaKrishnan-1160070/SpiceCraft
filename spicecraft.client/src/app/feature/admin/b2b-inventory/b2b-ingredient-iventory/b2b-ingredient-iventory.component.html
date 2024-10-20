@@ -1,0 +1,85 @@
+<div class="p-4 pb-0">
+  <sc-title [title]="'Ingredients Inventory'"></sc-title>
+</div>
+
+
+<div class="ms-5 me-5">
+  <!-- Data Grid for Inventory -->
+  <dx-data-grid
+    [dataSource]="inventory$ | async"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnReordering]="true"
+    [filterRow]="{ visible: true }"
+    [paging]="{ enabled: true, pageSize: 10 }"
+    [selection]="{ mode: 'single' }"
+  >
+    <dxo-search-panel
+      [visible]="true"
+      [width]="340"
+      placeholder="Search..."
+    ></dxo-search-panel>
+    <!-- Column Chooser -->
+    <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+
+    <dxo-paging
+      [enabled]="true"
+      [pageSize]="10"
+      [pageIndex]="1"
+    >
+    </dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [displayMode]="'full'"
+      [showInfo]="true"
+      [showPageSizeSelector]="true"
+      [allowedPageSizes]="[5, 10, 20, 50]"
+      infoText="Page #{0}. Total: {1} ({2} items)"
+      [showNavigationButtons]="true">
+    </dxo-pager>
+
+    <!-- Load Panel -->
+    <dxo-load-panel [enabled]="true"></dxo-load-panel>
+    <!-- Define columns for Inventory -->
+    <dxi-column dataField="ingredientId" caption="Ingredient ID"></dxi-column>
+    <dxi-column dataField="ingredientName" caption="Ingredient Name"></dxi-column>
+    <dxi-column dataField="unit" caption="Unit"></dxi-column>
+    <dxi-column dataField="itemsPerUnit" caption="Items Per Unit"></dxi-column>
+    <dxi-column dataField="numberOfUnits" caption="Available Units"></dxi-column>
+    <dxi-column dataField="currentStock" caption="Current Stock"></dxi-column>
+    <dxi-column dataField="reorderLevel" caption="Reorder Level"></dxi-column>
+
+
+    <!-- Edit Button to open Popup -->
+    <dxi-column caption="Edit Stock" [width]="140" [cellTemplate]="'editButtonTemplate'">
+      <div *dxTemplate="let data of 'editButtonTemplate'">
+        <dx-button type="success" text="Edit Stock" (onClick)="openEditPopup(data.data)"></dx-button>
+      </div>
+    </dxi-column>
+  </dx-data-grid>
+
+  <!-- DevExtreme Popup for Editing Current Stock -->
+  <dx-popup
+    [(visible)]="editPopupVisible"
+    [width]="400"
+    [height]="250"
+    [showTitle]="true"
+    title="Edit Current Stock"
+    [contentTemplate]="'content'"
+    [dragEnabled]="true"
+    [closeOnOutsideClick]="true"
+  >
+    <div *dxTemplate="let data of 'content'">
+      <dx-form [formData]="selectedIngredient">
+        <dxi-item dataField="ingredientName" [isRequired]="true" [editorOptions]="{ disabled: true }" caption="Ingredient Name"></dxi-item>
+        <dxi-item dataField="currentStock" [isRequired]="true" caption="Current Stock"></dxi-item>
+      </dx-form>
+
+      <div class="d-flex gap-3 mt-4">
+        <dx-button type="success" text="Save" (onClick)="saveStock()"></dx-button>
+        <dx-button type="danger" text="Cancel" (onClick)="closeEditPopup()"></dx-button>
+      </div>
+    </div>
+  </dx-popup>
+</div>

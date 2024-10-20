@@ -18,6 +18,8 @@ import {ItemFilterEnum} from "../../../core/enum/item-filter.enum";
 import {ItemFilterSortingEnum} from "../../../core/enum/item-filter-sorting.enum";
 import {AddToCartComponent} from "../add-to-cart/add-to-cart.component";
 import {CartService} from "../../../core/service/cart.service";
+import {AuthService} from "../../../core/service/auth.service";
+import {UserService} from "../../../core/service/user.service";
 
 @Component({
   selector: 'sc-item-list',
@@ -41,6 +43,8 @@ export class ItemListComponent implements OnInit, OnDestroy {
   private _categoryService = inject(CategoryService);
   private _lookupService = inject(LookupService);
   private _cartService = inject(CartService);
+  private _authService = inject(AuthService);
+  private _userService = inject(UserService);
   private _destroy$: Subject<void> = new Subject<void>();
 
 
@@ -52,8 +56,10 @@ export class ItemListComponent implements OnInit, OnDestroy {
   public productSorting!: LookupModel[];
   public subCategories!: LookupModel[];
   public itemIdToAddToCart = signal(0);
+  public isInternalUser = false;
 
   ngOnInit() {
+    this.isInternalUser = this._authService.isInternalUser();
     this.filterForm = {
       keyword: " ",
       categoryId: 0,
@@ -70,6 +76,9 @@ export class ItemListComponent implements OnInit, OnDestroy {
       s =>  {
         console.log(s);
         this.menuItems = s.data as any;
+        if (!this.isInternalUser) {
+          this.menuItems = this.menuItems?.filter(f => !f.isRemoved)
+        }
       }
     );
 
@@ -124,6 +133,9 @@ export class ItemListComponent implements OnInit, OnDestroy {
       .subscribe(
         s =>  {
           this.menuItems = s.data as any;
+          if (!this.isInternalUser) {
+            this.menuItems = this.menuItems?.filter(f => !f.isRemoved)
+          }
         })
   }
 

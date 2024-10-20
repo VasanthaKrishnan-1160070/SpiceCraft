@@ -8,6 +8,7 @@ using SpiceCraft.Server.IndentityModels;
 using SpiceCraft.Server.Middleware;
 using SpiceCraft.Server.SeedData;
 using System.Text;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
 using SpiceCraft.Server.ML.Navigation;
 
@@ -119,22 +120,27 @@ else
     app.UseExceptionHandler("/Home/Error");
 }
 
-// app.UseStaticFiles(new StaticFileOptions
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Items")),
+    RequestPath = "/uploads/items"
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Profiles")),
+    RequestPath = "/uploads/profiles"
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Profiles")),
+    RequestPath = "/uploads/common"
+});
+
+// builder.Services.Configure<FormOptions>(options =>
 // {
-//     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Items")),
-//     RequestPath = "/uploads/items"
-// });
-//
-// app.UseStaticFiles(new StaticFileOptions
-// {
-//     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Profiles")),
-//     RequestPath = "/uploads/profiles"
-// });
-//
-// app.UseStaticFiles(new StaticFileOptions
-// {
-//     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Profiles")),
-//     RequestPath = "/uploads/common"
+//     options.MultipartBodyLengthLimit = 52428800; // 50 MB limit
 // });
 
 

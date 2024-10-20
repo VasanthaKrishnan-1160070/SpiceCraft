@@ -13,7 +13,7 @@ namespace SpiceCraft.Server.BusinessLogics
         private readonly IOrderLogics _orderBusinessLogic;
         private readonly IPaymentLogics _paymentBusinessLogic;
         private readonly ICartRepository _shoppingCartService;
-        private readonly IUserRepository _userService; // Assuming a user service to get session info and user data
+        private readonly IUserRepository _userService; // user service to get session info and user data
         private readonly IShippingRepository _shippingService;
         private readonly IGiftCardRepository _giftCardService;
         private readonly IUserRepository _corporateClientService;

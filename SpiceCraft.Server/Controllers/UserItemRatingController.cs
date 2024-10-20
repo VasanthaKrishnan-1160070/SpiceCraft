@@ -25,7 +25,7 @@ namespace SpiceCraft.Server.Controllers
             return BadRequest(result.Message);
         }
 
-        [HttpGet("get-user-rating/{userId}/{itemId}")]
+        [HttpGet("get-user-rating/{userId}/itemId/{itemId}")]
         public async Task<IActionResult> GetUserRating(int userId, int itemId)
         {
             var result = await _userItemRatingLogics.GetUserItemRatingAsync(userId, itemId);
@@ -37,6 +37,13 @@ namespace SpiceCraft.Server.Controllers
         public async Task<IActionResult> GetItemRatings(int itemId)
         {
             var result = await _userItemRatingLogics.GetItemRatingsAsync(itemId);
+            return Ok(result);
+        }
+        
+        [HttpGet("ratings/{itemId}")]
+        public async Task<IActionResult> GetStarRatingsSummary(int itemId)
+        {
+            var result = await _userItemRatingLogics.GetStarRatingsSummaryAsync(itemId);
             return Ok(result);
         }
     }

@@ -6,4 +6,10 @@ public class IngredientDTO
     public string IngredientName { get; set; }
     public int CurrentStock { get; set; }
     public int ReorderLevel { get; set; }
+    
+    public string Unit { get; set; }
+    
+    public int ItemsPerUnit { get; set; }
+    
+    public int QuantityNeeded { get; set; }
 }

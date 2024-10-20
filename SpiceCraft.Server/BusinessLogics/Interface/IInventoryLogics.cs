@@ -24,4 +24,8 @@ public interface IInventoryLogics
     Task<ResultDetail<int>> DecrementProductStockAsync(int itemId, int quantity);
     
     Task<ResultDetail<List<IngredientDTO>>> GetLowStockIngredientsAsync();
+
+    Task<ResultDetail<IEnumerable<IngredientInventoryDTO>>> GetInventory();
+
+    void UpdateInventoryStock(int ingredientId, int newStock);
 }

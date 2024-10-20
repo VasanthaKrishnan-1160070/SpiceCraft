@@ -47,6 +47,11 @@ export class UserService {
     return `${loggedInUser.firstName} ${loggedInUser.lastName}`;
   }
 
+  getUserFirstName(): string {
+    const loggedInUser = this.getLoggedInUser();
+    return `${loggedInUser.firstName}`;
+  }
+
   getCurrentUserId(): number {
     const loggedInUser = this.getLoggedInUser();
     return loggedInUser.userId;

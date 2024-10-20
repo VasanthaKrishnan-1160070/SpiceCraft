@@ -35,7 +35,7 @@ public class ItemController(SpiceCraftContext context, IProductLogics productLog
     }
 
     [HttpPost("create-update-product")]
-    public ActionResult<ResultDetail<bool>> CreateUpdateProduct([FromForm] string createUpdateItem, IFormFileCollection files)
+    public IActionResult CreateUpdateProduct([FromForm] string createUpdateItem, IFormFileCollection files)
     {
         // Deserialize the JSON string into the ItemSummaryModel
         var itemModel = JsonConvert.DeserializeObject<CreateUpdateItemRequest>(createUpdateItem);
@@ -45,6 +45,6 @@ public class ItemController(SpiceCraftContext context, IProductLogics productLog
         {
             uploadedImages = Request.Form?.Files?.ToList();
         }
-        return productLogics.CreateUpdateProductDetails(itemModel, uploadedImages);
+        return Ok(productLogics.CreateUpdateProductDetails(itemModel, uploadedImages));
     }
 }

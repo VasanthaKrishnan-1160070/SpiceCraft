@@ -14,26 +14,38 @@
   <sc-root></sc-root>
 
   <script>
-    // Function to wrap the dx-license element with a new parent and hide the parent
-    // function wrapAndHideDxLicense() {
-    //   const dxLicenseElements = document.getElementsByTagName('dx-license');
-    //
-    //   for (let i = 0; i < dxLicenseElements.length; i++) {
-    //     const dxLicenseElement = dxLicenseElements[i];
-    //
-    //     // Create a new parent element
-    //     const newParent = document.createElement('div');
-    //
-    //     // Wrap the dx-license element with the new parent
-    //     dxLicenseElement.parentNode.insertBefore(newParent, dxLicenseElement);
-    //     newParent.appendChild(dxLicenseElement);
-    //     // Set the new parent to display: none
-    //     newParent.style.display = 'none';
-    //   }
-    // }
+    // Function to wrap and hide dx-license element
+    function wrapAndHideDxLicense() {
+      const dxLicenseElements = document.getElementsByTagName('dx-license');
+      console.log(dxLicenseElements);
+      console.log("length of dxLicenseElements.length", dxLicenseElements.length);
 
-    // Add an event listener for the DOMContentLoaded event to call wrapAndHideDxLicense when the page loads
-   // document.addEventListener('DOMContentLoaded', wrapAndHideDxLicense);
+      for (let i = 0; i < dxLicenseElements.length; i++) {
+        const dxLicenseElement = dxLicenseElements[i];
+        const newParent = document.createElement('div');
+
+        dxLicenseElement.parentNode.insertBefore(newParent, dxLicenseElement);
+        newParent.appendChild(dxLicenseElement);
+
+        newParent.style.display = 'none';
+      }
+    }
+
+    // MutationObserver to detect when dx-license element is added to the DOM
+    const observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        if (mutation.addedNodes.length > 0) {
+          const dxLicenseElements = document.getElementsByTagName('dx-license');
+          if (dxLicenseElements.length > 0) {
+            wrapAndHideDxLicense();
+            observer.disconnect(); // Stop observing once element is found
+          }
+        }
+      });
+    });
+
+    // Start observing the document body for child node additions
+    observer.observe(document.body, { childList: true, subtree: true });
   </script>
 </body>
 </html>

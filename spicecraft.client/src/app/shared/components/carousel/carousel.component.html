@@ -1,0 +1,54 @@
+
+
+<swiper-container
+  loop="true"
+  navigation="true"
+  speed="500"
+  slides-per-view="3"
+>
+
+
+    @for (item of menuItems; track item) {
+      <swiper-slide>
+        <div data-aos="zoom-in-down" class="p-1">
+        <sc-item-card
+          [menuItem]="item"
+          [showAddToCart]="canShowAddToCart"
+          (addToCart)="onAddToCart($event)"
+          [showAddToCart]="false"
+        >
+        </sc-item-card>
+        </div>
+      </swiper-slide>
+    }
+
+<!--  <swiper-slide>-->
+<!--    <div data-aos="zoom-in-down" class="p-3 bg-light-coffee specials-card">-->
+<!--      <img src="https://picsum.photos/id/42/250/200" />-->
+<!--      <p>Title</p>-->
+<!--    </div>-->
+
+<!--  </swiper-slide>-->
+<!--  <swiper-slide>-->
+<!--    <div data-aos="zoom-in-down" class="p-3 bg-light-coffee specials-card">-->
+<!--      <img src="https://picsum.photos/id/225/200/300" />-->
+<!--      <p>Title</p>-->
+<!--    </div>-->
+
+<!--  </swiper-slide>-->
+<!--  <swiper-slide>-->
+<!--    <div data-aos="zoom-in-down" class="p-3 bg-light-coffee specials-card">-->
+<!--      <img src="https://picsum.photos/id/248/200/300" />-->
+<!--    </div>-->
+<!--  </swiper-slide>-->
+<!--  <swiper-slide>-->
+<!--    <div data-aos="zoom-in-down" class="p-3 bg-light-coffee specials-card">-->
+<!--      <img src="https://picsum.photos/id/292/200/300" />-->
+<!--    </div>-->
+<!--  </swiper-slide>-->
+<!--  <swiper-slide>-->
+<!--    <div data-aos="zoom-in-down" class="p-3 bg-light-coffee specials-card">-->
+<!--      <img src="https://picsum.photos/id/312/200/300" />-->
+<!--    </div>-->
+<!--  </swiper-slide>-->
+</swiper-container>

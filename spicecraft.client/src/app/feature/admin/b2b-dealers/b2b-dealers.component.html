@@ -17,11 +17,18 @@
     [grouping]="{ autoExpandAll: true }"
     [sorting]="{ mode: 'multiple' }"
   >
+    <dxo-search-panel
+      [visible]="true"
+      [width]="340"
+      placeholder="Search..."
+    ></dxo-search-panel>
     <!-- Column Chooser -->
     <dxo-column-chooser [enabled]="true" mode="dragAndDrop"></dxo-column-chooser>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+
     <dxo-paging
       [enabled]="true"
-      [pageSize]="5"
+      [pageSize]="10"
       [pageIndex]="1"
     >
     </dxo-paging>
@@ -30,7 +37,7 @@
       [displayMode]="'full'"
       [showInfo]="true"
       [showPageSizeSelector]="true"
-      [allowedPageSizes]="[10, 20, 50]"
+      [allowedPageSizes]="[5, 10, 20, 50]"
       infoText="Page #{0}. Total: {1} ({2} items)"
       [showNavigationButtons]="true">
     </dxo-pager>

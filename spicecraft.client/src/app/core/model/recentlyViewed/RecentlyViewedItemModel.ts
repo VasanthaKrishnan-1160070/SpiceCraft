@@ -1,6 +1,6 @@
 export interface RecentlyViewedItemModel {
   itemId: number;
   userId: number;
-  itemName: string;
+  itemName?: string;
   viewedAt: Date;
 }

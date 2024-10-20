@@ -5,6 +5,7 @@ using SpiceCraft.Server.Models;
 using SpiceCraft.Server.Repository.Interface;
 using System.Collections.Generic;
 using System.Linq;
+using SpiceCraft.Server.ML.Models.SentitmentAnalysis;
 
 namespace SpiceCraft.Server.Repository
 {
@@ -27,7 +28,9 @@ namespace SpiceCraft.Server.Repository
                 UserId = rating.UserId,
                 ItemId = rating.ItemId,
                 Rating = rating.Rating ?? 0,
-                RatingDescription = rating.RatingDescription  
+                RatingDescription = rating.RatingDescription,
+                IsNegativeReview = rating.IsNegativeReview,
+                ImprovementDescription = rating.ImprovementDescription,
             };
         }
 
@@ -42,7 +45,7 @@ namespace SpiceCraft.Server.Repository
                     FirstName = r.User.FirstName,
                     UserId = r.UserId,
                     Rating = r.Rating ?? 0,
-                    RatingDescription = r.RatingDescription,
+                    RatingDescription = r.RatingDescription
                 })
                 .ToListAsync();
         }
@@ -59,7 +62,9 @@ namespace SpiceCraft.Server.Repository
                     UserId = userItemRatingDTO.UserId,
                     ItemId = userItemRatingDTO.ItemId,
                     Rating = userItemRatingDTO.Rating,
-                    RatingDescription = userItemRatingDTO.RatingDescription
+                    RatingDescription = userItemRatingDTO.RatingDescription,
+                    ImprovementDescription = userItemRatingDTO.ImprovementDescription,
+                    IsNegativeReview = userItemRatingDTO.IsNegativeReview,
                 };
                 _context.UserItemRatings.Add(rating);
             }
@@ -67,6 +72,8 @@ namespace SpiceCraft.Server.Repository
             {
                 rating.Rating = userItemRatingDTO.Rating;
                 rating.RatingDescription = userItemRatingDTO.RatingDescription;
+                rating.ImprovementDescription = userItemRatingDTO.ImprovementDescription;
+                rating.IsNegativeReview = userItemRatingDTO.IsNegativeReview;
                 rating.UpdatedAt = DateTime.Now;
             }
 
@@ -74,6 +81,32 @@ namespace SpiceCraft.Server.Repository
 
             userItemRatingDTO.UserItemRatingId = rating.UserItemRating1;
             return userItemRatingDTO;
+        }
+        
+        public async Task<List<StarRatingSummaryDTO>> GetStarRatingsSummaryAsync(int itemId)
+        {
+            var ratings = await _context.UserItemRatings
+                .Where(r => r.ItemId == itemId)
+                .GroupBy(r => r.Rating)
+                .Select(g => new StarRatingSummaryDTO
+                {
+                    Stars = g.Key ?? 0,
+                    Count = g.Count()
+                }).ToListAsync();
+
+            return ratings;
+        }
+        
+        public async Task<List<RatingDescriptionData>> GetRatingDescriptionsAsync()
+        {
+            return await _context.UserItemRatings
+                .Where(r => !string.IsNullOrEmpty(r.RatingDescription))
+                .Select(r => new RatingDescriptionData
+                {
+                    RatingDescription = r.RatingDescription,
+                    Label = r.Rating >= 3  // ratings of 3 or higher are positive, others are negative
+                })
+                .ToListAsync();
         }
     }
 

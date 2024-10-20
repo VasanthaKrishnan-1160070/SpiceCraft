@@ -14,9 +14,9 @@
 
         public ResultDetail<bool> RemoveProductFromListing(int itemId);
 
-        public ResultDetail<bool> CreateUpdateProductDetails(CreateUpdateItemRequest createUpdateProductRequest, List<IFormFile> uploadedImages);
+        ResultDetail<bool> CreateUpdateProductDetails(CreateUpdateItemRequest createUpdateItem, List<IFormFile> uploadedImages);
 
-       // public ProductSummaryDTO CreateUpdateProduct(ProductSummaryDTO productDetails);
+        // public ProductSummaryDTO CreateUpdateProduct(ProductSummaryDTO productDetails);
 
         // public Task<ResultDetail<int?>> UploadItemImages(IFormFileCollection files);
     }
