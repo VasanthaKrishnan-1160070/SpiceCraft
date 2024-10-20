@@ -355,6 +355,22 @@ resource "aws_lb_listener" "spicecraft_https_listener" {
   }
 }
 
+# Redirect HTTP to HTTPS
+# resource "aws_lb_listener" "spicecraft_http_listener" {
+#   load_balancer_arn = aws_lb.spicecraft_lb.arn
+#   port              = 80
+#   protocol          = "HTTP"
+
+#   default_action {
+#     type = "redirect"
+#     redirect {
+#       port        = "443"
+#       protocol    = "HTTPS"
+#       status_code = "HTTP_301"
+#     }
+#   }
+# }
+
 # Create a Route 53 Hosted Zone for vidhyamohan.com
 resource "aws_route53_zone" "spicecraft_hosted_zone" {
   name = "vidhyamohan.com"

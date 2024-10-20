@@ -17,7 +17,7 @@ public class RecommendationMLService : IRecommendationMLService
 {
     private readonly MLContext _mlContext;
     private ITransformer _model;
-    private readonly string _modelPath = "recommendation_model.zip"; // Define the path to save/load the model
+    private readonly string _modelPath = "recommendation_model.zip"; // save/load the model
 
     public RecommendationMLService()
     {
@@ -36,8 +36,8 @@ public class RecommendationMLService : IRecommendationMLService
         // Define the Matrix Factorization Trainer options
         var trainer = _mlContext.Recommendation().Trainers.MatrixFactorization(new MatrixFactorizationTrainer.Options
         {
-            MatrixColumnIndexColumnName = "UserIdEncoded",  // Use the encoded UserId
-            MatrixRowIndexColumnName = "ItemIdEncoded",     // Use the encoded ItemId
+            MatrixColumnIndexColumnName = "UserIdEncoded",  // Using the encoded UserId
+            MatrixRowIndexColumnName = "ItemIdEncoded",     // Using the encoded ItemId
             LabelColumnName = nameof(UserItemData.Label),   // Rating or Label column
             NumberOfIterations = 20,
             ApproximationRank = 100
