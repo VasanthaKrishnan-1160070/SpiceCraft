@@ -51,6 +51,7 @@ export class UserItemRatingComponent implements  OnDestroy{
   isInternalUser: boolean = false;
   reviewUserId = 0;
   requiresImprovement = false;
+  enableReviewSubmitButton = false;
   improvementDescription = '';
   private _authService: AuthService = inject(AuthService);
   private _ratingService = inject(UserItemRatingService);
@@ -81,6 +82,9 @@ export class UserItemRatingComponent implements  OnDestroy{
   statusFormat = () => '';
 
   submitRating() {
+    if (!this.enableReviewSubmitButton) {
+      return;
+    }
     const ratingData: UserItemRatingModel = {
       userId: this.getUserId(),
       itemId: this.itemId,
@@ -93,11 +97,17 @@ export class UserItemRatingComponent implements  OnDestroy{
       this.isAddRatingVisible = false;
       this.reviewUserId = 0;
       this.requiresImprovement = false;
+      this.enableReviewSubmitButton = false;
       this.load(); // Reload ratings after submission
     });
   }
 
+  onPopupHidden() {
+    this.enableReviewSubmitButton = false;
+  }
+
   onDescriptionFocusOut() {
+    this.enableReviewSubmitButton = false;
     const description = this.ratingDescription;
     if (description && description?.trim().length > 0) {
       this._sentimentAnalysisService.analyseDescription(description).pipe(
@@ -106,10 +116,12 @@ export class UserItemRatingComponent implements  OnDestroy{
       )
         .subscribe((result: SentimentPredictionModel) => {
           this.requiresImprovement = !result.predictedLabel;
+          this.enableReviewSubmitButton = true;
         });
     }
     else {
       this.requiresImprovement = false;
+      this.enableReviewSubmitButton = true;
     }
   }
 
@@ -158,13 +170,16 @@ export class UserItemRatingComponent implements  OnDestroy{
           // Step 3: Calculate the average rating
           const averageRating = this.totalRatings > 0 ? (weightedSum / this.totalRatings) : 0;
 
-          // Step 4: Map star ratings with percentage and class
-          this.starRatings = ratings.map(rating => ({
-            stars: rating.stars,
-            count: rating.count,
-            percentage: this.totalRatings > 0 ? (rating.count / this.totalRatings) * 100 : 0,
-            class: this.getRatingClass(rating.stars)
-          }));
+          // Step 4: Create the starRatings array ensuring all 5 ratings (1 to 5 stars) are included
+          this.starRatings = [5, 4, 3, 2, 1].map(stars => {
+            const foundRating = ratings.find(r => r.stars === stars);
+            return {
+              stars: stars,
+              count: foundRating ? foundRating.count : 0,  // Default to 0 if the rating is missing
+              percentage: this.totalRatings > 0 && foundRating ? (foundRating.count / this.totalRatings) * 100 : 0,
+              class: this.getRatingClass(stars)
+            };
+          });
 
           // Step 5: Ensure totalRatings is shown as a decimal (even if whole number)
           this.totalRatings = +averageRating.toFixed(1);
@@ -216,6 +231,7 @@ export class UserItemRatingComponent implements  OnDestroy{
         this.currentUserRating = s.data as UserItemRatingModel;
         this.currentRating = s.data?.rating ?? 0;
         this.ratingDescription = s.data?.ratingDescription ?? '';
+        this.improvementDescription = s.data?.improvementDescription ?? '';
       })
   }
 

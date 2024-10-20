@@ -45,7 +45,7 @@ namespace SpiceCraft.Server.Repository
                     FirstName = r.User.FirstName,
                     UserId = r.UserId,
                     Rating = r.Rating ?? 0,
-                    RatingDescription = r.RatingDescription,
+                    RatingDescription = r.RatingDescription
                 })
                 .ToListAsync();
         }
@@ -62,7 +62,9 @@ namespace SpiceCraft.Server.Repository
                     UserId = userItemRatingDTO.UserId,
                     ItemId = userItemRatingDTO.ItemId,
                     Rating = userItemRatingDTO.Rating,
-                    RatingDescription = userItemRatingDTO.RatingDescription
+                    RatingDescription = userItemRatingDTO.RatingDescription,
+                    ImprovementDescription = userItemRatingDTO.ImprovementDescription,
+                    IsNegativeReview = userItemRatingDTO.IsNegativeReview,
                 };
                 _context.UserItemRatings.Add(rating);
             }
@@ -70,6 +72,8 @@ namespace SpiceCraft.Server.Repository
             {
                 rating.Rating = userItemRatingDTO.Rating;
                 rating.RatingDescription = userItemRatingDTO.RatingDescription;
+                rating.ImprovementDescription = userItemRatingDTO.ImprovementDescription;
+                rating.IsNegativeReview = userItemRatingDTO.IsNegativeReview;
                 rating.UpdatedAt = DateTime.Now;
             }
 

@@ -63,6 +63,8 @@
 <dx-popup
   [(visible)]="isAddRatingVisible"
   [(hideOnOutsideClick)]="isAddRatingVisible"
+  (onShown)="onDescriptionFocusOut()"
+  (onHidden)="onPopupHidden()"
   title="Add Your Rating"
   [width]="500"
   [height]="500"
@@ -87,7 +89,7 @@
         </div>
       </div>
 
-      <div *ngIf="requiresImprovement" class="mb-3 row">
+      <div *ngIf="requiresImprovement || improvementDescription" class="mb-3 row">
         <label for="ratingDescription" class="form-label">Tell us how we could have improved ?</label>
         <div>
           <dx-text-area [(value)]="improvementDescription" [maxLength]="200" id="waysToImprove" [height]="90" stylingMode="outlined" placeholder="Tell us how we could have improved"></dx-text-area>
@@ -97,7 +99,7 @@
       <!-- Submit button using DevExtreme Button -->
       <div>
         <div>
-          <dx-button text="Submit Rating" type="success" stylingMode="contained" (onClick)="submitRating()"></dx-button>
+          <dx-button [disabled]="!enableReviewSubmitButton" text="Submit Rating" type="success" stylingMode="contained" (onClick)="submitRating()"></dx-button>
         </div>
       </div>
     </div>
