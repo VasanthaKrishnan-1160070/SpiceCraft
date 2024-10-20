@@ -9,6 +9,12 @@ provider "aws" {
   region = var.aws_region
 }
 
+data "aws_acm_certificate" "spicecraft_cert" {
+  domain = "vidhyamohan.com"
+  most_recent = true
+  statuses    = ["ISSUED"]
+}
+
 # Fetch the Default VPC
 data "aws_vpc" "default" {
   default = true
@@ -335,6 +341,38 @@ resource "aws_lb_listener" "spicecraft_listener" {
     target_group_arn = aws_lb_target_group.spicecraft_target_group.arn
   }
 }
+
+# Create HTTPS Listener (port 443) for the Load Balancer
+resource "aws_lb_listener" "spicecraft_https_listener" {
+  load_balancer_arn = aws_lb.spicecraft_lb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"  
+
+  # or if using the fetched ACM certificate, uncomment the line below and comment the one above
+   certificate_arn   = data.aws_acm_certificate.spicecraft_cert.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.spicecraft_target_group.arn
+  }
+}
+
+# Redirect HTTP to HTTPS
+# resource "aws_lb_listener" "spicecraft_http_listener" {
+#   load_balancer_arn = aws_lb.spicecraft_lb.arn
+#   port              = 80
+#   protocol          = "HTTP"
+
+#   default_action {
+#     type = "redirect"
+#     redirect {
+#       port        = "443"
+#       protocol    = "HTTPS"
+#       status_code = "HTTP_301"
+#     }
+#   }
+# }
 
 # Create a Route 53 Hosted Zone for vidhyamohan.com
 resource "aws_route53_zone" "spicecraft_hosted_zone" {

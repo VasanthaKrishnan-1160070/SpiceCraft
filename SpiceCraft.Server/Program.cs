@@ -120,23 +120,27 @@ else
     app.UseExceptionHandler("/Home/Error");
 }
 
+// Configure static files for 'Items' folder
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Items")),
     RequestPath = "/uploads/items"
 });
 
+// Configure static files for 'Profiles' folder
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Profiles")),
     RequestPath = "/uploads/profiles"
 });
 
+// Configure static files for 'Common' folder (should point to 'Common' instead of 'Profiles')
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Profiles")),
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Common")),
     RequestPath = "/uploads/common"
 });
+
 
 // builder.Services.Configure<FormOptions>(options =>
 // {
